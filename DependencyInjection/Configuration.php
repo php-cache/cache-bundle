@@ -46,6 +46,7 @@ class Configuration implements ConfigurationInterface
 		$rootNode
 			->children()
 				->booleanNode( 'enabled' )
+					->info( "Enabled or disables this service." )
 					->defaultTrue()
 				->end()
 			->end()
@@ -64,7 +65,6 @@ class Configuration implements ConfigurationInterface
 
 		$node
 			->requiresAtLeastOneElement()
-			->useAttributeAsKey( 'name' )
 			->prototype( 'array' )
 			->children()
 				->scalarNode( 'host' )->defaultValue( 'localhost' )->end()

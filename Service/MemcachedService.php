@@ -60,7 +60,10 @@ class MemcachedService extends CacheProvider implements Cache
 
 	/**
 	 * @param      $servers
-	 * @param null $callback
+	 * @param      $options
+	 * @param bool $enabled
+	 *
+	 * @throws \Exception
 	 */
 	public function __construct( $servers, $options, $enabled = true )
 	{
@@ -69,14 +72,12 @@ class MemcachedService extends CacheProvider implements Cache
 		}
 
 		$this->setEnabled( $enabled );
-		
+
 		$persistent_id   = sha1( serialize( $servers ) );
 		$this->memcached = new Memcached( $persistent_id );
 		$this->addServers( $servers );
 
-		foreach( $options as $option ) {
-			$this->memcached->setOption( $option[ 'opt' ], $option[ 'value' ] );
-		}
+		$this->processOptions( $options );
 	}
 
 	/**
@@ -84,14 +85,32 @@ class MemcachedService extends CacheProvider implements Cache
 	 */
 	public function addServers( array $servers )
 	{
-		if( false === $this->isEnabled() ) {
-			return false;
+		if( $this->isEnabled() ) {
+			// Persistent Connections
+			// Only add servers if the server list is empty
+			if ( sizeof( $this->memcached->getServerList() ) === 0 ) {
+				$this->memcached->addServers( $servers );
+			}
 		}
-	
-		// Persistent Connections
-		// Only add servers if the server list is empty
-		if ( sizeof( $this->memcached->getServerList() ) === 0 ) {
-			$this->memcached->addServers( $servers );
+	}
+
+	private function processOptions( array $options )
+	{
+
+		$configs = array(
+			'compression'     => Memcached::OPT_COMPRESSION,     'serializer'           => Memcached::OPT_SERIALIZER,
+			'prefix_key'      => Memcached::OPT_PREFIX_KEY,      'hash'                 => Memcached::OPT_HASH,
+			'distribution'    => Memcached::OPT_DISTRIBUTION,    'libketama_compatible' => Memcached::OPT_LIBKETAMA_COMPATIBLE,
+			'buffer_writes'   => Memcached::OPT_BUFFER_WRITES,   'binary_protocol'      => Memcached::OPT_BINARY_PROTOCOL,
+			'no_block'        => Memcached::OPT_NO_BLOCK,        'tcp_no_delay'         => Memcached::OPT_TCP_NODELAY,
+			'connect_timeout' => Memcached::OPT_CONNECT_TIMEOUT, 'retry_timeout'        => Memcached::OPT_RETRY_TIMEOUT,
+			'send_timeout'    => Memcached::OPT_SEND_TIMEOUT,    'recv_timeout'         => Memcached::OPT_RECV_TIMEOUT,
+			'poll_timeout'    => Memcached::OPT_POLL_TIMEOUT,    'cache_lookups'        => Memcached::OPT_CACHE_LOOKUPS,
+			'server_failure_limit' => Memcached::OPT_SERVER_FAILURE_LIMIT
+		);
+
+		foreach( $options as $name => $value ) {
+			$this->memcached->setOptions( $configs[ $name ], $value );
 		}
 	}
 
@@ -127,12 +146,13 @@ class MemcachedService extends CacheProvider implements Cache
 	}
 
 	/**
-	 * @param mixed|\Closure|callable $payload
+	 * @param \Closure|callable|mixed $payload
 	 *
 	 * @return mixed
 	 */
 	private function getDataFromPayload( $payload )
 	{
+		/** @var $payload \Closure|callable|mixed */
 		if ( is_callable( $payload ) ) {
 			if ( is_object( $payload ) && get_class( $payload ) == 'Closure' ) {
 				return $payload();
