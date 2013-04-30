@@ -10,7 +10,7 @@ Requires the php5-memcached extension (Works with amazons elasticache extension 
 ### To Install
 
 ```sh
-	composer require aequasi/memcached-bundle 1.0
+	composer.phar require aequasi/memcached-bundle 1.0
 ```
 
 Then add parameters (probably in parameters.yml) for your servers, and options
@@ -27,6 +27,10 @@ If you want doctrine to use this as the result and query cache, add this in your
 under your entity manager
 
 ```yml
+doctrine:
+    orm:
+        entity_managers:
+            default:
                 query_cache_driver:
                     type: service
                     id: memcached
@@ -48,7 +52,8 @@ $data = $this->get( 'memcached' )->cache(
 	function( ) use( $em, $color ) {
 		$repo = $em->getRepository( 'AcmeDemoBundle:Fruit' );
 		return $repo->findBy( array( 'color' => $color ) );
-	}, Cache::THIRTY_MINUTE );
+	}, Cache::THIRTY_MINUTE
+);
 ```
 
 This will attempt to grab `somekey`. If it cant find it, it will run the closure, and cache it for 30 minutes, as `somekey`. You can use a closure here, or a callable, or even just a scalable type.
