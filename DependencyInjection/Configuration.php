@@ -21,6 +21,17 @@ use Memcached;
  */
 class Configuration implements ConfigurationInterface
 {
+	private $debug;
+
+	/**
+	 * Constructor
+	 *
+	 * @param Boolean $debug Whether to use the debug mode
+	 */
+	public function  __construct($debug)
+	{
+		$this->debug = (Boolean) $debug;
+	}
 
 	/**
 	 * Generates the configuration tree builder.
@@ -34,6 +45,8 @@ class Configuration implements ConfigurationInterface
 
 		$rootNode->append( $this->getServersNode() );
 		$rootNode->append( $this->getOptionsNode() );
+
+		return $treeBuilder;
 	}
 
 	private function getServersNode( )

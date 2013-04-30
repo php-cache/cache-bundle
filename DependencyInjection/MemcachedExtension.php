@@ -35,15 +35,7 @@ class MemcachedExtension extends Extension
 		);
 		$loader->load( 'services.yml' );
 
-		$configuration = $this->getConfiguration( $configs, $container );
+		$configuration = new Configuration( $container->getParameter( 'kernel.debug' ) );
 		$config        = $this->processConfiguration( $configuration, $configs );
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public function getConfiguration(array $config, ContainerBuilder $container)
-	{
-		return new Configuration( );
 	}
 }
