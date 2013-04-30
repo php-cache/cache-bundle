@@ -92,6 +92,9 @@ class MemcachedService extends CacheProvider implements Cache
 		}
 	}
 
+	/**
+	 * @param array $options
+	 */
 	private function processOptions( array $options )
 	{
 

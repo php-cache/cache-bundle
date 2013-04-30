@@ -21,6 +21,10 @@ use Memcached;
  */
 class Configuration implements ConfigurationInterface
 {
+
+	/**
+	 * @var bool
+	 */
 	private $debug;
 
 	/**
@@ -57,6 +61,9 @@ class Configuration implements ConfigurationInterface
 		return $treeBuilder;
 	}
 
+	/**
+	 * @return \Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition|\Symfony\Component\Config\Definition\Builder\NodeDefinition
+	 */
 	private function getServersNode( )
 	{
 		$treeBuilder = new TreeBuilder();
@@ -75,7 +82,9 @@ class Configuration implements ConfigurationInterface
 		return $node;
 	}
 
-
+	/**
+	 * @return \Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition|\Symfony\Component\Config\Definition\Builder\NodeDefinition
+	 */
 	private function getOptionsNode()
 	{
 		$treeBuilder = new TreeBuilder();

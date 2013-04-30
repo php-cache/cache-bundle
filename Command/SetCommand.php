@@ -20,6 +20,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 class SetCommand extends ContainerAwareCommand
 {
 
+	/**
+	 *
+	 */
 	protected function configure()
 	{
 		$this->setName( 'memcached:set' )
@@ -29,6 +32,12 @@ class SetCommand extends ContainerAwareCommand
 			->addArgument( 'lifeTime', InputArgument::OPTIONAL, 'How long do you want it to be cached? ( 0 for infinite, Default: 60 seconds  )', 60 );
 	}
 
+	/**
+	 * @param InputInterface  $input
+	 * @param OutputInterface $output
+	 *
+	 * @return int|null|void
+	 */
 	protected function execute( InputInterface $input, OutputInterface $output )
 	{
 		$key = $input->getArgument( 'key' );
@@ -40,5 +49,7 @@ class SetCommand extends ContainerAwareCommand
 		$output->writeln( sprintf( '<info>Key: %s', $key ) );
 		$output->writeln( sprintf( '<info>Value: %s', $value ) );
 		$output->writeln( "\n" );
+
+		return;
 	}
 }
