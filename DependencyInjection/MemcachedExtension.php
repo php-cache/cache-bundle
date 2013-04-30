@@ -31,6 +31,7 @@ class MemcachedExtension extends Extension
 		$config        = $this->processConfiguration( $configuration, $configs );
 
 		$this->setParameters( $container, $config );
+		$container->setParameter( 'memcached', $config );
 
 		$loader = new Loader\YamlFileLoader(
 			$container,
