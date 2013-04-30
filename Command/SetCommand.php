@@ -22,7 +22,7 @@ class SetCommand extends ContainerAwareCommand
 
 	protected function configure()
 	{
-		$this->setName( 'memcached:get' )
+		$this->setName( 'memcached:set' )
 			->setDescription( 'Set a key\'s value to memcached' )
 			->addArgument( 'key', InputArgument::REQUIRED, 'What key do you want to set' )
 			->addArgument( 'value', InputArgument::REQUIRED, 'What do you want the value to be' );
