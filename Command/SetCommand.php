@@ -25,15 +25,17 @@ class SetCommand extends ContainerAwareCommand
 		$this->setName( 'memcached:set' )
 			->setDescription( 'Set a key\'s value to memcached' )
 			->addArgument( 'key', InputArgument::REQUIRED, 'What key do you want to set' )
-			->addArgument( 'value', InputArgument::REQUIRED, 'What do you want the value to be' );
+			->addArgument( 'value', InputArgument::REQUIRED, 'What do you want the value to be' )
+			->addArgument( 'lifeTime', InputArgument::OPTIONAL, 'How long do you want it to be cached? ( 0 for infinite, Default: 60 seconds  )', 60 );
 	}
 
 	protected function execute( InputInterface $input, OutputInterface $output )
 	{
 		$key = $input->getArgument( 'key' );
 		$value = $input->getArgument( 'value' );
+		$lifeTime = $input->getArgument( 'lifeTime' );
 
-		$this->getContainer()->get( 'memcached' )->set( $key, $value );
+		$this->getContainer()->get( 'memcached' )->set( $key, $value, $lifeTime );
 
 		$output->writeln( sprintf( '<info>Key: %s', $key ) );
 		$output->writeln( sprintf( '<info>Value: %s', $value ) );
