@@ -110,7 +110,7 @@ class MemcachedService extends CacheProvider implements Cache
 		);
 
 		foreach( $options as $name => $value ) {
-			$this->memcached->setOptions( $configs[ $name ], $value );
+			$this->memcached->setOption( $configs[ $name ], $value );
 		}
 	}
 
