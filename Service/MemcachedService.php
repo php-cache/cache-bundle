@@ -103,8 +103,7 @@ class MemcachedService extends CacheProvider implements Cache
 			'no_block'        => Memcached::OPT_NO_BLOCK,        'tcp_no_delay'         => Memcached::OPT_TCP_NODELAY,
 			'connect_timeout' => Memcached::OPT_CONNECT_TIMEOUT, 'retry_timeout'        => Memcached::OPT_RETRY_TIMEOUT,
 			'send_timeout'    => Memcached::OPT_SEND_TIMEOUT,    'recv_timeout'         => Memcached::OPT_RECV_TIMEOUT,
-			'poll_timeout'    => Memcached::OPT_POLL_TIMEOUT,    'cache_lookups'        => Memcached::OPT_CACHE_LOOKUPS,
-			'server_failure_limit' => Memcached::OPT_SERVER_FAILURE_LIMIT
+			'poll_timeout'    => Memcached::OPT_POLL_TIMEOUT,    'server_failure_limit' => Memcached::OPT_SERVER_FAILURE_LIMIT
 		);
 
 		foreach( $options as $name => $value ) {
