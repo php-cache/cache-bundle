@@ -23,14 +23,18 @@ $bundles(
 );
 ```
 
-Then add parameters (probably in parameters.yml) for your servers, and options
+Then add parameters (probably in config.yml) for your servers, and options
 
 ```yml
-parameters:
-    memcached.servers:
+memcached:
+    servers:
         - { host: localhost, port: 11211 }
-    memcached.options:
-        - { opt: %memcached.const.opt_send_timeout%, value: 3000000 }
+```
+
+There are also options that you can specify above. You can get the list of options by running
+
+```php
+php app/console config:dump memcached
 ```
 
 If you want doctrine to use this as the result and query cache, add this in your orm section
