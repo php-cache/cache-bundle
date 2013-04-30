@@ -65,7 +65,7 @@ class MemcachedService extends CacheProvider implements Cache
 	 */
 	public function __construct( $config )
 	{
-		if( empty( $config[ 'servers '] ) ) {
+		if( empty( $config[ 'servers' ] ) ) {
 			throw new \Exception( "Please configure the memcached extension. Missing Servers. " );
 		}
 
