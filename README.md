@@ -13,6 +13,16 @@ Requires the php5-memcached extension (Works with amazons elasticache extension 
 	composer.phar require aequasi/memcached-bundle 1.0
 ```
 
+Add the bundle to app/AppKernerl.php
+
+```php
+$bundles(
+    ...
+       new Aequasi\Bundle\MemcachedBundle\MemcachedBundle(),
+    ...
+);
+```
+
 Then add parameters (probably in parameters.yml) for your servers, and options
 
 ```yml
@@ -47,7 +57,7 @@ You can use the default memcached functions, doctrine's `useResultCache` and `us
 use Aequasi\Bundle\MemcachedBundle\Service\MemcachedService as Cache;
 
 /** @var $em \Doctrine\ORM\EntityManager */
-$data = $this->get( 'memcached' )->cache( 
+$data = $this->get( 'memcached' )->cache(
 	'somekey',
 	function( ) use( $em, $color ) {
 		$repo = $em->getRepository( 'AcmeDemoBundle:Fruit' );
