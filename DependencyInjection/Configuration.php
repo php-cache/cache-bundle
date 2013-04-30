@@ -49,11 +49,10 @@ class Configuration implements ConfigurationInterface
 					->info( "Enabled or disables this service." )
 					->defaultTrue()
 				->end()
+				->append( $this->getServersNode() )
+				->append( $this->getOptionsNode() )
 			->end()
 		;
-
-		$rootNode->append( $this->getServersNode() );
-		$rootNode->append( $this->getOptionsNode() );
 
 		return $treeBuilder;
 	}
@@ -65,6 +64,8 @@ class Configuration implements ConfigurationInterface
 
 		$node
 			->requiresAtLeastOneElement()
+			->addDefaultChildrenIfNoneSet()
+			->addDefaultsIfNotSet()
 			->prototype( 'array' )
 			->children()
 				->scalarNode( 'host' )->defaultValue( 'localhost' )->end()
@@ -78,6 +79,7 @@ class Configuration implements ConfigurationInterface
 
 	private function getOptionsNode()
 	{
+		echo "Adding options";
 		$treeBuilder = new TreeBuilder();
 		$node = $treeBuilder->root( 'options' );
 
