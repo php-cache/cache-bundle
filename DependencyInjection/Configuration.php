@@ -82,6 +82,7 @@ class Configuration implements ConfigurationInterface
 		$node = $treeBuilder->root( 'options' );
 
 		$node
+			->addDefaultsIfNotSet()
 			->children()
 				->booleanNode( 'compression' )
 					->info( 'Enables or disables payload compression. When enabled, item values longer than a certain threshold (currently 100 bytes) will be compressed during storage and decompressed during retrieval transparently. Default: True' )

@@ -59,25 +59,23 @@ class MemcachedService extends CacheProvider implements Cache
 	protected $memcached;
 
 	/**
-	 * @param      $servers
-	 * @param      $options
-	 * @param bool $enabled
+	 * @param array $config
 	 *
 	 * @throws \Exception
 	 */
-	public function __construct( $servers, $options, $enabled = true )
+	public function __construct( $config )
 	{
-		if( empty( $servers ) ) {
+		if( empty( $config[ 'servers '] ) ) {
 			throw new \Exception( "Please configure the memcached extension. Missing Servers. " );
 		}
 
-		$this->setEnabled( $enabled );
+		$this->setEnabled( $config[ 'enabled' ] );
 
-		$persistent_id   = sha1( serialize( $servers ) );
+		$persistent_id   = sha1( serialize( $config[ 'servers' ] ) );
 		$this->memcached = new Memcached( $persistent_id );
-		$this->addServers( $servers );
+		$this->addServers( $config[ 'servers' ] );
 
-		$this->processOptions( $options );
+		$this->processOptions( $config[ 'options' ] );
 	}
 
 	/**

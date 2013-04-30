@@ -1,4 +1,4 @@
 services:
     memcached:
         class: Aequasi\Bundle\MemcachedBundle\Service\MemcachedService
-        arguments: [ %memcached.servers%, %memcached.options%, %memcached.enabled% ]
+        arguments: [ %memcached% ]
