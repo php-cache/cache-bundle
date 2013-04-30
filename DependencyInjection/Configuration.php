@@ -153,7 +153,6 @@ class Configuration implements ConfigurationInterface
 		$node
 			->requiresAtLeastOneElement()
 			->addDefaultChildrenIfNoneSet()
-			->addDefaultsIfNotSet()
 			->prototype( 'array' )
 				->children()
 					->scalarNode( 'host' )->defaultValue( 'localhost' )->end()
