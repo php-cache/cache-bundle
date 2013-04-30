@@ -74,8 +74,8 @@ class MemcachedService extends CacheProvider implements Cache
 		$this->memcached = new Memcached( $persistent_id );
 		$this->addServers( $servers );
 
-		foreach( $options as $option => $value ) {
-			$this->memcached->setOption( $option, $value );
+		foreach( $options as $option ) {
+			$this->memcached->setOption( $option[ 'opt' ], $option[ 'value' ] );
 		}
 	}
 
