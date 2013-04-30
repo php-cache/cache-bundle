@@ -1,0 +1,29 @@
+{
+	"name":        "aequasi/memcached-bundle",
+	"version":     "1.0.0",
+	"type":        "library",
+	"description": "Memcached Bundle",
+	"keywords":    ["php", "memcached"],
+	"homepage":    "https://github.com/aequasi/memcached-bundle",
+	"license":     "Apache",
+	"authors":     [
+		{
+			"name":     "Aaron Scherer",
+			"email":    "aequasi@gmail.com",
+			"role":     "developer",
+			"homepage": "https://github.com/aequasi"
+		}
+	],
+	"support":     {
+		"email": "aequasi@gmail.com"
+	},
+	"require":     {
+		"php": ">=5.3.0",
+		"symfony/dependency-injection": "2.2.1"
+	},
+	"autoload":    {
+		"psr-0": {
+			"Aequasi": "src/"
+		}
+	}
+}
