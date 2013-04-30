@@ -2,7 +2,7 @@
 /**
  * @author    Aaron Scherer <aequasi@gmail.com>
  * @date 2013
- * @license http://www.apache.org/licenses/LICENSE-2.0.html Apache License, Version 2.0
+ * @license   http://www.apache.org/licenses/LICENSE-2.0.html Apache License, Version 2.0
  */
 namespace Aequasi\Bundle\MemcachedBundle\DependencyInjection;
 
@@ -24,15 +24,26 @@ class MemcachedExtension extends Extension
 	/**
 	 * Loads the configs for Memcached and puts data into the container
 	 *
-	 * @param array 	   $configs Array of configs
+	 * @param array            $configs   Array of configs
 	 * @param ContainerBuilder $container Container Object
 	 */
 	public function load( array $configs, ContainerBuilder $container )
 	{
-		$loader = new Loader\YamlFileLoader( 
+		$loader = new Loader\YamlFileLoader(
 			$container,
 			new FileLocator( __DIR__ . '/../Resources/config' )
 		);
 		$loader->load( 'services.yml' );
+
+		$configuration = $this->getConfiguration( $configs, $container );
+		$config        = $this->processConfiguration( $configuration, $configs );
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function getConfiguration(array $config, ContainerBuilder $container)
+	{
+		return new Configuration( );
 	}
 }
