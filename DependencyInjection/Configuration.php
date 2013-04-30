@@ -43,6 +43,14 @@ class Configuration implements ConfigurationInterface
 		$treeBuilder = new TreeBuilder();
 		$rootNode = $treeBuilder->root( 'memcached' );
 
+		$rootNode
+			->children()
+				->booleanNode( 'enabled' )
+					->defaultTrue()
+				->end()
+			->end()
+		;
+
 		$rootNode->append( $this->getServersNode() );
 		$rootNode->append( $this->getOptionsNode() );
 

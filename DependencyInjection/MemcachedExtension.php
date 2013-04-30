@@ -37,5 +37,20 @@ class MemcachedExtension extends Extension
 
 		$configuration = new Configuration( $container->getParameter( 'kernel.debug' ) );
 		$config        = $this->processConfiguration( $configuration, $configs );
+
+		$this->setParameters( $container, $config );
+	}
+
+	private function setParameters( ContainerBuilder $container, array $configs )
+	{
+		foreach( $configs as $key => $value )
+		{
+			if( is_array( $value ) ) {
+				$this->setParameters( $container, $configs[ $key ], ltrim( 'memcached.' . $key, '.' ) );
+				$container->setParameter(  ltrim( 'memcached.' . $key, '.' ), $value );
+			} else {
+				$container->setParameter( ltrim( 'memcached.' . $key, '.' ), $value );
+			}
+		}
 	}
 }
