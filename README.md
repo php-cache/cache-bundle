@@ -1,4 +1,4 @@
-memcached-bundle
+memcached-bundle [![Build Status](https://travis-ci.org/aequasi/memcached-bundle.png?branch=master)](https://travis-ci.org/aequasi/memcached-bundle)
 ================
 
 ### Memcached Bundle for Symfony 2
