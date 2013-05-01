@@ -2,12 +2,13 @@
 /**
  * @author    Aaron Scherer <aequasi@gmail.com>
  * @date 2013
- * @license http://www.apache.org/licenses/LICENSE-2.0.html Apache License, Version 2.0
+ * @license   http://www.apache.org/licenses/LICENSE-2.0.html Apache License, Version 2.0
  */
 namespace Aequasi\Bundle\MemcachedBundle\Service;
 
 use Doctrine\Common\Cache\Cache;
 use Doctrine\Common\Cache\CacheProvider;
+use Doctrine\DBAL\Connection;
 use Memcached;
 
 /**
@@ -59,13 +60,23 @@ class MemcachedService extends CacheProvider implements Cache
 	protected $memcached;
 
 	/**
+	 * @var bool
+	 */
+	protected $keyMap = false;
+
+	/**
+	 * @var Connection
+	 */
+	protected $keyMapConnection = null;
+
+	/**
 	 * @param array $config
 	 *
 	 * @throws \Exception
 	 */
 	public function __construct( $config )
 	{
-		if( empty( $config[ 'servers' ] ) ) {
+		if ( empty( $config[ 'servers' ] ) ) {
 			throw new \Exception( "Please configure the memcached extension. Missing Servers. " );
 		}
 
@@ -83,34 +94,12 @@ class MemcachedService extends CacheProvider implements Cache
 	 */
 	public function addServers( array $servers )
 	{
-		if( $this->isEnabled() ) {
+		if ( $this->isEnabled() ) {
 			// Persistent Connections
 			// Only add servers if the server list is empty
 			if ( sizeof( $this->memcached->getServerList() ) === 0 ) {
 				$this->memcached->addServers( $servers );
 			}
-		}
-	}
-
-	/**
-	 * @param array $options
-	 */
-	private function processOptions( array $options )
-	{
-
-		$configs = array(
-			'compression'     => Memcached::OPT_COMPRESSION,     'serializer'           => Memcached::OPT_SERIALIZER,
-			'prefix_key'      => Memcached::OPT_PREFIX_KEY,      'hash'                 => Memcached::OPT_HASH,
-			'distribution'    => Memcached::OPT_DISTRIBUTION,    'libketama_compatible' => Memcached::OPT_LIBKETAMA_COMPATIBLE,
-			'buffer_writes'   => Memcached::OPT_BUFFER_WRITES,   'binary_protocol'      => Memcached::OPT_BINARY_PROTOCOL,
-			'no_block'        => Memcached::OPT_NO_BLOCK,        'tcp_no_delay'         => Memcached::OPT_TCP_NODELAY,
-			'connect_timeout' => Memcached::OPT_CONNECT_TIMEOUT, 'retry_timeout'        => Memcached::OPT_RETRY_TIMEOUT,
-			'send_timeout'    => Memcached::OPT_SEND_TIMEOUT,    'recv_timeout'         => Memcached::OPT_RECV_TIMEOUT,
-			'poll_timeout'    => Memcached::OPT_POLL_TIMEOUT,    'server_failure_limit' => Memcached::OPT_SERVER_FAILURE_LIMIT
-		);
-
-		foreach( $options as $name => $value ) {
-			$this->memcached->setOption( $configs[ $name ], $value );
 		}
 	}
 
@@ -146,20 +135,118 @@ class MemcachedService extends CacheProvider implements Cache
 	}
 
 	/**
-	 * @param \Closure|callable|mixed $payload
+	 * Puts data into the cache.
+	 *
+	 * @param string   $id       The cache id.
+	 * @param string   $data     The cache entry/data.
+	 * @param bool|int $lifeTime The lifetime. If != false, sets a specific lifetime for this
+	 *                           cache entry (null => infinite lifeTime).
+	 *
+	 * @return boolean TRUE if the entry was successfully stored in the cache, FALSE otherwise.
+	 */
+	public function add( $id, $data, $lifeTime )
+	{
+		$this->addToKeyMap( $id, $data, $lifeTime );
+
+		if ( $lifeTime > 30 * 24 * 3600 ) {
+			$lifeTime = time() + $lifeTime;
+		}
+
+		return $this->memcached->add( $id, $data, $lifeTime );
+	}
+
+	/**
+	 * Adds the given key to the key map
+	 *
+	 * @param $id
+	 * @param $data
+	 * @param $lifeTime
+	 *
+	 * @return bool|int
+	 */
+	private function addToKeyMap( $id, $data, $lifeTime )
+	{
+		if ( !$this->isKeyMapEnabled() ) {
+			return false;
+		}
+
+		$data = array(
+			'cache_key'         => $id,
+			'memory_size'        => $this->getPayloadSize( $data ),
+			'lifeTime'    => $lifeTime,
+			'expiration'  => date( 'Y-m-d H:i:s', strtotime( "now +{$lifeTime} seconds" ) ),
+			'insert_date' => date( 'Y-m-d H:i:s' )
+		);
+
+		return $this->getKeyMapConnection()->insert( 'memcached_key_map', $data );
+	}
+
+	private function deleteFromKeyMap( $id )
+	{
+		if ( !$this->isKeyMapEnabled() ) {
+			return false;
+		}
+
+		return $this->getKeyMapConnection()->delete( 'memcached_key_map', array( 'cache_key' => $id ) );
+	}
+
+	/**
+	 * Gets whether or not mapping keys is enabled
+	 *
+	 * @return boolean
+	 */
+	public function isKeyMapEnabled()
+	{
+		return $this->keyMap;
+	}
+
+	/**
+	 * Gets the memory size of the given variable
+	 *
+	 * @param $data
+	 *
+	 * @return int
+	 */
+	private function getPayloadSize( $data )
+	{
+		$start_memory = memory_get_usage();
+		$data         = unserialize( serialize( $data ) );
+
+		return memory_get_usage() - $start_memory - PHP_INT_SIZE * 8;
+	}
+
+	/**
+	 * Gets the Key Mapping Doctrine Connection
+	 *
+	 * @return Connection|null
+	 */
+	public function getKeyMapConnection()
+	{
+		return $this->keyMapConnection;
+	}
+
+	/**
+	 * Sets the Key Mapping Doctrine Connection
+	 *
+	 * @param Connection $keyMapConnection
+	 *
+	 * @return $this
+	 */
+	public function setKeyMapConnection( Connection $keyMapConnection )
+	{
+		$this->keyMapConnection = $keyMapConnection;
+
+		return $this;
+	}
+
+	/**
+	 * @param $id
 	 *
 	 * @return mixed
 	 */
-	private function getDataFromPayload( $payload )
+	public function get( $id )
 	{
-		/** @var $payload \Closure|callable|mixed */
-		if ( is_callable( $payload ) ) {
-			if ( is_object( $payload ) && get_class( $payload ) == 'Closure' ) {
-				return $payload();
-			}
-			return call_user_func( $payload );
-		}
-		return $payload;
+		return $this->memcached->get( $id );
 	}
 
 	/**
@@ -169,9 +256,15 @@ class MemcachedService extends CacheProvider implements Cache
 	 *
 	 * @return bool
 	 */
-	public function add( $id, $data, $lifeTime )
+	public function set( $id, $data, $lifeTime )
 	{
-		return $this->memcached->add( $id, $data, $lifeTime );
+		$this->addToKeyMap( $id, $data, $lifeTime );
+
+		if ( $lifeTime > 30 * 24 * 3600 ) {
+			$lifeTime = time() + $lifeTime;
+		}
+
+		return $this->memcached->set( $id, $data, $lifeTime );
 	}
 
 	/**
@@ -207,6 +300,49 @@ class MemcachedService extends CacheProvider implements Cache
 	}
 
 	/**
+	 * Sets whether or not we are mapping keys
+	 *
+	 * @param bool $keyMap
+	 *
+	 * @return $this
+	 */
+	public function setKeyMapEnabled( $keyMap )
+	{
+		$this->keyMap = $keyMap;
+
+		return $this;
+	}
+
+	/**
+	 * Puts data into the cache.
+	 *
+	 * @param string   $id       The cache id.
+	 * @param string   $data     The cache entry/data.
+	 * @param bool|int $lifeTime The lifetime. If != false, sets a specific lifetime for this
+	 *                           cache entry (null => infinite lifeTime).
+	 *
+	 * @return boolean TRUE if the entry was successfully stored in the cache, FALSE otherwise.
+	 */
+	protected function doSave( $id, $data, $lifeTime = false )
+	{
+		return $this->set( $id, $data, (int)$lifeTime );
+	}
+
+	/**
+	 * Deletes a cache entry.
+	 *
+	 * @param string $id cache id
+	 *
+	 * @return boolean TRUE if the cache entry was successfully deleted, FALSE otherwise.
+	 */
+	protected function doDelete( $id )
+	{
+		$this->deleteFromKeyMap( $id );
+
+		return $this->memcached->delete( $id );
+	}
+
+	/**
 	 * Fetches an entry from the cache.
 	 *
 	 * @param string $id cache id The id of the cache entry to fetch.
@@ -228,59 +364,6 @@ class MemcachedService extends CacheProvider implements Cache
 	protected function doContains( $id )
 	{
 		return ( false !== $this->get( $id ) );
-	}
-
-	/**
-	 * @param $id
-	 *
-	 * @return mixed
-	 */
-	public function get( $id )
-	{
-		return $this->memcached->get( $id );
-	}
-
-	/**
-	 * Puts data into the cache.
-	 *
-	 * @param string   $id       The cache id.
-	 * @param string   $data     The cache entry/data.
-	 * @param bool|int $lifeTime The lifetime. If != false, sets a specific lifetime for this
-	 *                           cache entry (null => infinite lifeTime).
-	 *
-	 * @return boolean TRUE if the entry was successfully stored in the cache, FALSE otherwise.
-	 */
-	protected function doSave( $id, $data, $lifeTime = false )
-	{
-		if ( $lifeTime > 30 * 24 * 3600 ) {
-			$lifeTime = time() + $lifeTime;
-		}
-
-		return $this->set( $id, $data, (int)$lifeTime );
-	}
-
-	/**
-	 * @param $id
-	 * @param $data
-	 * @param $lifeTime
-	 *
-	 * @return bool
-	 */
-	public function set( $id, $data, $lifeTime )
-	{
-		return $this->memcached->set( $id, $data, $lifeTime );
-	}
-
-	/**
-	 * Deletes a cache entry.
-	 *
-	 * @param string $id cache id
-	 *
-	 * @return boolean TRUE if the cache entry was successfully deleted, FALSE otherwise.
-	 */
-	protected function doDelete( $id )
-	{
-		return $this->memcached->delete( $id );
 	}
 
 	/**
@@ -313,6 +396,55 @@ class MemcachedService extends CacheProvider implements Cache
 			Cache::STATS_MEMORY_USAGE      => $stats[ 'bytes' ],
 			Cache::STATS_MEMORY_AVAILIABLE => $stats[ 'limit_maxbytes' ],
 		);
+	}
+
+	/**
+	 * @param array $options
+	 */
+	private function processOptions( array $options )
+	{
+
+		$configs = array(
+			'compression'          => Memcached::OPT_COMPRESSION,
+			'serializer'           => Memcached::OPT_SERIALIZER,
+			'prefix_key'           => Memcached::OPT_PREFIX_KEY,
+			'hash'                 => Memcached::OPT_HASH,
+			'distribution'         => Memcached::OPT_DISTRIBUTION,
+			'libketama_compatible' => Memcached::OPT_LIBKETAMA_COMPATIBLE,
+			'buffer_writes'        => Memcached::OPT_BUFFER_WRITES,
+			'binary_protocol'      => Memcached::OPT_BINARY_PROTOCOL,
+			'no_block'             => Memcached::OPT_NO_BLOCK,
+			'tcp_no_delay'         => Memcached::OPT_TCP_NODELAY,
+			'connect_timeout'      => Memcached::OPT_CONNECT_TIMEOUT,
+			'retry_timeout'        => Memcached::OPT_RETRY_TIMEOUT,
+			'send_timeout'         => Memcached::OPT_SEND_TIMEOUT,
+			'recv_timeout'         => Memcached::OPT_RECV_TIMEOUT,
+			'poll_timeout'         => Memcached::OPT_POLL_TIMEOUT,
+			'server_failure_limit' => Memcached::OPT_SERVER_FAILURE_LIMIT
+		);
+
+		foreach ( $options as $name => $value ) {
+			$this->memcached->setOption( $configs[ $name ], $value );
+		}
+	}
+
+	/**
+	 * @param \Closure|callable|mixed $payload
+	 *
+	 * @return mixed
+	 */
+	private function getDataFromPayload( $payload )
+	{
+		/** @var $payload \Closure|callable|mixed */
+		if ( is_callable( $payload ) ) {
+			if ( is_object( $payload ) && get_class( $payload ) == 'Closure' ) {
+				return $payload();
+			}
+
+			return call_user_func( $payload );
+		}
+
+		return $payload;
 	}
 }
 
