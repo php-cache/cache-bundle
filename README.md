@@ -82,6 +82,8 @@ and
 php app/console memcached:set key value lifetime=60
 
 ```
+### Need Help?
 
+Create an issue if you've found a bug,
 
-
+or email me at aequasi@gmail.com
