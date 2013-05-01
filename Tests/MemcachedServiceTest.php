@@ -29,7 +29,7 @@ class MemcachedServiceTest extends TestCase
 		sleep( 2 );
 		$this->assertFalse( $memcached->get( 'test' ) );
 
-		$this->assertTrue( $memcached->set( 'test', 'testValue', 5 ) );
+		$this->assertTrue( $memcached->set( 'test', 'testValue', 0 ) );
 		$this->assertEquals( $memcached->get( 'test' ), 'testValue' );
 
 		$this->assertTrue( $memcached->delete( 'test' ) );

@@ -73,6 +73,7 @@ $data = $this->get( 'memcached' )->cache(
 This will attempt to grab `somekey`. If it cant find it, it will run the closure, and cache it for 30 minutes, as `somekey`. You can use a closure here, or a callable, or even just a scalable type.
 
 There are also two commands (might add more later), for getting and setting items in cache.
+
 ```sh
 
 php app/console memcached:get key
