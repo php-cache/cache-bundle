@@ -118,7 +118,7 @@ class MemcachedService extends CacheProvider implements Cache
 
 			// Create the table if it doesn't exist
 			$sql = <<<SQL
-CREATE IF NOT EXISTS TABLE `memcache_key_map` (
+CREATE TABLE IF NOT EXISTS `memcached_key_map` (
   `id` BIGINT(32) UNSIGNED NOT NULL AUTO_INCREMENT,
   `cache_key` VARCHAR(255) NOT NULL,
   `memory_size` BIGINT(32) UNSIGNED,
