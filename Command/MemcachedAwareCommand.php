@@ -19,7 +19,7 @@ use Aequasi\Bundle\MemcachedBundle\Service\MemcachedService;
  *
  * Grabs the given key out of cache
  */
-class MemcachedAwareCommand extends ContainerAwareCommand
+abstract class MemcachedAwareCommand extends ContainerAwareCommand
 {
 
 	/**
