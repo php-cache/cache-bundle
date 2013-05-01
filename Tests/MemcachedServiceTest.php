@@ -24,13 +24,13 @@ class MemcachedServiceTest extends TestCase
 		/** @var \Aequasi\Bundle\MemcachedBundle\Service\MemcachedService $memcached */
 		$memcached = $container->get( 'memcached' );
 
-		$this->assertFalse( $memcached->get( 'test' ) );
-		$this->assertTrue( $memcached->set( 'test', 'testValue', 1 ) );
+		$this->assertFalse( $memcached->fetch( 'test' ) );
+		$this->assertTrue( $memcached->save( 'test', 'testValue', 1 ) );
 		sleep( 2 );
-		$this->assertFalse( $memcached->get( 'test' ) );
+		$this->assertFalse( $memcached->fetch( 'test' ) );
 
-		$this->assertTrue( $memcached->set( 'test', 'testValue', 0 ) );
-		$this->assertEquals( $memcached->get( 'test' ), 'testValue' );
+		$this->assertTrue( $memcached->save( 'test', 'testValue', 0 ) );
+		$this->assertEquals( $memcached->fetch( 'test' ), 'testValue' );
 
 		$this->assertTrue( $memcached->delete( 'test' ) );
 		$this->assertTrue( $memcached->deleteAll() );
