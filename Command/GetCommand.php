@@ -6,7 +6,6 @@
  */
 namespace Aequasi\Bundle\MemcachedBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -17,7 +16,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * Grabs the given key out of cache
  */
-class GetCommand extends ContainerAwareCommand
+class GetCommand extends MemcachedAwareCommand
 {
 
 	protected function configure()
@@ -30,15 +29,13 @@ class GetCommand extends ContainerAwareCommand
 	protected function execute( InputInterface $input, OutputInterface $output )
 	{
 		$key = $input->getArgument( 'key' );
-		$value = $this->getValueFromKey( $key );
+		$value = $this->getMemcached()->get( $key );
 
-		$output->writeln( sprintf( '<info>Key: %s', $key ) );
-		$output->writeln( sprintf( '<info>Value: %s', $value ) );
+		$output->writeln( sprintf( '<info>Key: %s</info>', $key ) );
+		$output->writeln( sprintf( '<info>Value: %s</info>', $value ) );
+		if( $this->getMemcached()->hasError() ) {
+			$output->writeln( sprintf( '<error>%s</error>', $this->getMemcached()->getError() ) );
+		}
 		$output->writeln( "\n" );
-	}
-
-	protected function getValueFromKey( $key )
-	{
-		return $this->getContainer()->get( 'memcached' )->get( $key );
 	}
 }

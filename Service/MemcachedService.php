@@ -498,5 +498,15 @@ SQL;
 
 		return $payload;
 	}
+
+	public function hasError()
+	{
+		return $this->memcached->getResultCode() !== Memcached::RES_SUCCESS;
+	}
+
+	public function getError()
+	{
+		return $this->memcached->getResultMessage();
+	}
 }
 
