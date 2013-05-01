@@ -30,9 +30,8 @@ class DeleteCommand extends MemcachedAwareCommand
 	protected function execute( InputInterface $input, OutputInterface $output )
 	{
 		$key = $input->getArgument( 'key' );
-		$this->getContainer()->get( 'memcached' )->delete( $key );
+		$this->getMemcached()->delete( $key );
 
-		$output->writeln( sprintf( '<info>Key: %s</info>', $key ) );
 		$output->writeln( sprintf( '<info>Key: %s</info>', $key ) );
 		if( $this->getMemcached()->hasError() ) {
 			$output->writeln( sprintf( '<error>%s</error>', $this->getMemcached()->getError() ) );

@@ -184,7 +184,7 @@ SQL;
 				return $result;
 			}
 			$result = $this->getDataFromPayload( $payload );
-			$this->add( $key, $result, $time );
+			$this->save( $key, $result, $time );
 		} else {
 			$result = $this->getDataFromPayload( $payload );
 		}
@@ -198,27 +198,6 @@ SQL;
 	public function isEnabled()
 	{
 		return $this->enabled;
-	}
-
-	/**
-	 * Puts data into the cache.
-	 *
-	 * @param string   $id       The cache id.
-	 * @param string   $data     The cache entry/data.
-	 * @param bool|int $lifeTime The lifetime. If != false, sets a specific lifetime for this
-	 *                           cache entry (null => infinite lifeTime).
-	 *
-	 * @return boolean TRUE if the entry was successfully stored in the cache, FALSE otherwise.
-	 */
-	public function add( $id, $data, $lifeTime )
-	{
-		$this->addToKeyMap( $id, $data, $lifeTime );
-
-		if ( $lifeTime > 30 * 24 * 3600 ) {
-			$lifeTime = time() + $lifeTime;
-		}
-
-		return $this->memcached->add( $id, $data, $lifeTime );
 	}
 
 	/**
@@ -297,34 +276,6 @@ SQL;
 	}
 
 	/**
-	 * @param $id
-	 *
-	 * @return mixed
-	 */
-	public function get( $id )
-	{
-		return $this->memcached->get( $id );
-	}
-
-	/**
-	 * @param $id
-	 * @param $data
-	 * @param $lifeTime
-	 *
-	 * @return bool
-	 */
-	public function set( $id, $data, $lifeTime )
-	{
-		$this->addToKeyMap( $id, $data, $lifeTime );
-
-		if ( $lifeTime > 30 * 24 * 3600 ) {
-			$lifeTime = time() + $lifeTime;
-		}
-
-		return $this->memcached->set( $id, $data, $lifeTime );
-	}
-
-	/**
 	 * @param bool $enabled
 	 *
 	 * @return $this
@@ -356,6 +307,15 @@ SQL;
 		$this->memcached = $memcached;
 	}
 
+	private function deleteFromKeyMap( $id )
+	{
+		if ( !$this->isKeyMapEnabled() ) {
+			return false;
+		}
+
+		return $this->getKeyMapConnection()->delete( 'memcached_key_map', array( 'cache_key' => $id ) );
+	}
+
 	/**
 	 * Puts data into the cache.
 	 *
@@ -366,9 +326,15 @@ SQL;
 	 *
 	 * @return boolean TRUE if the entry was successfully stored in the cache, FALSE otherwise.
 	 */
-	protected function doSave( $id, $data, $lifeTime = false )
+	public function doSave( $id, $data, $lifeTime = false )
 	{
-		return $this->set( $id, $data, (int)$lifeTime );
+		$this->addToKeyMap( $id, $data, $lifeTime );
+
+		if ( $lifeTime > 30 * 24 * 3600 ) {
+			$lifeTime = time() + $lifeTime;
+		}
+
+		return $this->memcached->set( $id, $data, $lifeTime );
 	}
 
 	/**
@@ -385,15 +351,6 @@ SQL;
 		return $this->memcached->delete( $id );
 	}
 
-	private function deleteFromKeyMap( $id )
-	{
-		if ( !$this->isKeyMapEnabled() ) {
-			return false;
-		}
-
-		return $this->getKeyMapConnection()->delete( 'memcached_key_map', array( 'cache_key' => $id ) );
-	}
-
 	/**
 	 * Fetches an entry from the cache.
 	 *
@@ -403,7 +360,7 @@ SQL;
 	 */
 	protected function doFetch( $id )
 	{
-		return $this->get( $id );
+		return $this->memcached->get( $id );
 	}
 
 	/**
@@ -415,7 +372,7 @@ SQL;
 	 */
 	protected function doContains( $id )
 	{
-		return ( false !== $this->get( $id ) );
+		return ( false !== $this->memcached->get( $id ) );
 	}
 
 	/**

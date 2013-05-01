@@ -29,7 +29,7 @@ class GetCommand extends MemcachedAwareCommand
 	protected function execute( InputInterface $input, OutputInterface $output )
 	{
 		$key = $input->getArgument( 'key' );
-		$value = $this->getMemcached()->get( $key );
+		$value = $this->getMemcached()->fetch( $key );
 
 		$output->writeln( sprintf( '<info>Key: %s</info>', $key ) );
 		$output->writeln( sprintf( '<info>Value: %s</info>', $value ) );
