@@ -76,7 +76,7 @@ class MemcachedService extends CacheProvider implements Cache
 	 *
 	 * @throws \Exception
 	 */
-	public function __construct( $config, Registry $doctrine )
+	public function __construct( $config, Registry $doctrine = null )
 	{
 		if ( empty( $config[ 'servers' ] ) ) {
 			throw new \Exception( "Please configure the memcached extension. Missing Servers. " );
@@ -90,7 +90,9 @@ class MemcachedService extends CacheProvider implements Cache
 
 		$this->processOptions( $config[ 'options' ] );
 
-		$this->setupKeyMapping( $config[ 'keyMap' ], $doctrine );
+		if( null !== $doctrine ) {
+			$this->setupKeyMapping( $config[ 'keyMap' ], $doctrine );
+		}
 	}
 
 	/**
