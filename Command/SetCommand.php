@@ -43,7 +43,7 @@ class SetCommand extends MemcachedAwareCommand
 		$value = $input->getArgument( 'value' );
 		$lifeTime = $input->getArgument( 'lifeTime' );
 
-		$this->getMemcached()->set( $key, $value, $lifeTime );
+		$this->getMemcached()->save( $key, $value, $lifeTime );
 
 		$output->writeln( sprintf( '<info>Key: %s</info>', $key ) );
 		$output->writeln( sprintf( '<info>Value: %s</info>', $value ) );
