@@ -8,6 +8,7 @@ matrix:
   allow_failures:
     - php: 5.5
 
-before_script: echo "extension = memcached.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
-before_script: composer self-update
-before_script: composer install --dev --prefer-source
+before_script:
+    - echo "extension = memcached.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+    - composer self-update
+    - composer install --dev --prefer-source
