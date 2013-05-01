@@ -66,21 +66,17 @@ class MemcachedService extends CacheProvider implements Cache
 	protected $keyMap = false;
 
 	/**
-	 * @var Registry
+	 * @var Connection
 	 */
-	protected $doctrine;
+	protected $keyMapConnection = null;
 
 	/**
-	 * @var string
-	 */
-	protected $keyMapConnectionName = null;
-
-	/**
-	 * @param array $config
+	 * @param array    $config
+	 * @param Registry $doctrine
 	 *
 	 * @throws \Exception
 	 */
-	public function __construct( $config )
+	public function __construct( $config, Registry $doctrine )
 	{
 		if ( empty( $config[ 'servers' ] ) ) {
 			throw new \Exception( "Please configure the memcached extension. Missing Servers. " );
@@ -93,6 +89,68 @@ class MemcachedService extends CacheProvider implements Cache
 		$this->addServers( $config[ 'servers' ] );
 
 		$this->processOptions( $config[ 'options' ] );
+
+		$this->setupKeyMapping( $config[ 'keyMap' ], $doctrine );
+	}
+
+	/**
+	 * Sets up Key Mapping, if enabled
+	 *
+	 * Creates the necessary tables, if they arent there, and updates the service
+	 *
+	 * @param array            $configs
+	 * @param Registry         $doctrine
+	 *
+	 * @throws \Exception
+	 */
+	private function setupKeyMapping( array $configs, Registry $doctrine )
+	{
+		if ( $configs[ 'enabled' ] ) {
+
+			// Make sure the connection isn't empty
+			if ( $configs[ 'connection' ] === '' ) {
+				throw new \Exception( "Please specify a `connection` for the keyMap setting under memcached. " );
+			}
+
+			// Grab the connection from doctrine
+			/** @var \Doctrine\DBAL\Connection $connection */
+			$connection = $doctrine->getConnection( $configs[ 'connection' ] );
+
+			// Create the table if it doesn't exist
+			$sql = <<<SQL
+CREATE IF NOT EXISTS TABLE `memcache_key_map` (
+  `id` BIGINT(32) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `cache_key` VARCHAR(255) NOT NULL,
+  `memory_size` BIGINT(32) UNSIGNED,
+  `lifeTime` INT(11) UNSIGNED NOT NULL,
+  `expiration` DATETIME NOT NULL,
+  `insert_date` DATETIME NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX (`cache_key`),
+  INDEX (`expiration`),
+  INDEX (`insert_date`)
+) ENGINE=INNODB;
+SQL;
+			$connection->executeQuery( $sql );
+
+			// Fetch the memcached service, set key mapping to enabled, and set the connection
+			$this->setKeyMapEnabled( true )
+				->setKeyMapConnection( $connection );
+		}
+	}
+
+	/**
+	 * Sets whether or not we are mapping keys
+	 *
+	 * @param bool $keyMap
+	 *
+	 * @return $this
+	 */
+	public function setKeyMapEnabled( $keyMap )
+	{
+		$this->keyMap = $keyMap;
+
+		return $this;
 	}
 
 	/**
@@ -177,16 +235,14 @@ class MemcachedService extends CacheProvider implements Cache
 		}
 
 		$data = array(
-			'cache_key'         => $id,
-			'memory_size'        => $this->getPayloadSize( $data ),
+			'cache_key'   => $id,
+			'memory_size' => $this->getPayloadSize( $data ),
 			'lifeTime'    => $lifeTime,
 			'expiration'  => date( 'Y-m-d H:i:s', strtotime( "now +{$lifeTime} seconds" ) ),
 			'insert_date' => date( 'Y-m-d H:i:s' )
 		);
 
-		return $this->getDoctrine()
-			->getConnection( $this->getKeyMapConnectionName() )
-			->insert( 'memcached_key_map', $data );
+		return $this->getKeyMapConnection()->insert( 'memcached_key_map', $data );
 	}
 
 	/**
@@ -215,43 +271,27 @@ class MemcachedService extends CacheProvider implements Cache
 	}
 
 	/**
-	 * @param Registry $doctrine
+	 * Gets the Key Mapping Doctrine Connection
+	 *
+	 * @return Connection|null
+	 */
+	public function getKeyMapConnection()
+	{
+		return $this->keyMapConnection;
+	}
+
+	/**
+	 * Sets the Key Mapping Doctrine Connection
+	 *
+	 * @param Connection $keyMapConnection
 	 *
 	 * @return $this
 	 */
-	public function setDoctrine( Registry $doctrine )
+	public function setKeyMapConnection( Connection $keyMapConnection )
 	{
-		$this->doctrine = $doctrine;
+		$this->keyMapConnection = $keyMapConnection;
 
 		return $this;
-	}
-
-	/**
-	 * @return Registry
-	 */
-	public function getDoctrine()
-	{
-		return $this->doctrine;
-	}
-
-	/**
-	 * @param string $keyMapConnectionName
-	 *
-	 * @return $this
-	 */
-	public function setKeyMapConnectionName( $keyMapConnectionName )
-	{
-		$this->keyMapConnectionName = $keyMapConnectionName;
-
-		return $this;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getKeyMapConnectionName()
-	{
-		return $this->keyMapConnectionName;
 	}
 
 	/**
@@ -315,20 +355,6 @@ class MemcachedService extends CacheProvider implements Cache
 	}
 
 	/**
-	 * Sets whether or not we are mapping keys
-	 *
-	 * @param bool $keyMap
-	 *
-	 * @return $this
-	 */
-	public function setKeyMapEnabled( $keyMap )
-	{
-		$this->keyMap = $keyMap;
-
-		return $this;
-	}
-
-	/**
 	 * Puts data into the cache.
 	 *
 	 * @param string   $id       The cache id.
@@ -363,9 +389,7 @@ class MemcachedService extends CacheProvider implements Cache
 			return false;
 		}
 
-		return $this->getDoctrine()
-			->getConnection( $this->getKeyMapConnectionName() )
-			->delete( 'memcached_key_map', array( 'cache_key' => $id ) );
+		return $this->getKeyMapConnection()->delete( 'memcached_key_map', array( 'cache_key' => $id ) );
 	}
 
 	/**
