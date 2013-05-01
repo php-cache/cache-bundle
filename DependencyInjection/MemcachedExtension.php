@@ -38,6 +38,8 @@ class MemcachedExtension extends Extension
 			new FileLocator( __DIR__ . '/../Resources/config' )
 		);
 		$loader->load( 'services.yml' );
+
+		$this->setupKeyMapping( $config[ 'keyMap' ], $container );
 	}
 
 	/**
@@ -64,6 +66,54 @@ class MemcachedExtension extends Extension
 			} else {
 				$container->setParameter( ltrim( 'memcached.' . $key, '.' ), $value );
 			}
+		}
+	}
+
+	/**
+	 * Sets up Key Mapping, if enabled
+	 *
+	 * Creates the necessary tables, if they arent there, and updates the service
+	 *
+	 * @param array            $configs
+	 * @param ContainerBuilder $container
+	 *
+	 * @throws \Exception
+	 */
+	private function setupKeyMapping( array $configs, ContainerBuilder $container )
+	{
+		if( $configs[ 'enabled' ] ) {
+
+			// Make sure the connection isn't empty
+			if( $configs[ 'connection' ] === '' ) {
+				throw new \Exception( "Please specify a `connection` for the keyMap setting under memcached. " );
+			}
+
+			// Grab the connection. Will throw a service not found if there isnt a connection with that name
+			/** @var \Doctrine\DBAL\Connection $connection */
+			$connection = $container->get( sprintf( 'doctrine.dbal.%s_connection', $configs[ 'connection' ] ) );
+
+			// Create the table if it doesn't exist
+			$sql = <<<SQL
+CREATE IF NOT EXISTS TABLE `memcache_key_map` (
+  `id` BIGINT(32) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `cache_key` VARCHAR(255) NOT NULL,
+  `memory_size` BIGINT(32) UNSIGNED,
+  `lifeTime` INT(11) UNSIGNED NOT NULL,
+  `expiration` DATETIME NOT NULL,
+  `insert_date` DATETIME NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX (`cache_key`),
+  INDEX (`expiration`),
+  INDEX (`insert_date`)
+) ENGINE=INNODB;
+SQL;
+			$connection->executeQuery( $sql );
+
+
+			// Fetch the memcached service, set key mapping to enabled, and set the connection
+			$this->get( 'memcached' )
+				->setKeyMapEnabled( true )
+				->setKeyMapConnection( $connection );
 		}
 	}
 }
