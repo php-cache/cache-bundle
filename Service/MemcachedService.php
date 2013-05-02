@@ -179,7 +179,7 @@ SQL;
 	public function cache( $key, $payload, $time = self::NO_EXPIRE )
 	{
 		if ( $this->isEnabled() && $time !== self::NO_CACHE ) {
-			$result = $this->get( $key );
+			$result = $this->fetch( $key );
 			if ( $result !== false ) {
 				return $result;
 			}
