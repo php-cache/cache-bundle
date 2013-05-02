@@ -124,8 +124,8 @@ CREATE TABLE IF NOT EXISTS `memcached_key_map` (
   `id` BIGINT(32) UNSIGNED NOT NULL AUTO_INCREMENT,
   `cache_key` VARCHAR(255) NOT NULL,
   `memory_size` BIGINT(32) UNSIGNED,
-  `lifeTime` INT(11) UNSIGNED NOT NULL,
-  `expiration` DATETIME NOT NULL,
+  `lifeTime` INT(11) UNSIGNED,
+  `expiration` DATETIME,
   `insert_date` DATETIME NOT NULL,
   PRIMARY KEY (`id`),
   INDEX (`cache_key`),
@@ -222,6 +222,9 @@ SQL;
 			'expiration'  => date( 'Y-m-d H:i:s', strtotime( "now +{$lifeTime} seconds" ) ),
 			'insert_date' => date( 'Y-m-d H:i:s' )
 		);
+		if( $lifeTime === null ) {
+			unset( $data[ 'lifeTime' ], $data[ 'expiration' ] );
+		}
 
 		return $this->getKeyMapConnection()->insert( 'memcached_key_map', $data );
 	}
