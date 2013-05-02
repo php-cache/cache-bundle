@@ -3,6 +3,10 @@ memcached-bundle [![Build Status](https://travis-ci.org/aequasi/memcached-bundle
 
 ### Memcached Bundle for Symfony 2
 
+Creates a service in Symfony 2 that can also be used with doctrines `result_cache_driver` and `query_cache_driver`.
+
+There is also functionality for having a key map stored in mysql. Basically, it stores the keys, the size of the value, how long the lifetime is, and when it should expire.
+
 Should work in all versions of symfony, and php 5.3
 
 Requires the php5-memcached extension (Works with amazons elasticache extension as well)
@@ -72,17 +76,18 @@ $data = $this->get( 'memcached' )->cache(
 
 This will attempt to grab `somekey`. If it cant find it, it will run the closure, and cache it for 30 minutes, as `somekey`. You can use a closure here, or a callable, or even just a scalable type.
 
-There are also two commands (might add more later), for getting and setting items in cache.
+There are also three commands (might add more later), for getting, setting, and deleting items in cache.
 
 ```sh
 
 php app/console memcached:get key
 
-and
-
 php app/console memcached:set key value lifetime=60
 
+php app/console memcached:delete key
+
 ```
+
 ### Need Help?
 
 Create an issue if you've found a bug,
