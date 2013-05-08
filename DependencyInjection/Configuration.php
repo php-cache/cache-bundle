@@ -6,6 +6,7 @@
  */
 namespace Aequasi\Bundle\MemcachedBundle\DependencyInjection;
 
+use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Memcached;
@@ -53,22 +54,9 @@ class Configuration implements ConfigurationInterface
 					->info( "Enabled or disables this service. Default: True" )
 					->defaultTrue()
 				->end()
-				->arrayNode( 'keyMap' )
-					->info( "Settings for creating a key map in a database" )
-					->addDefaultsIfNotSet()
-					->children()
-						->booleanNode( 'enabled' )
-							->info( "Enable or Disable storing keys and their lifetimes to the database. Default: False" )
-							->defaultFalse()
-						->end()
-						->scalarNode( 'connection' )
-							->info( "Doctrine Connection Name" )
-							->defaultValue( "" )
-						->end()
-					->end()
-				->end()
-				->append( $this->getServersNode() )
-				->append( $this->getOptionsNode() )
+				->append( $this->getClustersNode() )
+				->append($this->addSessionSupportSection())
+				->append($this->addDoctrineSection())
 			->end()
 		;
 
@@ -76,26 +64,152 @@ class Configuration implements ConfigurationInterface
 	}
 
 	/**
-	 * @return \Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition|\Symfony\Component\Config\Definition\Builder\NodeDefinition
+	 * Configure the 'memcached.keyMap` section
+	 *
+	 * @return ArrayNodeDefinition
 	 */
-	private function getServersNode( )
+	private function getKeymapNode()
 	{
 		$treeBuilder = new TreeBuilder();
-		$node = $treeBuilder->root( 'servers' );
+		$node = $treeBuilder->root( 'keyMap' );
 
 		$node
-			->requiresAtLeastOneElement()
-			->addDefaultChildrenIfNoneSet()
-			->prototype( 'array' )
+			->info( "Settings for creating a key map in a database" )
 			->children()
-				->scalarNode( 'host' )->defaultValue( 'localhost' )->end()
-				->scalarNode( 'port' )->defaultValue( 11211 )->end()
+				->addDefaultsIfNotSet()
+				->children()
+					->booleanNode( 'enabled' )
+						->info( "Enable or Disable storing keys and their lifetimes to the database. Default: False" )
+						->defaultFalse()
+					->end()
+					->scalarNode( 'connection' )
+						->info( "Doctrine Connection Name" )
+						->defaultValue( "" )
+					->end()
+				->end()
+			->end()
+			;
+
+		return $node;
+	}
+
+	/**
+	 * @return \Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition|\Symfony\Component\Config\Definition\Builder\NodeDefinition
+	 */
+	private function getClustersNode( )
+	{
+		$treeBuilder = new TreeBuilder();
+		$node = $treeBuilder->root( 'clusters' );
+
+		$node
+			->children()
+				->arrayNode( 'clusters' )
+					->requiresAtLeastOneElement()
+					->addDefaultChildrenIfNoneSet()
+					->useAttributeAsKey( 'name' )
+					->prototype( 'array' )
+						->children()
+							->scalarNode('persistent_id')
+								->defaultNull()
+								->info('Specify to enable persistent connections. All clients with the same ID share connections.')
+							->end()
+							->arrayNode('hosts')
+								->requiresAtLeastOneElement()
+								->prototype('array')
+									->scalarNode( 'host' )
+										->cannotBeEmpty()
+										->defaultValue( 'localhost' )
+									->end()
+									->scalarNode( 'port' )
+										->cannotBeEmpty()
+										->defaultValue( 11211 )
+										->validate()
+										->ifTrue( function( $v ) { return !is_numeric( $v ); } )
+											->thenInvalid( "Host port must be numeric")
+										->end()
+										->scalarNode('weight')
+											->defaultValue(0)
+											->validate()
+											->ifTrue(function ($v) { return !is_numeric($v); })
+												->thenInvalid('host weight must be numeric')
+											->end()
+										->end()
+									->end()
+								->end()
+							->end()
+							->append( $this->getKeymapNode() )
+							->append( $this->getOptionsNode() )
+						->end()
+					->end()
+				->end()
 			->end()
 		;
 
 		return $node;
 	}
 
+	/**
+	 * Configure the "memcached.session" section
+	 *
+	 * @return ArrayNodeDefinition
+	 */
+	private function addSessionSupportSection()
+	{
+		$tree = new TreeBuilder();
+		$node = $tree->root('session');
+
+		$node
+			->children()
+				->scalarNode('cluster')->isRequired()->end()
+				->scalarNode('prefix')->end()
+				->scalarNode('ttl')->end()
+			->end()
+		->end();
+
+		return $node;
+	}
+
+
+    /**
+     * Configure the "memcached.doctrine" section
+     *
+     * @return ArrayNodeDefinition
+     */
+    private function addDoctrineSection()
+    {
+        $tree = new TreeBuilder();
+        $node = $tree->root('doctrine');
+
+        foreach (array('metadata', 'result', 'query') as $type) {
+            $node->children()
+                ->arrayNode($type)
+                    ->canBeUnset()
+                    ->children()
+                        ->scalarNode('cluster')->isRequired()->end()
+                        ->scalarNode('prefix')->defaultValue('')->end()
+                    ->end()
+                    ->fixXmlConfig('entity_manager')
+                    ->children()
+                        ->arrayNode('entity_managers')
+                            ->defaultValue(array())
+                            ->beforeNormalization()->ifString()->then(function($v) { return (array) $v; })->end()
+                            ->prototype('scalar')->end()
+                        ->end()
+                    ->end()
+                    ->fixXmlConfig('document_manager')
+                    ->children()
+                        ->arrayNode('document_managers')
+                            ->defaultValue(array())
+                            ->beforeNormalization()->ifString()->then(function($v) { return (array) $v; })->end()
+                            ->prototype('scalar')->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end();
+        }
+
+        return $node;
+    }
 	/**
 	 * @return \Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition|\Symfony\Component\Config\Definition\Builder\NodeDefinition
 	 */

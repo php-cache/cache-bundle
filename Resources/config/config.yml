@@ -1,0 +1,3 @@
+parameters:
+    memcache.doctrine_cache.class: Aequasi\Bundle\MemcachedBundle\Doctrine\Cache\MemcachedProvider
+    memcache.session_handler.class: Symfony\Component\HttpFoundation\Session\Storage\Handler\MemcachedSessionHandler

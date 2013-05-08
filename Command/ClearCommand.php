@@ -14,11 +14,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 
 /**
- * GetCommand
+ * ClearCommand
  *
- * Grabs the given key out of cache
+ * Flushed the given memcached cluster
  */
-class GetCommand extends ContainerAwareCommand
+class ClearCommand extends ContainerAwareCommand
 {
 
 	/**
@@ -26,11 +26,12 @@ class GetCommand extends ContainerAwareCommand
 	 */
 	protected function configure()
 	{
-		$this->setName( 'memcached:get' )
-			->setDescription( 'Get a key\'s value from memcached' )
-			->addArgument( 'cluster', InputArgument::REQUIRED, 'What cluster do you want to use' )
-			->addArgument( 'key', InputArgument::REQUIRED, 'What key do you want to get' );
+		$this
+			->setName( 'memcached:clear' )
+			->setDescription( 'Invalidate all Memcached items' )
+			->addArgument( 'cluster', InputArgument::REQUIRED, 'What cluster do you want to use' );
 	}
+
 
 	/**
 	 * @param InputInterface  $input
@@ -40,17 +41,14 @@ class GetCommand extends ContainerAwareCommand
 	 */
 	protected function execute( InputInterface $input, OutputInterface $output )
 	{
-		$key = $input->getArgument( 'key' );
 		$cluster = $input->getArgument( 'cluster' );
-
 		try {
 			$memcached = $this->getContainer()->get( 'memcached.' . $cluster );
-			$value = $memcached->fetch( $key );
+			$memcached->flush();
 			if ( $memcached->hasError() ) {
 				$output->writeln( sprintf( '<error>%s</error>', $memcached->getError() ) );
 			} else {
-				$output->writeln( sprintf( '<info>Key: %s</info>', $key ) );
-				$output->writeln( sprintf( '<info>Value: %s</info>', $value ) );
+				$output->writeln( '<info>OK</info>' );
 			}
 		} catch( ServiceNotFoundException $e ) {
 			$output->writeln( "<error>cluster '{$cluster}' is not found</error>" );

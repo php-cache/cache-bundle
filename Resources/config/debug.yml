@@ -1,0 +1,9 @@
+parameters:
+    memcached.data_collector.class: Aequasi\Bundle\MemcachedBundle\DataCollector\MemcachedDataCollector
+    memcached.data_collector.template: "AequasiMemcacheBundle:Collector:memcached"
+
+services:
+    memcached.data_collector:
+        class: %memcached.data_collector.class%
+        tags:
+            - { name: data_collector, template: %memcached.data_collector.template%, id:"memcached"}
