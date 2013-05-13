@@ -1,7 +1,7 @@
 <?php
 namespace Aequasi\Bundle\MemcachedBundle\DataCollector;
 
-use Aequasi\Bundle\MemcachedBundle\Cache\LoggingMemcacheInterface;
+use Aequasi\Bundle\MemcachedBundle\Cache\LoggingMemcachedInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
@@ -37,13 +37,13 @@ class MemcachedDataCollector extends DataCollector
 	/**
 	 * Add a Memcached object to the collector
 	 *
-	 * @param string                   $name      Name of the Memcached client
-	 * @param array                    $options   Options for Memcached client
-	 * @param LoggingMemcacheInterface $memcached Logging Memcached object
+	 * @param string                    $name      Name of the Memcached client
+	 * @param array                     $options   Options for Memcached client
+	 * @param LoggingMemcachedInterface $memcached Logging Memcached object
 	 *
 	 * @return void
 	 */
-	public function addClient( $name, $options, LoggingMemcacheInterface $memcached )
+	public function addClient( $name, $options, LoggingMemcachedInterface $memcached )
 	{
 		$this->clusters[ $name ] = $memcached;
 		$this->options[ $name ]  = $options;
@@ -61,7 +61,7 @@ class MemcachedDataCollector extends DataCollector
 			$this->data[ 'clusters' ][ 'calls' ][ $name ]   = $calls;
 			$this->data[ 'clusters' ][ 'options' ][ $name ] = $this->options[ $name ];
 		}
-		$this->data[ 'clusters' ][ 'statistics' ] = $this->calculateStatistics( $this->data[ 'clusters' ][ 'calls' ] );
+		$this->data[ 'clusters' ][ 'statistics' ] = $this->calculateStatistics( );
 		$this->data[ 'total' ][ 'statistics' ]    = $this->calculateTotalStatistics(
 			$this->data[ 'clusters' ][ 'statistics' ]
 		);
@@ -116,11 +116,9 @@ class MemcachedDataCollector extends DataCollector
 	}
 
 	/**
-	 * @param $calls
-	 *
 	 * @return array
 	 */
-	private function calculateStatistics( $calls )
+	private function calculateStatistics( )
 	{
 		$statistics = array();
 		foreach ( $this->data[ 'clusters' ][ 'calls' ] as $name => $calls ) {

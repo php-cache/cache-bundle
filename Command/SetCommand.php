@@ -49,7 +49,7 @@ class SetCommand extends ContainerAwareCommand
 
 		try {
 			$memcached = $this->getContainer()->get( 'memcached.' . $cluster );
-			$memcached->save( $key, $value, $lifeTime );
+			$memcached->set( $key, $value, $lifeTime );
 			if ( $memcached->hasError() ) {
 				$output->writeln( sprintf( '<error>%s</error>', $memcached->getError() ) );
 			} else {

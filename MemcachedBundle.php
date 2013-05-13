@@ -9,7 +9,6 @@ namespace Aequasi\Bundle\MemcachedBundle;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Aequasi\Bundle\MemcachedBundle\DependencyInjection\Compiler\EnableSessionSupport;
-use Aequasi\Bundle\MemcachedBundle\DependencyInjection\Compiler\EnableKeyMapSupport;
 
 /**
  * MemcachedBundle Class
@@ -25,6 +24,5 @@ class MemcachedBundle extends Bundle
 		parent::build( $container );
 
 		$container->addCompilerPass( new EnableSessionSupport() );
-		$container->addCompilerPass( new EnableKeyMapSupport() );
 	}
 }

@@ -1,3 +1,23 @@
 parameters:
-    memcache.doctrine_cache.class: Aequasi\Bundle\MemcachedBundle\Doctrine\Cache\MemcachedProvider
-    memcache.session_handler.class: Symfony\Component\HttpFoundation\Session\Storage\Handler\MemcachedSessionHandler
+    memcached.doctrine_cache.class: Aequasi\Bundle\MemcachedBundle\Doctrine\Cache\MemcachedProvider
+    memcached.session_handler.class: Aequasi\Bundle\MemcachedBundle\Session\MemcachedSessionHandler
+    memcached.default_options:
+        compression: true
+        serializer: php
+        prefix_key: ""
+        hash: default
+        distribution: modula
+        libketama_compatible: true
+        buffer_writes: false
+        binary_protocol: false
+        no_block: false
+        tcp_nodelay: false
+        socket_send_size: ~
+        socket_recv_size: ~
+        connect_timeout: 1000
+        retry_timeout: 5
+        send_timeout: 0
+        recv_timeout: 0
+        poll_timeout: 1000
+        cache_lookups: false
+        server_failure_limit: 3

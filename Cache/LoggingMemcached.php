@@ -9,6 +9,8 @@ namespace Aequasi\Bundle\MemcachedBundle\Cache;
 use Doctrine\DBAL\Connection;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 
+use Memcached;
+
 /**
  * Class to encapsulate PHP Memcached object for unit tests and to add logging in logging mode
  */
@@ -83,8 +85,8 @@ class LoggingMemcached implements LoggingMemcachedInterface
 	/**
 	 * Constructor instantiates and stores Memcached object
 	 *
-	 * @param bool $enabled Are we caching?
-	 * @param bool $logging Are we logging?
+	 * @param bool $enabled      Are we caching?
+	 * @param bool $logging      Are we logging?
 	 * @param null $persistentId Are we persisting?
 	 */
 	public function __construct( $enabled, $logging = false, $persistentId = null )
@@ -93,10 +95,10 @@ class LoggingMemcached implements LoggingMemcachedInterface
 		$this->calls   = array();
 		$this->logging = $logging;
 		if ( $persistentId ) {
-			$this->memcached = new \Memcached( $persistentId );
+			$this->memcached  = new \Memcached( $persistentId );
 			$this->initialize = count( $this->getServerList() ) == 0;
 		} else {
-			$this->memcached = new \Memcached( );
+			$this->memcached  = new \Memcached();
 			$this->initialize = true;
 		}
 	}
@@ -111,7 +113,7 @@ class LoggingMemcached implements LoggingMemcachedInterface
 	 *
 	 * @throws \Exception
 	 */
-	private function setupKeyMapping( array $configs, Registry $doctrine )
+	public function setupKeyMap( array $configs, Registry $doctrine )
 	{
 		if ( $configs[ 'enabled' ] ) {
 
@@ -123,23 +125,6 @@ class LoggingMemcached implements LoggingMemcachedInterface
 			// Grab the connection from doctrine
 			/** @var \Doctrine\DBAL\Connection $connection */
 			$connection = $doctrine->getConnection( $configs[ 'connection' ] );
-
-			// Create the table if it doesn't exist
-			$sql = <<<SQL
-CREATE TABLE IF NOT EXISTS `memcached_key_map` (
-`id` BIGINT(32) UNSIGNED NOT NULL AUTO_INCREMENT,
-`cache_key` VARCHAR(255) NOT NULL,
-`memory_size` BIGINT(32) UNSIGNED,
-`lifeTime` INT(11) UNSIGNED,
-`expiration` DATETIME,
-`insert_date` DATETIME NOT NULL,
-PRIMARY KEY (`id`),
-INDEX (`cache_key`),
-INDEX (`expiration`),
-INDEX (`insert_date`)
-) ENGINE=INNODB;
-SQL;
-			$connection->executeQuery( $sql );
 
 			// Fetch the memcached service, set key mapping to enabled, and set the connection
 			$this->setKeyMapEnabled( true )
@@ -185,54 +170,6 @@ SQL;
 	}
 
 	/**
-	 * Adds the given key to the key map
-	 *
-	 * @param $id
-	 * @param $data
-	 * @param $lifeTime
-	 *
-	 * @return bool|int
-	 */
-	private function addToKeyMap( $id, $data, $lifeTime )
-	{
-		if ( !$this->isKeyMapEnabled() ) {
-			return false;
-		}
-
-		$data = array(
-			'cache_key'   => $id,
-			'memory_size' => $this->getPayloadSize( $data ),
-			'lifeTime'    => $lifeTime,
-			'expiration'  => date( 'Y-m-d H:i:s', strtotime( "now +{$lifeTime} seconds" ) ),
-			'insert_date' => date( 'Y-m-d H:i:s' )
-		);
-		if ( $lifeTime === null ) {
-			unset( $data[ 'lifeTime' ], $data[ 'expiration' ] );
-		}
-
-		return $this->getKeyMapConnection()->insert( 'memcached_key_map', $data );
-	}
-
-	/**
-	 * @param \Closure|callable|mixed $payload
-	 *
-	 * @return mixed
-	 */
-	private function getDataFromPayload( $payload )
-	{
-		/** @var $payload \Closure|callable|mixed */
-		if ( is_callable( $payload ) ) {
-			if ( is_object( $payload ) && get_class( $payload ) == 'Closure' ) {
-				return $payload();
-			}
-
-			return call_user_func( $payload );
-		}
-
-		return $payload;
-	}
-
-	/**
 	 * Gets whether or not mapping keys is enabled
 	 *
 	 * @return boolean
@@ -240,21 +177,6 @@ SQL;
 	public function isKeyMapEnabled()
 	{
 		return $this->keyMap;
-	}
-
-	/**
-	 * Gets the memory size of the given variable
-	 *
-	 * @param $data
-	 *
-	 * @return int
-	 */
-	private function getPayloadSize( $data )
-	{
-		$start_memory = memory_get_usage();
-		$data         = unserialize( serialize( $data ) );
-
-		return memory_get_usage() - $start_memory - PHP_INT_SIZE * 8;
 	}
 
 	/**
@@ -311,23 +233,150 @@ SQL;
 		return $this->enabled;
 	}
 
+	/**
+	 * @return bool
+	 */
+	public function hasError()
+	{
+		return $this->memcached->getResultCode() !== Memcached::RES_SUCCESS;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getError()
+	{
+		return $this->memcached->getResultMessage();
+	}
+
+	/**
+	 * @param $name
+	 * @param $arguments
+	 *
+	 * @return mixed
+	 */
 	function __call( $name, $arguments )
 	{
 		return $this->processRequest( $name, $arguments );
 	}
 
+	/**
+	 * @param $name
+	 * @param $arguments
+	 *
+	 * @return mixed
+	 */
 	protected function processRequest( $name, $arguments )
 	{
 
-		if( $this->logging ) {
-			$start = microtime( true );
-			$result = call_user_func_array( array( $this->memcached, $name ), $arguments );
-			$time = microtime( true ) - $start;
-			$this->calls[] = (object)compact( 'start', 'time', 'name', 'arguments', 'result' );
+		if ( $this->logging ) {
+			$start          = microtime( true );
+			$result         = call_user_func_array( array( $this->memcached, $name ), $arguments );
+			$time           = microtime( true ) - $start;
+			$this->calls[ ] = (object)compact( 'start', 'time', 'name', 'arguments', 'result' );
 		} else {
 			$result = call_user_func_array( array( $this->memcached, $name ), $arguments );
 		}
 
+		if( in_array( $name, array( 'add', 'set' ) ) ) {
+			$this->addToKeyMap( $arguments[ 0 ], $arguments[ 1 ], $arguments[ 2 ] );
+		}
+		if( $name == 'delete' ) {
+			$this->deleteFromKeyMap( $arguments[ 0 ] );
+		}
+		if( $name == 'flush' ) {
+			$this->truncateKeyMap( );
+		}
+
 		return $result;
+	}
+
+	/**
+	 * Adds the given key to the key map
+	 *
+	 * @param $id
+	 * @param $data
+	 * @param $lifeTime
+	 *
+	 * @return bool|int
+	 */
+	private function addToKeyMap( $id, $data, $lifeTime )
+	{
+		if ( !$this->isKeyMapEnabled() ) {
+			return false;
+		}
+
+		$data = array(
+			'cache_key'   => $id,
+			'memory_size' => $this->getPayloadSize( $data ),
+			'lifeTime'    => $lifeTime,
+			'expiration'  => date( 'Y-m-d H:i:s', strtotime( "now +{$lifeTime} seconds" ) ),
+			'insert_date' => date( 'Y-m-d H:i:s' )
+		);
+		if ( $lifeTime === null ) {
+			unset( $data[ 'lifeTime' ], $data[ 'expiration' ] );
+		}
+
+		return $this->getKeyMapConnection()->insert( 'memcached_key_map', $data );
+	}
+
+	/**
+	 * @param $id
+	 *
+	 * @return bool|int
+	 */
+	private function deleteFromKeyMap( $id )
+	{
+		if ( !$this->isKeyMapEnabled() ) {
+			return false;
+		}
+
+		return $this->getKeyMapConnection()->delete( 'memcached_key_map', array( 'cache_key' => $id ) );
+	}
+
+	/**
+	 * @return bool|int
+	 */
+	private function truncateKeyMap( )
+	{
+		if ( !$this->isKeyMapEnabled() ) {
+			return false;
+		}
+
+		return $this->getKeyMapConnection()->executeQuery( 'TRUNCATE memcached_key_map' );
+	}
+
+	/**
+	 * @param \Closure|callable|mixed $payload
+	 *
+	 * @return mixed
+	 */
+	private function getDataFromPayload( $payload )
+	{
+		/** @var $payload \Closure|callable|mixed */
+		if ( is_callable( $payload ) ) {
+			if ( is_object( $payload ) && get_class( $payload ) == 'Closure' ) {
+				return $payload();
+			}
+
+			return call_user_func( $payload );
+		}
+
+		return $payload;
+	}
+
+	/**
+	 * Gets the memory size of the given variable
+	 *
+	 * @param $data
+	 *
+	 * @return int
+	 */
+	private function getPayloadSize( $data )
+	{
+		$start_memory = memory_get_usage();
+		$data         = unserialize( serialize( $data ) );
+
+		return memory_get_usage() - $start_memory - PHP_INT_SIZE * 8;
 	}
 }

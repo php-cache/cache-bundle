@@ -9,7 +9,7 @@ namespace Aequasi\Bundle\MemcachedBundle\Cache;
 /**
  * AntiStampedeMemcached Class
  */
-class AntiStampedeMemcached extends LoggingMemcache
+class AntiStampedeMemcached extends LoggingMemcached
 {
 	const MAX_TTL = 2592000;
 

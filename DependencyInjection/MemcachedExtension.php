@@ -11,6 +11,10 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\Parameter;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
 
 /**
  * This is the class that loads and manages your bundle configuration
@@ -98,16 +102,16 @@ class MemcachedExtension extends Extension
 	 * @param array            $config    Configuration for bundle
 	 * @param ContainerBuilder $container Service container
 	 *
-	 * @throws \LogicException
+	 * @throws LogicException
 	 */
 	private function enableSessionSupport( array $config, ContainerBuilder $container )
 	{
-		$cluster = $config[ 'session' ][ 'clusters' ];
+		$cluster = $config[ 'session' ][ 'cluster' ];
 		if ( null === $cluster ) {
 			return;
 		}
 		if ( !isset( $config[ 'clusters' ] ) || !isset( $config[ 'clusters' ][ $cluster ] ) ) {
-			throw new \LogicException( sprintf( 'Failed to hook into the session. The cluster "%s" doesn\'t exist!', $cluster ) );
+			throw new LogicException( sprintf( 'Failed to hook into the session. The cluster "%s" doesn\'t exist!', $cluster ) );
 		}
 		// calculate options
 		$sessionOptions = $container->getParameter( 'session.storage.options' );
@@ -135,7 +139,7 @@ class MemcachedExtension extends Extension
 	 * @param array            $config    A configuration array
 	 * @param ContainerBuilder $container Service container
 	 *
-	 * @throws \LogicException
+	 * @throws LogicException
 	 */
 	private function addClusters( array $config, ContainerBuilder $container )
 	{
@@ -174,8 +178,7 @@ class MemcachedExtension extends Extension
 
 		// Check if Key Map logging is enabled
 		if( $config[ 'keyMap' ][ 'enabled' ] ) {
-			$memcached->addMethodCall( 'setupKeyMap', array( $config, $container->getAlias( 'doctrine' ) ) );
-			$container->setDefinition( 'memcached.key_map_support', new Definition( true ) );
+			$memcached->addMethodCall( 'setupKeyMap', array( $config[ 'keyMap' ], new Reference( 'doctrine' ) ) );
 		}
 
 		// Add servers to the memcached client

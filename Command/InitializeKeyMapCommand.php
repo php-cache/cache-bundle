@@ -13,12 +13,14 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 
+use Doctrine\DBAL\Connection;
+
 /**
- * GetCommand
+ * ClearCommand
  *
- * Grabs the given key out of cache
+ * Flushed the given memcached cluster
  */
-class GetCommand extends ContainerAwareCommand
+class InitializeKeyMapCommand extends ContainerAwareCommand
 {
 
 	/**
@@ -26,11 +28,12 @@ class GetCommand extends ContainerAwareCommand
 	 */
 	protected function configure()
 	{
-		$this->setName( 'memcached:get' )
-			->setDescription( 'Get a key\'s value from memcached' )
-			->addArgument( 'cluster', InputArgument::REQUIRED, 'What cluster do you want to use' )
-			->addArgument( 'key', InputArgument::REQUIRED, 'What key do you want to get' );
+		$this
+			->setName( 'memcached:initialize:keymap' )
+			->setDescription( 'Initialize the Memcached Mysql Key Map' )
+			->addArgument( 'cluster', InputArgument::REQUIRED, 'What cluster do you want to use' );
 	}
+
 
 	/**
 	 * @param InputInterface  $input
@@ -40,18 +43,30 @@ class GetCommand extends ContainerAwareCommand
 	 */
 	protected function execute( InputInterface $input, OutputInterface $output )
 	{
-		$key = $input->getArgument( 'key' );
 		$cluster = $input->getArgument( 'cluster' );
-
 		try {
 			$memcached = $this->getContainer()->get( 'memcached.' . $cluster );
-			$value = $memcached->get( $key );
-			if ( $memcached->hasError() ) {
-				$output->writeln( sprintf( '<error>%s</error>', $memcached->getError() ) );
-			} else {
-				$output->writeln( sprintf( '<info>Key: %s</info>', $key ) );
-				$output->writeln( sprintf( '<info>Value: %s</info>', $value ) );
-			}
+
+			/** @var Connection $connection */
+			$connection = $memcached->getKeyMapConnection();
+
+			$sql = <<<SQL
+CREATE TABLE IF NOT EXISTS `memcached_key_map` (
+`id` BIGINT(32) UNSIGNED NOT NULL AUTO_INCREMENT,
+`cache_key` VARCHAR(255) NOT NULL,
+`memory_size` BIGINT(32) UNSIGNED,
+`lifeTime` INT(11) UNSIGNED,
+`expiration` DATETIME,
+`insert_date` DATETIME NOT NULL,
+PRIMARY KEY (`id`),
+INDEX (`cache_key`),
+INDEX (`expiration`),
+INDEX (`insert_date`)
+) ENGINE=INNODB;
+SQL;
+
+			$connection->executeQuery( $sql );
+
 		} catch( ServiceNotFoundException $e ) {
 			$output->writeln( "<error>cluster '{$cluster}' is not found</error>" );
 		}
