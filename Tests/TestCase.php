@@ -45,8 +45,10 @@ class TestCase extends \PHPUnit_Framework_TestCase
 					'clusters' => array(
 						'default' => array(
 							'hosts' => array(
-								'host' => 'localhost',
-								'port' => 11211,
+								array(
+									'host' => 'localhost',
+									'port' => 11211,
+								)
 							),
 							'keyMap' => array(
 								'enabled' => false,
