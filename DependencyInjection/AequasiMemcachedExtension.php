@@ -235,9 +235,4 @@ class AequasiMemcachedExtension extends Extension
 			$definition->addMethodCall( 'addClient', array( $name, $options, new Reference( $serviceName ) ) );
 		}
 	}
-
-	public function getAlias()
-	{
-		return 'memcached';
-	}
 }
