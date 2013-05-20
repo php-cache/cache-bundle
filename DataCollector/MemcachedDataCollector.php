@@ -43,7 +43,7 @@ class MemcachedDataCollector extends DataCollector
 	 *
 	 * @return void
 	 */
-	public function addClient( $name, $options, LoggingMemcachedInterface $memcached )
+	public function addCluster( $name, $options, LoggingMemcachedInterface $memcached )
 	{
 		$this->clusters[ $name ] = $memcached;
 		$this->options[ $name ]  = $options;
