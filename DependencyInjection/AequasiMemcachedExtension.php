@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\Exception\LogicException;
  * To learn more see {@link http://symfony.com/doc/current/cookbook/bundles/extension.html}
  * Based on Lsw\MemcachedBundle by Christian Soronellas
  */
-class MemcachedExtension extends Extension
+class AequasiMemcachedExtension extends Extension
 {
 
 	/**
@@ -234,5 +234,10 @@ class MemcachedExtension extends Extension
 			$definition = $container->getDefinition( 'memcached.data_collector' );
 			$definition->addMethodCall( 'addClient', array( $name, $options, new Reference( $serviceName ) ) );
 		}
+	}
+
+	public function getAlias()
+	{
+		return 'memcached';
 	}
 }

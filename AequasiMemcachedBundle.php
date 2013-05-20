@@ -13,7 +13,7 @@ use Aequasi\Bundle\MemcachedBundle\DependencyInjection\Compiler\EnableSessionSup
 /**
  * MemcachedBundle Class
  */
-class MemcachedBundle extends Bundle
+class AequasiMemcachedBundle extends Bundle
 {
 
 	/**
