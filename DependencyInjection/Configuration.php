@@ -50,10 +50,6 @@ class Configuration implements ConfigurationInterface
 
 		$rootNode
 			->children()
-				->booleanNode( 'enabled' )
-					->info( "Enabled or disables this service. Default: True" )
-					->defaultTrue()
-				->end()
 				->append( $this->getClustersNode() )
 				->append($this->addSessionSupportSection())
 				->append($this->addDoctrineSection())
@@ -108,6 +104,10 @@ class Configuration implements ConfigurationInterface
 					->scalarNode('persistent_id')
 						->defaultNull()
 						->info('Specify to enable persistent connections. All clients with the same ID share connections.')
+					->end()
+					->booleanNode( 'enabled' )
+						->info( "Enabled or disables this service. Default: True" )
+						->defaultTrue()
 					->end()
 					->arrayNode('hosts')
 						->requiresAtLeastOneElement()

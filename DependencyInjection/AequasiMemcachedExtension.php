@@ -169,6 +169,11 @@ class AequasiMemcachedExtension extends Extension
 		}
 
 		$memcached = new Definition( 'Aequasi\Bundle\MemcachedBundle\Cache\AntiStampedeMemcached' );
+		
+		// Is this Cluster Enabled
+		$memcached->addArgument( $config[ 'enabled' ] );
+
+		// Is this Cluster Logging
 		$memcached->addArgument( new Parameter( 'kernel.debug' ) );
 
 		// Check if it has to be persistent
@@ -230,9 +235,9 @@ class AequasiMemcachedExtension extends Extension
 		$serviceName = sprintf( 'memcached.%s', $name );
 		$container->setDefinition( $serviceName, $memcached );
 		// Add the service to the data collector
-		if ( $container->hasDefinition( 'memcached.data_collector' ) ) {
-			$definition = $container->getDefinition( 'memcached.data_collector' );
-			$definition->addMethodCall( 'addClient', array( $name, $options, new Reference( $serviceName ) ) );
+		if ( $container->hasDefinition( 'data_collector.memcached' ) ) {
+			$definition = $container->getDefinition( 'data_collector.memcached' );
+			$definition->addMethodCall( 'addCluster', array( $name, $options, new Reference( $serviceName ) ) );
 		}
 	}
 }
