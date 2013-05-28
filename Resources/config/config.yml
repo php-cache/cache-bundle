@@ -1,7 +1,7 @@
 parameters:
-    memcached.doctrine_cache.class: Aequasi\Bundle\MemcachedBundle\Doctrine\Cache\MemcachedProvider
-    memcached.session_handler.class: Aequasi\Bundle\MemcachedBundle\Session\MemcachedSessionHandler
-    memcached.default_options:
+    cache.doctrine.memcached.class: Aequasi\Bundle\MemcachedBundle\Doctrine\Cache\MemcachedProvider
+    cache.session.memcached.class:  Aequasi\Bundle\MemcachedBundle\Session\MemcachedSessionHandler
+    cache.memcached.default_options:
         compression: true
         serializer: php
         prefix_key: ""

@@ -1,4 +1,0 @@
-services:
-    memcached:
-        class: Aequasi\Bundle\MemcachedBundle\Service\MemcachedService
-        arguments: [ %memcached%, "@?doctrine" ]

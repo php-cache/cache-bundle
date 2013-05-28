@@ -4,16 +4,16 @@
  * @date 2013
  * @license   http://www.apache.org/licenses/LICENSE-2.0.html Apache License, Version 2.0
  */
-namespace Aequasi\Bundle\MemcachedBundle;
+namespace Aequasi\Bundle\CacheBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Aequasi\Bundle\MemcachedBundle\DependencyInjection\Compiler\EnableSessionSupport;
+use Aequasi\Bundle\CacheBundle\DependencyInjection\Compiler\EnableSessionSupport;
 
 /**
- * MemcachedBundle Class
+ * CacheBundle Class
  */
-class AequasiMemcachedBundle extends Bundle
+class AequasiCacheBundle extends Bundle
 {
 
 	/**
