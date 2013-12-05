@@ -4,14 +4,14 @@
  * @date 2013
  * @license   http://www.apache.org/licenses/LICENSE-2.0.html Apache License, Version 2.0
  */
-namespace Aequasi\Bundle\MemcachedBundle\DependencyInjection\Compiler;
+namespace Aequasi\Bundle\CacheBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * EnableSessionSupport is a compiler pass to set the session handler.
- * Based on Emagister\MemcachedBundle by Christian Soronellas
+ * Based on Emagister\CacheBundle by Christian Soronellas
  */
 class EnableSessionSupport implements CompilerPassInterface
 {

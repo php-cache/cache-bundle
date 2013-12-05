@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\Exception\LogicException;
  * This is the class that loads and manages your bundle configuration
  *
  * To learn more see {@link http://symfony.com/doc/current/cookbook/bundles/extension.html}
- * Based on Lsw\MemcachedBundle by Christian Soronellas
+ * Based on Lsw\CacheBundle by Christian Soronellas
  */
 class AequasiCacheExtension extends Extension
 {
@@ -39,9 +39,9 @@ class AequasiCacheExtension extends Extension
 		$loader = new Loader\YamlFileLoader( $container, new FileLocator( __DIR__ . '/../Resources/config' ) );
 
 		$loader->load( 'config.yml' );
-		if ( $container->getParameter( 'kernel.debug' ) ) {
-			$loader->load( 'debug.yml' );
-		}
+		//if ( $container->getParameter( 'kernel.debug' ) ) {
+		//	$loader->load( 'debug.yml' );
+		//}
 
 		if ( isset( $config[ 'session' ] ) ) {
 			$this->enableSessionSupport( $config, $container );
@@ -70,6 +70,8 @@ class AequasiCacheExtension extends Extension
 	 *
 	 * @param array            $config    A configuration array
 	 * @param ContainerBuilder $container A ContainerBuilder instance
+	 *
+	 * @throws \Exception
 	 */
 	protected function loadDoctrine( array $config, ContainerBuilder $container )
 	{
@@ -162,6 +164,7 @@ class AequasiCacheExtension extends Extension
 			case 'memcache':
 			case 'apc':
 			case 'xcache':
+			case 'redis':
 				if( extension_loaded( $type ) ) 
 					return true;
 				throw new LogicException( sprintf( "%s extension is not loaded! To configure %s instances, it MUST be loaded!", ucwords( $type ), $type ) );

@@ -5,11 +5,11 @@
  * @license   http://www.apache.org/licenses/LICENSE-2.0.html Apache License, Version 2.0
  */
 
-namespace Aequasi\Bundle\MemcachedBundle\Tests;
+namespace Aequasi\Bundle\CacheBundle\Tests;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 
-use Aequasi\Bundle\MemcachedBundle\DependencyInjection\MemcachedExtension;
+use Aequasi\Bundle\CacheBundle\DependencyInjection\MemcachedExtension;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\Compiler\ResolveDefinitionTemplatesPas
 /**
  * Class TestCase
  *
- * @package Aequasi\Bundle\MemcachedBundle\Tests
+ * @package Aequasi\Bundle\CacheBundle\Tests
  */
 class TestCase extends \PHPUnit_Framework_TestCase
 {

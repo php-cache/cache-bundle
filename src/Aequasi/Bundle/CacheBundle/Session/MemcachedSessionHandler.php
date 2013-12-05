@@ -5,9 +5,9 @@
  * @license   http://www.apache.org/licenses/LICENSE-2.0.html Apache License, Version 2.0
  */
 
-namespace Aequasi\Bundle\MemcachedBundle\Session;
+namespace Aequasi\Bundle\CacheBundle\Session;
 
-use Aequasi\Bundle\MemcachedBundle\Cache\LoggingMemcachedInterface as Memcached;
+use Aequasi\Bundle\CacheBundle\Cache\LoggingMemcachedInterface as Memcached;
 
 /**
  * MemcachedSessionHandler.

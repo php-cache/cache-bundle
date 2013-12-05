@@ -1,9 +1,0 @@
-parameters:
-    cache.data_collector.class: Aequasi\Bundle\CacheBundle\DataCollector\CacheDataCollector
-    cache.data_collector.template: AequasiCacheBundle:DataCollector:cache
-
-services:
-    data_collector.cache:
-        class: %cache.data_collector.class%
-        tags:
-            - { name: data_collector, template: %cache.data_collector.template%, id: cache_collector }

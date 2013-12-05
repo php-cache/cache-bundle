@@ -1,10 +1,10 @@
 {
-	"name":        "aequasi/memcached-bundle",
-	"version":     "1.3.6",
+	"name":        "aequasi/cached-bundle",
+	"version":     "0.0.1",
 	"type":        "library",
-	"description": "Memcached Bundle",
-	"keywords":    ["php", "memcached"],
-	"homepage":    "https://github.com/aequasi/memcached-bundle",
+	"description": "Cached Bundle",
+	"keywords":    ["php", "cache", "redis", "memcached"],
+	"homepage":    "https://github.com/aequasi/cache-bundle",
 	"license":     "Apache",
 	"authors":     [
 		{
@@ -23,10 +23,14 @@
 		"doctrine/common": ">=2.1.0",
 		"doctrine/dbal": ">=2.1.0"
 	},
+	"suggest": {
+		"ext-memcached": "Allows for caching with Memcached",
+		"ext-redis": 	 "Allows for caching with Redis"
+	},
 	"autoload":    {
 		"psr-0": {
-			"Aequasi\\Bundle\\MemcachedBundle": ""
+			"": "src"
 		}
 	},
-	"target-dir": "Aequasi/Bundle/MemcachedBundle"
+	"target-dir": "Aequasi/Bundle/CachedBundle"
 }

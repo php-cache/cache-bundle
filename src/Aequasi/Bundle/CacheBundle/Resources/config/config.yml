@@ -1,0 +1,3 @@
+parameters:
+    cache.doctrine.memcached.class: Aequasi\Bundle\CacheBundle\Doctrine\Cache\MemcachedProvider
+    cache.session.memcached.class:  Aequasi\Bundle\CacheBundle\Session\MemcachedSessionHandler
