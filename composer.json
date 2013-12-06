@@ -30,6 +30,5 @@
 		"psr-0": {
 			"Aequasi\\Bundle\\CacheBundle": "src"
 		}
-	},
-	"target-dir": "Aequasi/Bundle/CachedBundle"
+	}
 }
