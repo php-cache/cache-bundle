@@ -8,7 +8,7 @@ namespace Aequasi\Bundle\CacheBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Aequasi\Bundle\CacheBundle\DependencyInjection\Compiler\EnableSessionSupport;
+use Aequasi\Bundle\CacheBundle\DependencyInjection\Compiler;
 
 /**
  * CacheBundle Class
@@ -23,6 +23,8 @@ class AequasiCacheBundle extends Bundle
 	{
 		parent::build( $container );
 
-		$container->addCompilerPass( new EnableSessionSupport() );
+		$container->addCompilerPass( new Compiler\ServiceBuilderCompilerPass() );
+		$container->addCompilerPass( new Compiler\SessionSupportCompilerPass() );
+		$container->addCompilerPass( new Compiler\DoctrineSupportCompilerPass() );
 	}
 }
