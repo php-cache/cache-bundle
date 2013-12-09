@@ -38,8 +38,9 @@ class SessionSupportCompilerPass extends BaseCompilerPass
 	 */
 	private function enableSessionSupport( array $config )
 	{
+
 		$instance = $config[ 'instance' ];
-		$instances = $this->container->get( $this->getAlias() . '.instance.' . $instance );
+		$instances = $this->container->getParameter( $this->getAlias() . '.instance' );
 
 		if( null === $instance ) {
 			return;
@@ -48,23 +49,23 @@ class SessionSupportCompilerPass extends BaseCompilerPass
 			throw new InvalidConfigurationException( sprintf( 'Failed to hook into the session. The instance "%s" doesn\'t exist!', $instance ) );
 		}
 
-		if( in_array(  $instances[ $instance ][ 'type' ], array( 'memcache', 'redis', 'memcached' ) ) )
+		if( !in_array( strtolower( $instances[ $instance ][ 'type' ] ), array( 'memcache', 'redis', 'memcached' ) ) )
 		{
-			throw new InvalidConfigurationException( sprintf( "%s is not a valid cache type for session support. Please use Memcache, Memcached, or Redis. ", $instance ) );
+			throw new InvalidConfigurationException( sprintf( "%s is not a valid cache type for session support. Please use Memcache, Memcached, or Redis. ", $instances[ $instance ][ 'type' ] ) );
 		}
 
 
 		// calculate options
 		$sessionOptions = $this->container->getParameter( 'session.storage.options' );
-		if( isset( $sessionOptions[ 'cookie_lifetime' ] ) && !isset( $config[ 'session' ][ 'cookie_lifetime' ] ) ) {
-			$config[ 'session' ][ 'cookie_lifetime' ] = $sessionOptions[ 'cookie_lifetime' ];
+		if( isset( $sessionOptions[ 'cookie_lifetime' ] ) && !isset( $config[ 'cookie_lifetime' ] ) ) {
+			$config[ 'cookie_lifetime' ] = $sessionOptions[ 'cookie_lifetime' ];
 		}
 		// load the session handler
 		$definition = new Definition( $this->container->getParameter( sprintf( '%s.session.handler.class', $this->getAlias() ) ) );
 		$this->container->setDefinition( sprintf( '%s.session_handler', $this->getAlias() ), $definition );
 		$this->container->setAlias( 'cache.session_handler', sprintf( '%s.session_handler', $this->getAlias() ) );
 		$definition->addArgument( new Reference( sprintf( '%s.instance.%s', $this->getAlias(), $instance ) ) )
-		           ->addArgument( $config[ 'session' ] );
+		           ->addArgument( $config );
 
 		$this->container->setAlias( 'session.handler', $this->getAlias() .'.session_handler' );
 	}
