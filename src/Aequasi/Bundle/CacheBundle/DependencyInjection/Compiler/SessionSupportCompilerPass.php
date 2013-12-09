@@ -24,7 +24,7 @@ class SessionSupportCompilerPass extends BaseCompilerPass
 		}
 
 		// If the aequasi.cache.session_handler service is loaded set the alias
-		if ( $this->container->hasParameter( 'aequasi_cache.session' ) ) {
+		if ( $this->container->hasParameter( $this->getAlias() . '.session' ) ) {
 			$this->enableSessionSupport( $this->container->getParameter( $this->getAlias() . '.session' ) );
 		}
 	}
@@ -39,7 +39,7 @@ class SessionSupportCompilerPass extends BaseCompilerPass
 	private function enableSessionSupport( array $config )
 	{
 		$instance = $config[ 'instance' ];
-		$instances = $this->container->get( $this->getAlias() . '.instance' );
+		$instances = $this->container->get( $this->getAlias() . '.instance.' . $instance );
 
 		if( null === $instance ) {
 			return;

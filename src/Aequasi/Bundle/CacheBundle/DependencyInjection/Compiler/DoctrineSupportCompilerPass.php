@@ -25,7 +25,7 @@ class DoctrineSupportCompilerPass extends BaseCompilerPass
 		}
 
 		// If the aequasi.cache.session_handler service is loaded set the alias
-		if ( $this->container->hasParameter( 'aequasi_cache.doctrine' ) ) {
+		if ( $this->container->hasParameter( $this->getAlias() . '.doctrine' ) ) {
 			$this->enableDoctrineSupport( $this->container->getParameter( $this->getAlias() . '.doctrine' ) );
 		}
 	}
