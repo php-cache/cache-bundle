@@ -94,7 +94,7 @@ class ServiceBuilderCompilerPass extends BaseCompilerPass
 						$host   = is_null( $config[ 'host' ] ) ? 'localhost' : $config[ 'host' ];
 						$port   = is_null( $config[ 'port' ] ) ? 11211 : $config[ 'port' ];
 						$weight = is_null( $config[ 'weight' ] ) ? 0 : $config[ 'weight' ];
-						$cache->addMethodCall( 'addServer', $host, $port, $weight );
+						$cache->addMethodCall( 'addServer', array( $host, $port, $weight ) );
 					}
 					unset( $config );
 
