@@ -38,7 +38,7 @@ class SessionSupportCompilerPass extends BaseCompilerPass
 	 */
 	private function enableSessionSupport( array $config )
 	{
-		$instance = $config[ 'session' ][ 'instance' ];
+		$instance = $config[ 'instance' ];
 		$instances = $this->container->get( $this->getAlias() . '.instance' );
 
 		if( null === $instance ) {
