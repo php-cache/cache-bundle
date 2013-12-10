@@ -5,9 +5,9 @@
  * @license   http://www.apache.org/licenses/LICENSE-2.0.html Apache License, Version 2.0
  */
 
-namespace Aequasi\Bundle\CacheBundle\DependencyInjection\Compiler;
+namespace Aequasi\Bundle\CacheBundle\DependencyInjection\Builder;
 
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
@@ -15,7 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  *
  * @package Aequasi\Bundle\CacheBundle\DependencyInjection\Compiler
  */
-abstract class BaseCompilerPass implements CompilerPassInterface
+abstract class BaseBuilder
 {
 
 	/**
@@ -26,7 +26,7 @@ abstract class BaseCompilerPass implements CompilerPassInterface
 	/**
 	 * {@inheritDoc}
 	 */
-	public function process( ContainerBuilder $container )
+	public function __construct( ContainerBuilder $container )
 	{
 		$this->container = $container;
 

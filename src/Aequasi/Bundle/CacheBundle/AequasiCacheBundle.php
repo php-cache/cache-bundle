@@ -11,7 +11,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Aequasi\Bundle\CacheBundle\DependencyInjection\Compiler;
 
 /**
- * CacheBundle Class
+ * Class AequasiCacheBundle
+ *
+ * @package Aequasi\Bundle\CacheBundle
  */
 class AequasiCacheBundle extends Bundle
 {
@@ -23,8 +25,11 @@ class AequasiCacheBundle extends Bundle
 	{
 		parent::build( $container );
 
-		$container->addCompilerPass( new Compiler\ServiceBuilderCompilerPass() );
 		$container->addCompilerPass( new Compiler\SessionSupportCompilerPass() );
 		$container->addCompilerPass( new Compiler\DoctrineSupportCompilerPass() );
+
+		if( $container->getParameter( 'kernel.debug' ) ) {
+			$container->addCompilerPass( new Compiler\DataCollectorCompilerPass() );
+		}
 	}
 }

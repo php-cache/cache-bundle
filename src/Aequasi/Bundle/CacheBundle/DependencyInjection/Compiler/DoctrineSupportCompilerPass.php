@@ -7,9 +7,6 @@
 namespace Aequasi\Bundle\CacheBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
-use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * DoctrineCompilerPass is a compiler pass to set the doctrine caches.
@@ -20,7 +17,7 @@ class DoctrineSupportCompilerPass extends BaseCompilerPass
 	protected function prepare()
 	{
 		// If there is no active session support, return
-		if( !$this->container->hasAlias( 'doctrine' ) ) {
+		if( !$this->container->hasAlias( 'doctrine.orm.entity_manager' ) ) {
 			return;
 		}
 
@@ -39,26 +36,21 @@ class DoctrineSupportCompilerPass extends BaseCompilerPass
 	 */
 	protected function enableDoctrineSupport( array $config )
 	{
-		$types = array( 'orm', 'odm' );
-		foreach( $types as $managerType ) {
-			foreach( $config[ 'doctrine' ][ 'managerType' ] as $name => $ems ) {
-				foreach( $ems as $em => $caches ) {
-					foreach( $caches as $cacheType => $cache ) {
-						// Get the type
-						$type = strtolower( $cache[ 'type' ] );
+		$types = array( 'entity_managers', 'document_managers' );
+		foreach( $config as $cacheType => $cacheData ) {
+			foreach( $types as $type ) {
+				if( !isset( $cacheData[ $type ] ) ) continue;
 
-						if( !isset( $cache[ 'instance' ] ) ) {
-							throw new InvalidConfigurationException( sprintf( "There was no instance passed. Please specify a instance in the %s entity manager under the %s type", $em, $cacheType ) );
-						}
-						$client = new Reference( sprintf( '%s.instance.%s', $this->getAlias(), $cache[ 'instance' ] ) );
-						$def    = new Definition( $this->container->getParameter( sprintf( 'cache.doctrine.%s.class', $type ) ) );
-						$def->setScope( ContainerInterface::SCOPE_CONTAINER );
-						$def->setCacheInstance( $client );
-						if( !empty( $cache[ 'namespace' ] ) ) {
-							$def->addMethodCall( 'setNamespace', array( $cache[ 'namespace' ] ) );
-						}
-						$this->container->setDefinition( sprintf( 'doctrine.%s.%s_%s', $managerType, $em, $cacheType ), $def );
-					}
+				if( !isset( $cacheData[ 'instance' ] ) ) {
+					throw new InvalidConfigurationException( sprintf( "There was no instance passed. Please specify a instance under the %s type", $cacheType ) );
+				}
+				$cacheDefinitionName = sprintf( '%s.instance.%s', $this->getAlias(), $cacheData[ 'instance' ] );
+				$definition = $this->container->getDefinition( $cacheDefinitionName );
+
+				foreach( $cacheData[ $type ] as $manager ) {
+					$doctrineDefinitionName = sprintf( "doctrine.%s.%s_%s_cache", ( $type == 'entity_managers' ? 'orm' : 'odm' ), $manager, $cacheType );
+					$this->container->setAlias( $doctrineDefinitionName, $cacheDefinitionName );
+					//$this->container->setDefinition( $doctrineDefinitionName, $definition );
 				}
 			}
 		}

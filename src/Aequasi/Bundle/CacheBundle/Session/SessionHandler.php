@@ -9,12 +9,10 @@ namespace Aequasi\Bundle\CacheBundle\Session;
 
 use Doctrine\Common\Cache\Cache;
 
-
 /**
- * SessionHandler.
+ * Class SessionHandler
  *
- * Cache based session storage handler
- *
+ * @package Aequasi\Bundle\CacheBundle\Session
  */
 class SessionHandler implements \SessionHandlerInterface
 {
