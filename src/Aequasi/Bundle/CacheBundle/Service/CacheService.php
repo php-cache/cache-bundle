@@ -13,6 +13,10 @@ use Doctrine\Common\Cache\Cache;
  * Class CacheService
  *
  * @package Aequasi\Bundle\CacheBundle\Service
+ * @method boolean flushAll() flushAll() Flushes all cache entries
+ * @method boolean deleteAll() deleteAll() Deletes all cache entries
+ * @method string  getNamespace() getNamespace() Retrieves the namespace that prefixes all cache ids.
+ * @method boolean setNamespace() setNamespace(string $namespace) Sets the namespace to prefix all cache ids wtih.
  */
 class CacheService implements Cache
 {
@@ -25,6 +29,24 @@ class CacheService implements Cache
 	private $logging = false;
 
 	private $calls = array();
+
+	/**
+	 * Magic Extension of the Cache Providers
+	 *
+	 * @param $name
+	 * @param $arguments
+	 *
+	 * @return mixed
+	 * @throws \InvalidArgumentException
+	 */
+	public function __call( $name, $arguments )
+	{
+		if( !method_exists( $this->cache, $name ) ) {
+			throw new \InvalidArgumentException( sprintf( "%s is not a valid function of the %s cache type.", $name, get_class( $this->cache ) ) );
+		}
+
+		return call_user_func_array( array( $this->cache, $name ), $arguments );
+	}
 
 	private function timeCall( $name, $arguments )
 	{
