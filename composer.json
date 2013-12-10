@@ -1,6 +1,5 @@
 {
 	"name":        "aequasi/cache-bundle",
-	"version":     "0.0.1",
 	"type":        "library",
 	"description": "Cached Bundle",
 	"keywords":    ["php", "cache", "redis", "memcached"],
