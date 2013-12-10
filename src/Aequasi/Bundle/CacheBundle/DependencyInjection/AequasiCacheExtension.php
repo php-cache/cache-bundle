@@ -6,16 +6,16 @@
  */
 namespace Aequasi\Bundle\CacheBundle\DependencyInjection;
 
+use Aequasi\Bundle\CacheBundle\DependencyInjection\Builder\ServiceBuilder;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 /**
- * This is the class that loads and manages your bundle configuration
+ * Class AequasiCacheExtension
  *
- * To learn more see {@link http://symfony.com/doc/current/cookbook/bundles/extension.html}
- * Based on Lsw\CacheBundle by Christian Soronellas
+ * @package Aequasi\Bundle\CacheBundle\DependencyInjection
  */
 class AequasiCacheExtension extends Extension
 {
@@ -34,7 +34,13 @@ class AequasiCacheExtension extends Extension
 		$loader = new Loader\YamlFileLoader( $container, new FileLocator( __DIR__ . '/../Resources/config' ) );
 		$loader->load( 'services.yml' );
 
+		if( $container->getParameter( 'kernel.debug' ) ) {
+			$loader->load( 'collector.yml' );
+		}
+
 		$container->setParameter( $this->getAlias() . '.instance', $config[ 'instances' ] );
+		new ServiceBuilder( $container );
+
 		$container->setParameter( $this->getAlias() . '.session', $config[ 'session' ] );
 		$container->setParameter( $this->getAlias() . '.doctrine', $config[ 'doctrine' ] );
 	}

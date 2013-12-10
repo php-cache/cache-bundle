@@ -2,17 +2,22 @@
 /**
  * @author    Aaron Scherer
  * @date      12/6/13
- * @copyright Underground Elephant
+ * @license   http://www.apache.org/licenses/LICENSE-2.0.html Apache License, Version 2.0
  */
 
-namespace Aequasi\Bundle\CacheBundle\DependencyInjection\Compiler;
+namespace Aequasi\Bundle\CacheBundle\DependencyInjection\Builder;
 
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Reference;
 
-class ServiceBuilderCompilerPass extends BaseCompilerPass
+/**
+ * Class ServiceBuilderCompilerPass
+ *
+ * @package Aequasi\Bundle\CacheBundle\DependencyInjection\Compiler
+ */
+class ServiceBuilder extends BaseBuilder
 {
 
 	/**
@@ -50,8 +55,16 @@ class ServiceBuilderCompilerPass extends BaseCompilerPass
 	{
 		$namespace = is_null( $instance[ 'namespace' ] ) ? $name : $instance[ 'namespace' ];
 
-		$service = $this->container->setDefinition( $this->getAlias() . '.instance.' . $name, new DefinitionDecorator( $typeId ) )
-		                           ->addMethodCall( 'setNamespace', array( $namespace ) );
+		$coreName = $this->getAlias() . '.instance.' . $name . '.core';
+		$service = $this->container
+			->setDefinition( $coreName, new Definition( $this->container->getParameter( $typeId . '.class' ) ) )
+		  ->addMethodCall( 'setNamespace', array( $namespace ) )
+			->setPublic( false );
+
+		$this->container
+			->setDefinition( $this->getAlias() . '.instance.' . $name , new Definition( $this->container->getParameter( 'aequasi_cache.service.class' ) ) )
+		  ->addMethodCall( 'setCache', array( new Reference( $coreName ) ) )
+			->addMethodCall( 'setLogging', array( $this->container->getParameter( 'kernel.debug' ) ) );
 
 		return $service;
 	}
@@ -71,7 +84,7 @@ class ServiceBuilderCompilerPass extends BaseCompilerPass
 						$host    = empty( $config[ 'host' ] ) ? 'localhost' : $config[ 'host' ];
 						$port    = empty( $config[ 'port' ] ) ? 11211 : $config[ 'port' ];
 						$timeout = is_null( $config[ 'timeout' ] ) ? 0 : $config[ 'timeout' ];
-						$cache->addMethodCall( 'addServer', $host, $port, $timeout );
+						$cache->addMethodCall( 'addServer', array( $host, $port, $timeout ) );
 					}
 					unset( $config );
 
@@ -94,7 +107,7 @@ class ServiceBuilderCompilerPass extends BaseCompilerPass
 						$host   = is_null( $config[ 'host' ] ) ? 'localhost' : $config[ 'host' ];
 						$port   = is_null( $config[ 'port' ] ) ? 11211 : $config[ 'port' ];
 						$weight = is_null( $config[ 'weight' ] ) ? 0 : $config[ 'weight' ];
-						$cache->addMethodCall( 'addServer', $host, $port, $weight );
+						$cache->addMethodCall( 'addServer', array( $host, $port, $weight ) );
 					}
 					unset( $config );
 
@@ -112,7 +125,7 @@ class ServiceBuilderCompilerPass extends BaseCompilerPass
 						$host    = empty( $config[ 'host' ] ) ? 'localhost' : $config[ 'host' ];
 						$port    = empty( $config[ 'port' ] ) ? 6379 : $config[ 'port' ];
 						$timeout = is_null( $config[ 'timeout' ] ) ? 2 : $config[ 'timeout' ];
-						$cache->addMethodCall( 'connect', $host, $port, $timeout );
+						$cache->addMethodCall( 'connect', array( $host, $port, $timeout ) );
 					}
 					unset( $config );
 
@@ -131,4 +144,4 @@ class ServiceBuilderCompilerPass extends BaseCompilerPass
 				break;
 		}
 	}
-} 
+}

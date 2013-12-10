@@ -28,8 +28,7 @@
 	},
 	"autoload":    {
 		"psr-0": {
-			"": "src"
+			"Aequasi\\Bundle\\CacheBundle": "src"
 		}
-	},
-	"target-dir": "Aequasi/Bundle/CachedBundle"
+	}
 }

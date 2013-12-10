@@ -9,12 +9,10 @@ namespace Aequasi\Bundle\CacheBundle\Session;
 
 use Doctrine\Common\Cache\Cache;
 
-
 /**
- * SessionHandler.
+ * Class SessionHandler
  *
- * Cache based session storage handler
- *
+ * @package Aequasi\Bundle\CacheBundle\Session
  */
 class SessionHandler implements \SessionHandlerInterface
 {
@@ -75,7 +73,7 @@ class SessionHandler implements \SessionHandlerInterface
 	 */
 	public function read( $sessionId )
 	{
-		return $this->cache->get( $this->prefix . $sessionId ) ? : '';
+		return $this->cache->fetch( $this->prefix . $sessionId ) ? : '';
 	}
 
 	/**
@@ -83,7 +81,7 @@ class SessionHandler implements \SessionHandlerInterface
 	 */
 	public function write( $sessionId, $data )
 	{
-		return $this->cache->set( $this->prefix . $sessionId, $data, time() + $this->ttl );
+		return $this->cache->save( $this->prefix . $sessionId, $data, time() + $this->ttl );
 	}
 
 	/**

@@ -12,13 +12,9 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Memcached;
 
 /**
- * This class contains the configuration information for the bundle
- *
- * This information is solely responsible for how the different configuration
- * sections are normalized, and merged.
+ * Class Configuration
  *
  * @package Aequasi\Bundle\CacheBundle\DependencyInjection
- *
  */
 class Configuration implements ConfigurationInterface
 {
@@ -165,37 +161,34 @@ class Configuration implements ConfigurationInterface
    */
   private function addDoctrineSection()
   {
-      $tree = new TreeBuilder();
-      $node = $tree->root('doctrine');
+	  $tree = new TreeBuilder();
+		$node = $tree->root('doctrine');
 
-      foreach (array('metadata', 'result', 'query') as $type) {
-          $node->children()
-              ->arrayNode($type)
-                  ->canBeUnset()
-                  ->children()
-                      ->scalarNode('instance')->isRequired()->end()
-                      ->scalarNode('prefix')->defaultValue('')->end()
-                  ->end()
-                  ->fixXmlConfig('entity_manager')
-                  ->children()
-                      ->arrayNode('entity_managers')
-                          ->defaultValue(array())
-                          ->beforeNormalization()->ifString()->then(function($v) { return (array) $v; })->end()
-                          ->prototype('scalar')->end()
-                      ->end()
-                  ->end()
-                  ->fixXmlConfig('document_manager')
-                  ->children()
-                      ->arrayNode('document_managers')
-                          ->defaultValue(array())
-                          ->beforeNormalization()->ifString()->then(function($v) { return (array) $v; })->end()
-                          ->prototype('scalar')->end()
-                      ->end()
-                  ->end()
-              ->end()
-          ->end();
-      }
+		foreach (array('metadata', 'result', 'query') as $type) {
+	    $node->children()
+        ->arrayNode($type)
+          ->canBeUnset()
+          ->children()
+            ->scalarNode('instance')->isRequired()->end()
+          ->end()
+          ->children()
+            ->arrayNode('entity_managers')
+              ->defaultValue(array())
+              ->beforeNormalization()->ifString()->then(function($v) { return (array) $v; })->end()
+              ->prototype('scalar')->end()
+            ->end()
+          ->end()
+          ->children()
+            ->arrayNode('document_managers')
+              ->defaultValue(array())
+              ->beforeNormalization()->ifString()->then(function($v) { return (array) $v; })->end()
+              ->prototype('scalar')->end()
+            ->end()
+          ->end()
+        ->end()
+	    ->end();
+		}
 
-      return $node;
+    return $node;
   }
 }
