@@ -97,7 +97,16 @@ If you change any of your routes, you will need to clear all of the route_* keys
 
 #### To Use
 
-You can use the default cache functions, doctrine's `useResultCache` and `useQueryCache`, along with the default doctrine functions. Heres an example
+To use this with doctrine's entity manager, just make sure you have useResultCache` and/or `useQueryCache` set to true. If you want to use the user cache, just grab the service out of the container like so:
+
+```php
+// Change default to the name of your instance
+$cache = $container->get( 'aequasi_cache.instance.default' );
+// Or
+$cache = $container->get( 'aequasi_cache.default' );
+```
+
+Here is an example usage of the service:
 
 ```php
 $cache = $this->get( 'aequasi_cache.instance.default' );
@@ -111,7 +120,7 @@ if( $data = $cache->fetch( $key ) ) {
 }
 ```
 
-There is also the `cache()` function on the service that allows you to wrap the above, into a single function
+There is also the `cache()` function on the service that allows you to wrap the above, into a single function:
 
 ```php
 $cache = $this->get( 'aequasi_cache.instance.default' );
