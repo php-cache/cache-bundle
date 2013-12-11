@@ -14,6 +14,9 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 class DoctrineSupportCompilerPass extends BaseCompilerPass
 {
 
+	/**
+	 * @return mixed|void
+	 */
 	protected function prepare()
 	{
 		// If there is no active session support, return
@@ -45,12 +48,10 @@ class DoctrineSupportCompilerPass extends BaseCompilerPass
 					throw new InvalidConfigurationException( sprintf( "There was no instance passed. Please specify a instance under the %s type", $cacheType ) );
 				}
 				$cacheDefinitionName = sprintf( '%s.instance.%s', $this->getAlias(), $cacheData[ 'instance' ] );
-				$definition = $this->container->getDefinition( $cacheDefinitionName );
 
 				foreach( $cacheData[ $type ] as $manager ) {
 					$doctrineDefinitionName = sprintf( "doctrine.%s.%s_%s_cache", ( $type == 'entity_managers' ? 'orm' : 'odm' ), $manager, $cacheType );
 					$this->container->setAlias( $doctrineDefinitionName, $cacheDefinitionName );
-					//$this->container->setDefinition( $doctrineDefinitionName, $definition );
 				}
 			}
 		}
