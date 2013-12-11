@@ -124,3 +124,7 @@ var_dump( $user );
 Create an issue if you've found a bug,
 
 or email me at aequasi@gmail.com
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/aequasi/cache-bundle/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
