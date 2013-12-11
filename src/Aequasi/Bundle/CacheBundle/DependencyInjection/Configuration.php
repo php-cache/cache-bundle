@@ -9,7 +9,7 @@ namespace Aequasi\Bundle\CacheBundle\DependencyInjection;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
-use Memcached;
+use aequasi_cache;
 
 /**
  * Class Configuration
@@ -49,6 +49,7 @@ class Configuration implements ConfigurationInterface
 				->append( $this->getClustersNode() )
 				->append($this->addSessionSupportSection())
 				->append($this->addDoctrineSection())
+				->append($this->addRouterSection())
 			->end()
 		;
 
@@ -133,7 +134,7 @@ class Configuration implements ConfigurationInterface
 	}
 
 	/**
-	 * Configure the "memcached.session" section
+	 * Configure the "aequasi_cache.session" section
 	 *
 	 * @return ArrayNodeDefinition
 	 */
@@ -143,6 +144,7 @@ class Configuration implements ConfigurationInterface
 		$node = $tree->root('session');
 
 		$node
+			->addDefaultsIfNotSet()
 			->children()
 				->scalarNode('instance')->isRequired()->end()
 				->scalarNode('prefix')->defaultValue("session_")->end()
@@ -155,7 +157,7 @@ class Configuration implements ConfigurationInterface
 
 
   /**
-   * Configure the "memcached.doctrine" section
+   * Configure the "aequasi_cache.doctrine" section
    *
    * @return ArrayNodeDefinition
    */
@@ -191,4 +193,25 @@ class Configuration implements ConfigurationInterface
 
     return $node;
   }
+
+	/**
+	 * Configure the "aequasi_cache.router" section
+	 *
+	 * @return ArrayNodeDefinition
+	 */
+	private function addRouterSection()
+	{
+		$tree = new TreeBuilder();
+		$node = $tree->root('router');
+
+		$node
+			->addDefaultsIfNotSet()
+			->children()
+				->scalarNode('instance')->defaultNull()->end()
+				->booleanNode('enabled')->defaultFalse()->end()
+			->end()
+		->end();
+
+		return $node;
+	}
 }
