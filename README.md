@@ -58,15 +58,14 @@ aequasi_cache:
     doctrine:
         metadata:
             instance: default
-            entity_manager: default          # the name of your entity_manager connection
-            document_manager: default        # the name of your document_manager connection
+            entity_managers:   [ default ]          # the name of your entity_manager connection
+            document_managers: [ default ]       # the name of your document_manager connection
         result:
             instance: default
-            entity_manager: [default, read]  # you may specify multiple entity_managers
-            prefix: "result_"                # you may specify a prefix for the entries
+            entity_managers:   [ default, read ]  # you may specify multiple entity_managers
         query:
             instance: default
-            entity_manager: default
+            entity_managers: [ default ]
 ```
 
 #### Session
