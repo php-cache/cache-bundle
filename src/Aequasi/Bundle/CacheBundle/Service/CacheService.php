@@ -13,9 +13,42 @@ use Doctrine\Common\Cache\Cache;
  * Class CacheService
  *
  * @package Aequasi\Bundle\CacheBundle\Service
+ * @method boolean flushAll() flushAll() Flushes all cache entries
+ * @method boolean deleteAll() deleteAll() Deletes all cache entries
+ * @method string  getNamespace() getNamespace() Retrieves the namespace that prefixes all cache ids.
+ * @method boolean setNamespace() setNamespace(string $namespace) Sets the namespace to prefix all cache ids wtih.
  */
 class CacheService implements Cache
 {
+	/**
+	 * 60 Second Cache
+	 */
+	const SIXTY_SECOND = 60;
+
+	/**
+	 * 30 Minute Cache
+	 */
+	const THIRTY_MINUTE = 1800;
+
+	/**
+	 * 1 Hour Cache
+	 */
+	const ONE_HOUR = 3600;
+
+	/**
+	 * 6 Hour Cache
+	 */
+	const SIX_HOUR = 21600;
+
+	/**
+	 * Infinite Cache
+	 */
+	const NO_EXPIRE = 0;
+
+	/**
+	 * No Cache
+	 */
+	const NO_CACHE = -1;
 
 	/**
 	 * @var Cache
@@ -25,6 +58,24 @@ class CacheService implements Cache
 	private $logging = false;
 
 	private $calls = array();
+
+	/**
+	 * Magic Extension of the Cache Providers
+	 *
+	 * @param $name
+	 * @param $arguments
+	 *
+	 * @return mixed
+	 * @throws \InvalidArgumentException
+	 */
+	public function __call( $name, $arguments )
+	{
+		if( !method_exists( $this->cache, $name ) ) {
+			throw new \InvalidArgumentException( sprintf( "%s is not a valid function of the %s cache type.", $name, get_class( $this->cache ) ) );
+		}
+
+		return call_user_func_array( array( $this->cache, $name ), $arguments );
+	}
 
 	private function timeCall( $name, $arguments )
 	{
@@ -88,7 +139,7 @@ class CacheService implements Cache
 	 *
 	 * @return boolean TRUE if the entry was successfully stored in the cache, FALSE otherwise.
 	 */
-	function save( $id, $data, $lifeTime = 0 )
+	function save( $id, $data, $lifeTime = self::NO_EXPIRE )
 	{
 		if( $this->isLogging() ) {
 			$call = $this->timeCall( 'save', array( $id, $data, $lifeTime ) );
@@ -118,6 +169,54 @@ class CacheService implements Cache
 		}
 
 		return $this->cache->delete( $id );
+	}
+
+	/**
+	 * Returns the $key from cache, if its there.
+	 * If its not there, it will use data to set the value.
+	 * If data is a closure, it will run the closure, and store the result.
+	 *
+	 * @param string         $id
+	 * @param callable|mixed $data
+	 * @param int            $lifeTime
+	 *
+	 * @return mixed
+	 */
+	public function cache( $id, $data, $lifeTime = self::NO_EXPIRE )
+	{
+		if( $lifeTime === self::NO_CACHE ) {
+			return $this->getDataFromPayload( $data );
+		}
+
+		if( $this->contains( $id ) ) {
+			return $this->fetch( $id );
+		}
+
+		$result = $this->getDataFromPayload( $data );
+		$this->save( $id, $result, $lifeTime );
+		return $result;
+	}
+
+	/**
+	 * Checks to see if $payload is callable, if it is, run it and return the data.
+	 * Otherwise, just return $payload
+	 *
+	 * @param $payload
+	 *
+	 * @return callable|mixed
+	 */
+	private function getDataFromPayload( $payload )
+	{
+		/** @var $payload \Closure|callable|mixed */
+		if( is_callable( $payload ) ) {
+			if( is_object( $payload ) && get_class( $payload ) == 'Closure' ) {
+				return $payload();
+			}
+
+			return call_user_func( $payload );
+		}
+
+		return $payload;
 	}
 
 	/**

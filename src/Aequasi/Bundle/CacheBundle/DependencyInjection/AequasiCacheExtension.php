@@ -6,7 +6,6 @@
  */
 namespace Aequasi\Bundle\CacheBundle\DependencyInjection;
 
-use Aequasi\Bundle\CacheBundle\DependencyInjection\Builder\ServiceBuilder;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
@@ -39,7 +38,9 @@ class AequasiCacheExtension extends Extension
 		}
 
 		$container->setParameter( $this->getAlias() . '.instance', $config[ 'instances' ] );
-		new ServiceBuilder( $container );
+		new Builder\ServiceBuilder( $container );
+		$container->setParameter( $this->getAlias() . '.router', $config[ 'router' ] );
+		new Builder\RouterBuilder( $container );
 
 		$container->setParameter( $this->getAlias() . '.session', $config[ 'session' ] );
 		$container->setParameter( $this->getAlias() . '.doctrine', $config[ 'doctrine' ] );
