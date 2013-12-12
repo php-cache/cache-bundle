@@ -18,31 +18,31 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 abstract class BaseBuilder
 {
 
-	/**
-	 * @var ContainerBuilder
-	 */
-	protected $container;
+    /**
+     * @var ContainerBuilder
+     */
+    protected $container;
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function __construct( ContainerBuilder $container )
-	{
-		$this->container = $container;
+    /**
+     * {@inheritDoc}
+     */
+    public function __construct( ContainerBuilder $container )
+    {
+        $this->container = $container;
 
-		$this->prepare();
-	}
+        $this->prepare();
+    }
 
-	/**
-	 * @return string
-	 */
-	protected function getAlias()
-	{
-		return 'aequasi_cache';
-	}
+    /**
+     * @return string
+     */
+    protected function getAlias()
+    {
+        return 'aequasi_cache';
+    }
 
-	/**
-	 * @return mixed
-	 */
-	abstract protected function prepare();
+    /**
+     * @return mixed
+     */
+    abstract protected function prepare();
 } 

@@ -20,34 +20,40 @@ use Symfony\Component\DependencyInjection\Reference;
 class RouterBuilder extends BaseBuilder
 {
 
-	/**
-	 * {@inheritDoc}
-	 */
-	protected function prepare( )
-	{
-		$router = $this->container->getParameter( $this->getAlias() . '.router' );
+    /**
+     * {@inheritDoc}
+     */
+    protected function prepare()
+    {
+        $router = $this->container->getParameter( $this->getAlias() . '.router' );
 
-		if( $router[ 'enabled' ] ) {
-			$this->buildRouter( $router );
-		}
-	}
+        if ($router[ 'enabled' ]) {
+            $this->buildRouter( $router );
+        }
+    }
 
-	private function buildRouter( array $config )
-	{
-		$instance  = $config[ 'instance' ];
-		$instances = $this->container->getParameter( $this->getAlias() . '.instance' );
+    private function buildRouter( array $config )
+    {
+        $instance = $config[ 'instance' ];
+        $instances = $this->container->getParameter( $this->getAlias() . '.instance' );
 
-		if( null === $instance ) {
-			throw new InvalidConfigurationException( 'Failed to hook into the router. No instance was passed.' );
-		}
-		if( !isset( $instances[ $instance ] ) ) {
-			throw new InvalidConfigurationException( sprintf( 'Failed to hook into the router. The instance "%s" doesn\'t exist!', $instance ) );
-		}
+        if (null === $instance) {
+            throw new InvalidConfigurationException( 'Failed to hook into the router. No instance was passed.' );
+        }
+        if (!isset( $instances[ $instance ] )) {
+            throw new InvalidConfigurationException( sprintf(
+                'Failed to hook into the router. The instance "%s" doesn\'t exist!',
+                $instance
+            ) );
+        }
 
-		if( !in_array( strtolower( $instances[ $instance ][ 'type' ] ), array( 'memcache', 'redis', 'memcached' ) ) ) {
-			throw new InvalidConfigurationException( sprintf( "%s is not a valid cache type for session support. Please use Memcache, Memcached, or Redis. ", $instances[ $instance ][ 'type' ] ) );
-		}
+        if (!in_array( strtolower( $instances[ $instance ][ 'type' ] ), array( 'memcache', 'redis', 'memcached' ) )) {
+            throw new InvalidConfigurationException( sprintf(
+                "%s is not a valid cache type for session support. Please use Memcache, Memcached, or Redis. ",
+                $instances[ $instance ][ 'type' ]
+            ) );
+        }
 
-		$this->container->setParameter( 'router.class', 'Aequasi\Bundle\CacheBundle\Routing\Router' );
-	}
+        $this->container->setParameter( 'router.class', 'Aequasi\Bundle\CacheBundle\Routing\Router' );
+    }
 }

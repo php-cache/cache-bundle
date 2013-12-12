@@ -16,62 +16,66 @@ use Aequasi\Bundle\CacheBundle\Service\CacheService;
 class Router extends BaseRouter
 {
 
-	/**
-	 * @var ContainerInterface
-	 */
-	protected $container;
+    /**
+     * @var ContainerInterface
+     */
+    protected $container;
 
-	/**
-	 * @var CacheService
-	 */
-	protected $cache;
+    /**
+     * @var CacheService
+     */
+    protected $cache;
 
-	public function __construct( ContainerInterface $container, $resource, array $options = array(), RequestContext $context = null )
-	{
-		$this->container = $container;
+    public function __construct(
+        ContainerInterface $container,
+        $resource,
+        array $options = array(),
+        RequestContext $context = null
+    ) {
+        $this->container = $container;
 
-		$this->initializeCache();
+        $this->initializeCache();
 
-		parent::__construct( $container, $resource, $options, $context );
-	}
+        parent::__construct( $container, $resource, $options, $context );
+    }
 
-	private function initializeCache()
-	{
-		$config   = $this->container->getParameter( 'aequasi_cache.router' );
-		$instance = $config[ 'instance' ];
+    private function initializeCache()
+    {
+        $config = $this->container->getParameter( 'aequasi_cache.router' );
+        $instance = $config[ 'instance' ];
 
-		/** @var CacheService $cache */
-		$this->cache = $this->container->get( 'aequasi_cache.instance.' . $instance );
-	}
+        /** @var CacheService $cache */
+        $this->cache = $this->container->get( 'aequasi_cache.instance.' . $instance );
+    }
 
-	public function getMatcher()
-	{
-		if( null !== $this->matcher ) {
-			return $this->matcher;
-		}
+    public function getMatcher()
+    {
+        if (null !== $this->matcher) {
+            return $this->matcher;
+        }
 
-		$matcher = new CacheUrlMatcher( $this->getRouteCollection(), $this->context );
-		$matcher->setCache( $this->cache );
+        $matcher = new CacheUrlMatcher( $this->getRouteCollection(), $this->context );
+        $matcher->setCache( $this->cache );
 
-		return $this->matcher = $matcher;
-	}
+        return $this->matcher = $matcher;
+    }
 
-	/**
-	 * {@inheritdoc}
-	 */
-	public function getRouteCollection()
-	{
-		$key = 'route_collection';
+    /**
+     * {@inheritdoc}
+     */
+    public function getRouteCollection()
+    {
+        $key = 'route_collection';
 
-		if( null === $this->collection ) {
-			if( $this->cache->contains( $key ) ) {
-				return $this->collection = $this->cache->fetch( $key );
-			}
+        if (null === $this->collection) {
+            if ($this->cache->contains( $key )) {
+                return $this->collection = $this->cache->fetch( $key );
+            }
 
-			$this->collection = parent::getRouteCollection();
-			$this->cache->save( $key, $this->collection, 60 * 60 * 24 * 7 );
-		}
+            $this->collection = parent::getRouteCollection();
+            $this->cache->save( $key, $this->collection, 60 * 60 * 24 * 7 );
+        }
 
-		return $this->collection;
-	}
+        return $this->collection;
+    }
 }

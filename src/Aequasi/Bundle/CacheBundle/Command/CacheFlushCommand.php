@@ -21,27 +21,28 @@ use Symfony\Component\Console\Input\InputArgument;
 class CacheFlushCommand extends ContainerAwareCommand
 {
 
-	/**
-	 * {@inheritdoc}
-	 */
-	protected function configure()
-	{
-		$this->setName( 'cache:flush' );
-		$this->setDescription( 'Flushes the given cache' );
-		$this->addArgument( 'instance', InputArgument::REQUIRED, 'Which instance do you want to clean?' );
-	}
+    /**
+     * {@inheritdoc}
+     */
+    protected function configure()
+    {
+        $this->setName( 'cache:flush' );
+        $this->setDescription( 'Flushes the given cache' );
+        $this->addArgument( 'instance', InputArgument::REQUIRED, 'Which instance do you want to clean?' );
+    }
 
-	/**
-	 * {@inheritdoc}
-	 */
-	protected function execute( InputInterface $input, OutputInterface $output )
-	{
-		$serviceName = 'aequasi_cache.instance.' . $input->getArgument( 'instance' );
+    /**
+     * {@inheritdoc}
+     */
+    protected function execute( InputInterface $input, OutputInterface $output )
+    {
+        $serviceName = 'aequasi_cache.instance.' . $input->getArgument( 'instance' );
 
-		/** @var CacheService $service */
-		$service = $this->getContainer()->get( $serviceName );
-		$service->flushAll();
+        /** @var CacheService $service */
+        $service = $this->getContainer()
+                        ->get( $serviceName );
+        $service->flushAll();
 
-		return 1;
-	}
+        return 1;
+    }
 } 
