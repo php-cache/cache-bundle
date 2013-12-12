@@ -17,7 +17,7 @@ class AequasiCacheExtensionTest extends TestCase
 		$container = $this->createContainerFromFile('service');
 
 
-		$config = $container->getParameter( $this->getAlias() . '.instances' );
+		$config = $container->getParameter( $this->getAlias() . '.instance' );
 
 		foreach( array( 'memcached', 'redis' ) as $type ) {
 
