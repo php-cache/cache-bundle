@@ -3,8 +3,11 @@ php:
   - "5.4"
   - "5.3"
 
+services:
+    - redis-server
+    - memcached
+
 before_script:
-    - echo "extension = memcached.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
-    - echo "extension = redis.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+    - ./.travis.cache.sh
     - composer self-update
-    - composer install --dev --prefer-source
+    - composer install --dev --prefer-source --no-interaction
