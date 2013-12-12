@@ -49,7 +49,7 @@ class AequasiCacheExtension extends Extension
 			$container->setParameter( $this->getAlias() . '.session', $config[ 'session' ] );
 		}
 
-		if( isset( $config[ 'session' ] ) ) {
+		if( isset( $config[ 'doctrine' ] ) ) {
 			$container->setParameter( $this->getAlias() . '.doctrine', $config[ 'doctrine' ] );
 		}
 	}
