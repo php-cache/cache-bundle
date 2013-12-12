@@ -26,7 +26,7 @@ class AequasiCacheExtensionTest extends TestCase
 			$this->assertTrue( $container->hasDefinition( $this->getAlias() . '.instance.' . $type ) );
 			$this->assertTrue( $container->hasDefinition( $this->getAlias() . '.' . $type ) );
 
-			$this->assertInstanceOf( 'Aequasi\Bundle\CacheBundle\Service\CacheService', $container->get( $this->getAlias() . '.' . $type ) );
+			$this->assertInstanceOf( 'Aequasi\Bundle\CacheBundle\Service\CacheService', $container->get( $this->getAlias() . '.instance.' . $type ) );
 			$this->assertInstanceOf( 'Doctrine\Common\Cache\Cache', $container->get( $this->getAlias() . '.' . $type )->getCache() );
 
 			$function = 'get' . ucwords( $type );
