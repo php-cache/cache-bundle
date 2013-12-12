@@ -1,0 +1,10 @@
+language: php
+php:
+  - "5.4"
+  - "5.3"
+
+before_script:
+    - echo "extension = memcached.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+    - echo "extension = redis.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+    - composer self-update
+    - composer install --dev --prefer-source

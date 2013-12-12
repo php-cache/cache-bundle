@@ -1,0 +1,9 @@
+aequasi_cache:
+    instances:
+        default:
+            type: redis
+            hosts:
+                - { host: localhost, port: 6379 }
+    router:
+        enabled: true
+        instance: default
