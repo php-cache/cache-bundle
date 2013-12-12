@@ -46,7 +46,7 @@ class AequasiCacheExtensionTest extends TestCase
 		$this->assertTrue( $config[ 'enabled' ] );
 		$this->assertEquals( $config[ 'instance' ], 'default' );
 
-		$this->assertInstanceOf( 'Aequasi\Bundle\CacheBundle\Routing\Router', $container->get( 'router' ) );
+		$this->assertEquals( 'Aequasi\Bundle\CacheBundle\Routing\Router', $container->getParameter( 'router.class' ) );
 	}
 
 	private function getAlias()
