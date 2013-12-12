@@ -1,4 +1,4 @@
-Aequasi cache-bundle
+Aequasi cache-bundle [![Build Status](https://travis-ci.org/aequasi/cache-bundle.png?branch=master)](https://travis-ci.org/aequasi/cache-bundle)
 ====================
 
 #### Cache Bundle for Symfony 2
