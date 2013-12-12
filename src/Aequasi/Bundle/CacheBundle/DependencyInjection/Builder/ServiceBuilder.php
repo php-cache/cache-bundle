@@ -35,7 +35,7 @@ class ServiceBuilder extends BaseBuilder
 
 	private function buildInstance( $name, array $instance )
 	{
-		$typeId = $this->getAlias() . '.' . $instance[ 'type' ];
+		$typeId = $this->getAlias() . '.abstract.' . $instance[ 'type' ];
 		if( !$this->container->hasDefinition( $typeId ) ) {
 			throw new InvalidConfigurationException( sprintf( "`%s` is not a valid cache type. If you are using a custom type, make sure to add your service. ", $instance[ 'type' ] ) );
 		}
