@@ -8,6 +8,7 @@
 namespace Aequasi\Bundle\CacheBundle\DependencyInjection\Builder;
 
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Reference;
@@ -65,6 +66,9 @@ class ServiceBuilder extends BaseBuilder
 			->setDefinition( $this->getAlias() . '.instance.' . $name , new Definition( $this->container->getParameter( 'aequasi_cache.service.class' ) ) )
 		  ->addMethodCall( 'setCache', array( new Reference( $coreName ) ) )
 			->addMethodCall( 'setLogging', array( $this->container->getParameter( 'kernel.debug' ) ) );
+
+		$alias = new Alias( $this->getAlias() . '.instance.' . $name );
+		$this->container->setAlias( $this->getAlias() . '.' . $name, $alias );
 
 		return $service;
 	}
