@@ -42,7 +42,7 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode    = $treeBuilder->root( 'cache' );
+        $rootNode    = $treeBuilder->root('cache');
 
         $rootNode
             ->children()
@@ -61,69 +61,69 @@ class Configuration implements ConfigurationInterface
     private function getClustersNode()
     {
         $treeBuilder = new TreeBuilder();
-        $node        = $treeBuilder->root( 'instances' );
+        $node        = $treeBuilder->root('instances');
 
         $node
             ->requiresAtLeastOneElement()
-            ->addDefaultChildrenIfNoneSet( 'default' )
-            ->useAttributeAsKey( 'name' )
-            ->prototype( 'array' )
+            ->addDefaultChildrenIfNoneSet('default')
+            ->useAttributeAsKey('name')
+            ->prototype('array')
                 ->children()
-                    ->enumNode( 'type' )
-                        ->values( array( 'redis', 'file', 'memcached', 'apc' ) )
+                    ->enumNode('type')
+                        ->values(array('redis', 'file', 'memcached', 'apc'))
                     ->end()
-                    ->scalarNode( 'id' )
+                    ->scalarNode('id')
                         ->defaultNull()
                     ->end()
-                    ->scalarNode( 'namespace' )
+                    ->scalarNode('namespace')
                         ->defaultNull()
-                        ->info( "Namespace for doctrine keys." )
+                        ->info("Namespace for doctrine keys.")
                     ->end()
-                    ->booleanNode( 'persistent' )
+                    ->booleanNode('persistent')
                         ->defaultNull()
-                        ->info( "For Redis and Memcached: Specify if you want persistent connections" )
+                        ->info("For Redis and Memcached: Specify if you want persistent connections")
                     ->end()
-                    ->scalarNode( 'auth_password' )
-                        ->info( "For Redis: Authorization info" )
+                    ->scalarNode('auth_password')
+                        ->info("For Redis: Authorization info")
                     ->end()
-                    ->scalarNode( 'directory' )
-                        ->info( "For File System and PHP File: Directory to store cache." )
-                        ->defaultNull()
-                    ->end()
-                    ->scalarNode( 'extension' )
-                        ->info( "For File System and PHP File: Extension to use." )
+                    ->scalarNode('directory')
+                        ->info("For File System and PHP File: Directory to store cache.")
                         ->defaultNull()
                     ->end()
-                    ->arrayNode( 'options' )
-                        ->info( "Options for Redis and Memcached" )
+                    ->scalarNode('extension')
+                        ->info("For File System and PHP File: Extension to use.")
+                        ->defaultNull()
                     ->end()
-                    ->arrayNode( 'hosts' )
-                        ->prototype( 'array' )
+                    ->arrayNode('options')
+                        ->info("Options for Redis and Memcached")
+                    ->end()
+                    ->arrayNode('hosts')
+                        ->prototype('array')
                             ->children()
-                                ->scalarNode( 'host' )
+                                ->scalarNode('host')
                                     ->defaultNull()
                                 ->end()
-                                ->scalarNode( 'port' )
+                                ->scalarNode('port')
                                     ->defaultNull()
                                     ->validate()
-                                        ->ifTrue( function ( $v ) { return !is_null( $v ) && !is_numeric( $v ); } )
-                                        ->thenInvalid( "Host port must be numeric" )
+                                        ->ifTrue(function ($v) { return !is_null($v) && !is_numeric($v); })
+                                        ->thenInvalid("Host port must be numeric")
                                     ->end()
                                 ->end()
-                                ->scalarNode( 'weight' )
-                                    ->info( "For Memcached: Weight for given host." )
+                                ->scalarNode('weight')
+                                    ->info("For Memcached: Weight for given host.")
                                     ->defaultNull()
                                     ->validate()
-                                        ->ifTrue( function ( $v ) { return !is_null( $v ) && !is_numeric( $v ); } )
-                                        ->thenInvalid( 'host weight must be numeric' )
+                                        ->ifTrue(function ($v) { return !is_null($v) && !is_numeric($v); })
+                                        ->thenInvalid('host weight must be numeric')
                                     ->end()
                                 ->end()
-                                ->scalarNode( 'timeout' )
-                                    ->info( "For Redis and Memcache: Timeout for the given host." )
+                                ->scalarNode('timeout')
+                                    ->info("For Redis and Memcache: Timeout for the given host.")
                                     ->defaultNull()
                                     ->validate()
-                                        ->ifTrue( function ( $v ) { return !is_null( $v ) && !is_numeric( $v ); } )
-                                        ->thenInvalid( 'host timeout must be numeric' )
+                                        ->ifTrue(function ($v) { return !is_null($v) && !is_numeric($v); })
+                                        ->thenInvalid('host timeout must be numeric')
                                     ->end()
                                 ->end()
                             ->end()
@@ -143,14 +143,14 @@ class Configuration implements ConfigurationInterface
     private function addSessionSupportSection()
     {
         $tree = new TreeBuilder();
-        $node = $tree->root( 'session' );
+        $node = $tree->root('session');
 
         $node
             ->addDefaultsIfNotSet()
             ->children()
-                ->scalarNode( 'instance' )->isRequired()->end()
-                ->scalarNode( 'prefix' )->defaultValue( "session_" )->end()
-                ->scalarNode( 'ttl' )->end()
+                ->scalarNode('instance')->isRequired()->end()
+                ->scalarNode('prefix')->defaultValue("session_")->end()
+                ->scalarNode('ttl')->end()
             ->end();
 
         return $node;
@@ -164,7 +164,7 @@ class Configuration implements ConfigurationInterface
     private function addDoctrineSection()
     {
         $tree = new TreeBuilder();
-        $node = $tree->root( 'doctrine' );
+        $node = $tree->root('doctrine');
 
         $types = array('metadata', 'result', 'query');
         foreach ($types as $type) {
@@ -173,22 +173,22 @@ class Configuration implements ConfigurationInterface
                     ->arrayNode( $type )
                         ->canBeUnset()
                         ->children()
-                            ->scalarNode( 'instance' )->isRequired()->end()
-                            ->arrayNode( 'entity_managers' )
+                            ->scalarNode('instance')->isRequired()->end()
+                            ->arrayNode('entity_managers')
                                 ->defaultValue( array() )
                                 ->beforeNormalization()
                                     ->ifString()
-                                    ->then( function ( $v ) { return (array)$v; } )
+                                    ->then( function ($v) { return (array)$v; } )
                                 ->end()
                                 ->prototype( 'scalar' )->end()
                             ->end()
-                            ->arrayNode( 'document_managers' )
-                                ->defaultValue( array() )
+                            ->arrayNode('document_managers')
+                                ->defaultValue(array())
                                 ->beforeNormalization()
                                     ->ifString()
-                                    ->then( function ( $v ) { return (array)$v; } )
+                                    ->then(function ($v) { return (array)$v; } )
                                 ->end()
-                                ->prototype( 'scalar' )->end()
+                                ->prototype('scalar')->end()
                         ->end()
                     ->end()
                 ->end();
@@ -205,13 +205,13 @@ class Configuration implements ConfigurationInterface
     private function addRouterSection()
     {
         $tree = new TreeBuilder();
-        $node = $tree->root( 'router' );
+        $node = $tree->root('router');
 
         $node
             ->addDefaultsIfNotSet()
             ->children()
-                ->scalarNode( 'instance' )->defaultNull()->end()
-                ->booleanNode( 'enabled' )->defaultFalse()->end()
+                ->scalarNode('instance')->defaultNull()->end()
+                ->booleanNode('enabled')->defaultFalse()->end()
             ->end();
 
         return $node;

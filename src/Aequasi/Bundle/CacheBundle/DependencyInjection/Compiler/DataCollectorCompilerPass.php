@@ -23,15 +23,15 @@ class DataCollectorCompilerPass extends BaseCompilerPass
      */
     protected function prepare()
     {
-        $instances = $this->container->getParameter( $this->getAlias() . '.instance' );
+        $instances = $this->container->getParameter($this->getAlias() . '.instance');
 
-        $definition = $this->container->getDefinition( 'data_collector.cache' );
+        $definition = $this->container->getDefinition('data_collector.cache');
 
-        foreach (array_keys( $instances ) as $name) {
-            $instance = new Reference( sprintf( "%s.instance.%s", $this->getAlias(), $name ) );
-            $definition->addMethodCall( 'addInstance', array( $name, $instance ) );
+        foreach (array_keys($instances) as $name) {
+            $instance = new Reference(sprintf("%s.instance.%s", $this->getAlias(), $name));
+            $definition->addMethodCall('addInstance', array($name, $instance));
         }
 
-        $this->container->setDefinition( 'data_collector.cache', $definition );
+        $this->container->setDefinition('data_collector.cache', $definition);
     }
 }

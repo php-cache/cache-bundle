@@ -26,7 +26,7 @@ abstract class BaseCompilerPass implements CompilerPassInterface
     /**
      * {@inheritDoc}
      */
-    public function process( ContainerBuilder $container )
+    public function process(ContainerBuilder $container)
     {
         $this->container = $container;
 

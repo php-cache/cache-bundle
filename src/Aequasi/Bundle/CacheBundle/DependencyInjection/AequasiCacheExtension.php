@@ -25,32 +25,32 @@ class AequasiCacheExtension extends Extension
      * @param array            $configs   Array of configs
      * @param ContainerBuilder $container Container Object
      */
-    public function load( array $configs, ContainerBuilder $container )
+    public function load(array $configs, ContainerBuilder $container)
     {
-        $configuration = new Configuration( $container->getParameter( 'kernel.debug' ) );
-        $config        = $this->processConfiguration( $configuration, $configs );
+        $configuration = new Configuration($container->getParameter('kernel.debug'));
+        $config        = $this->processConfiguration($configuration, $configs);
 
-        $loader = new Loader\YamlFileLoader( $container, new FileLocator( __DIR__ . '/../Resources/config' ) );
-        $loader->load( 'services.yml' );
+        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
+        $loader->load('services.yml');
 
-        if ($container->getParameter( 'kernel.debug' )) {
-            $loader->load( 'collector.yml' );
+        if ($container->getParameter('kernel.debug')) {
+            $loader->load('collector.yml');
         }
 
-        $container->setParameter( $this->getAlias() . '.instance', $config[ 'instances' ] );
-        new Builder\ServiceBuilder( $container );
+        $container->setParameter($this->getAlias() . '.instance', $config['instances']);
+        new Builder\ServiceBuilder($container);
 
-        if (isset( $config[ 'router' ] )) {
-            $container->setParameter( $this->getAlias() . '.router', $config[ 'router' ] );
-            new Builder\RouterBuilder( $container );
+        if (isset($config['router'])) {
+            $container->setParameter($this->getAlias() . '.router', $config['router']);
+            new Builder\RouterBuilder($container);
         }
 
-        if (isset( $config[ 'session' ] )) {
-            $container->setParameter( $this->getAlias() . '.session', $config[ 'session' ] );
+        if (isset($config['session'])) {
+            $container->setParameter($this->getAlias() . '.session', $config['session']);
         }
 
-        if (isset( $config[ 'doctrine' ] )) {
-            $container->setParameter( $this->getAlias() . '.doctrine', $config[ 'doctrine' ] );
+        if (isset($config['doctrine'])) {
+            $container->setParameter($this->getAlias() . '.doctrine', $config['doctrine']);
         }
     }
 }

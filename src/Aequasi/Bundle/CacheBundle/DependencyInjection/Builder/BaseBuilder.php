@@ -26,7 +26,7 @@ abstract class BaseBuilder
     /**
      * {@inheritDoc}
      */
-    public function __construct( ContainerBuilder $container )
+    public function __construct(ContainerBuilder $container)
     {
         $this->container = $container;
 
