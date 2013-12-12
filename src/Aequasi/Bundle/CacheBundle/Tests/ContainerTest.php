@@ -19,7 +19,7 @@ class ContainerTest extends TestCase
          */
         public function testContainer()
         {
-                $container = $this->createYamlBundleTestContainer();
+                $container = $this->createContainer();
 
                 // @TODO Create Tests.....
                 $this->assertTrue( true );
