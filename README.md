@@ -26,7 +26,7 @@ Add the bundle to app/AppKernel.php
 ```php
 $bundles(
     ...
-       new Aequasi\Bundle\CacheBundle\CacheBundle(),
+       new Aequasi\Bundle\CacheBundle\AequasiCacheBundle(),
     ...
 );
 ```
