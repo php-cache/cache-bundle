@@ -1,54 +1,54 @@
 parameters:
-    aequasi_cache.apc.class: Doctrine\Common\Cache\ApcCache
-    aequasi_cache.array.class: Doctrine\Common\Cache\ArrayCache
-    aequasi_cache.file_system.class: Doctrine\Common\Cache\FilesystemCache
-    aequasi_cache.memcache.class: Doctrine\Common\Cache\MemcacheCache
-    aequasi_cache.memcached.class: Doctrine\Common\Cache\MemcachedCache
-    aequasi_cache.redis.class: Doctrine\Common\Cache\RedisCache
-    aequasi_cache.php_file.class: Doctrine\Common\Cache\PhpFileCache
-    aequasi_cache.win_cache.class: Doctrine\Common\Cache\WinCacheCache
-    aequasi_cache.xcache.class: Doctrine\Common\Cache\XcacheCache
-    aequasi_cache.zend_data.class: Doctrine\Common\Cache\ZendDataCache
+    aequasi_cache.abstract.apc.class: Doctrine\Common\Cache\ApcCache
+    aequasi_cache.abstract.array.class: Doctrine\Common\Cache\ArrayCache
+    aequasi_cache.abstract.file_system.class: Doctrine\Common\Cache\FilesystemCache
+    aequasi_cache.abstract.memcache.abstract.class: Doctrine\Common\Cache\MemcacheCache
+    aequasi_cache.abstract.memcached.class: Doctrine\Common\Cache\MemcachedCache
+    aequasi_cache.abstract.redis.class: Doctrine\Common\Cache\RedisCache
+    aequasi_cache.abstract.php_file.class: Doctrine\Common\Cache\PhpFileCache
+    aequasi_cache.abstract.win_cache.abstract.class: Doctrine\Common\Cache\WinCacheCache
+    aequasi_cache.abstract.xcache.abstract.class: Doctrine\Common\Cache\XcacheCache
+    aequasi_cache.abstract.zend_data.class: Doctrine\Common\Cache\ZendDataCache
     aequasi_cache.session.handler.class: Aequasi\Bundle\CacheBundle\Session\SessionHandler
     aequasi_cache.service.class: Aequasi\Bundle\CacheBundle\Service\CacheService
 
 services:
     aequasi_cache.abstract.apc:
-        class: %aequasi_cache.apc.class%
+        class: %aequasi_cache.abstract.apc.class%
         abstract: true
 
     aequasi_cache.abstract.array:
-        class: %aequasi_cache.array.class%
+        class: %aequasi_cache.abstract.array.class%
         abstract: true
 
     aequasi_cache.abstract.file_system:
-        class: %aequasi_cache.file_system.class%
+        class: %aequasi_cache.abstract.file_system.class%
         abstract: true
 
     aequasi_cache.abstract.memcache:
-        class: %aequasi_cache.memcache.class%
+        class: %aequasi_cache.abstract.memcache.class%
         abstract: true
 
     aequasi_cache.abstract.memcached:
-        class: %aequasi_cache.memcached.class%
+        class: %aequasi_cache.abstract.memcached.class%
         abstract: true
 
     aequasi_cache.abstract.redis:
-        class: %aequasi_cache.redis.class%
+        class: %aequasi_cache.abstract.redis.class%
         abstract: true
 
     aequasi_cache.abstract.php_file:
-        class: %aequasi_cache.php_file.class%
+        class: %aequasi_cache.abstract.php_file.class%
         abstract: true
 
     aequasi_cache.abstract.win_cache:
-        class: %aequasi_cache.win_cache.class%
+        class: %aequasi_cache.abstract.win_cache.class%
         abstract: true
 
     aequasi_cache.abstract.xcache:
-        class: %aequasi_cache.xcache.class%
+        class: %aequasi_cache.abstract.xcache.class%
         abstract: true
 
     aequasi_cache.zend_data:
-        class: %aequasi_cache.zend_data.class%
+        class: %aequasi_cache.abstract.zend_data.class%
         abstract: true
