@@ -16,30 +16,39 @@ services:
     aequasi_cache.abstract.apc:
         class: %aequasi_cache.apc.class%
         abstract: true
+
     aequasi_cache.abstract.array:
         class: %aequasi_cache.array.class%
         abstract: true
+
     aequasi_cache.abstract.file_system:
         class: %aequasi_cache.file_system.class%
         abstract: true
+
     aequasi_cache.abstract.memcache:
         class: %aequasi_cache.memcache.class%
         abstract: true
+
     aequasi_cache.abstract.memcached:
         class: %aequasi_cache.memcached.class%
         abstract: true
+
     aequasi_cache.abstract.redis:
         class: %aequasi_cache.redis.class%
         abstract: true
+
     aequasi_cache.abstract.php_file:
         class: %aequasi_cache.php_file.class%
         abstract: true
+
     aequasi_cache.abstract.win_cache:
         class: %aequasi_cache.win_cache.class%
         abstract: true
+
     aequasi_cache.abstract.xcache:
         class: %aequasi_cache.xcache.class%
         abstract: true
+
     aequasi_cache.zend_data:
         class: %aequasi_cache.zend_data.class%
         abstract: true
