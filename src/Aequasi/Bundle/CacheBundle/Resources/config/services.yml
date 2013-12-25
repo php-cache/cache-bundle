@@ -6,8 +6,8 @@ parameters:
     aequasi_cache.abstract.memcached.class: Doctrine\Common\Cache\MemcachedCache
     aequasi_cache.abstract.redis.class: Doctrine\Common\Cache\RedisCache
     aequasi_cache.abstract.php_file.class: Doctrine\Common\Cache\PhpFileCache
-    aequasi_cache.abstract.win_cache.abstract.class: Doctrine\Common\Cache\WinCacheCache
-    aequasi_cache.abstract.xcache.abstract.class: Doctrine\Common\Cache\XcacheCache
+    aequasi_cache.abstract.win_cache.class: Doctrine\Common\Cache\WinCacheCache
+    aequasi_cache.abstract.xcache.class: Doctrine\Common\Cache\XcacheCache
     aequasi_cache.abstract.zend_data.class: Doctrine\Common\Cache\ZendDataCache
     aequasi_cache.session.handler.class: Aequasi\Bundle\CacheBundle\Session\SessionHandler
     aequasi_cache.service.class: Aequasi\Bundle\CacheBundle\Service\CacheService
