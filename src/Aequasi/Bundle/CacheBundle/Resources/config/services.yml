@@ -2,7 +2,7 @@ parameters:
     aequasi_cache.abstract.apc.class: Doctrine\Common\Cache\ApcCache
     aequasi_cache.abstract.array.class: Doctrine\Common\Cache\ArrayCache
     aequasi_cache.abstract.file_system.class: Doctrine\Common\Cache\FilesystemCache
-    aequasi_cache.abstract.memcache.abstract.class: Doctrine\Common\Cache\MemcacheCache
+    aequasi_cache.abstract.memcache.class: Doctrine\Common\Cache\MemcacheCache
     aequasi_cache.abstract.memcached.class: Doctrine\Common\Cache\MemcachedCache
     aequasi_cache.abstract.redis.class: Doctrine\Common\Cache\RedisCache
     aequasi_cache.abstract.php_file.class: Doctrine\Common\Cache\PhpFileCache
