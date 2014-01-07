@@ -100,7 +100,7 @@ class CacheService implements Cache
      *
      * @return mixed The cached data or FALSE, if no cache entry exists for the given id.
      */
-    function fetch( $id )
+    public function fetch( $id )
     {
         if ($this->isLogging()) {
             $call         = $this->timeCall( 'fetch', array( $id ) );
@@ -122,7 +122,7 @@ class CacheService implements Cache
      *
      * @return boolean TRUE if a cache entry exists for the given cache id, FALSE otherwise.
      */
-    function contains( $id )
+    public function contains( $id )
     {
         if ($this->isLogging()) {
             $call           = $this->timeCall( 'contains', array( $id ) );
@@ -144,7 +144,7 @@ class CacheService implements Cache
      *
      * @return boolean TRUE if the entry was successfully stored in the cache, FALSE otherwise.
      */
-    function save( $id, $data, $lifeTime = self::NO_EXPIRE )
+    public function save( $id, $data, $lifeTime = self::NO_EXPIRE )
     {
         if ($this->isLogging()) {
             $call            = $this->timeCall( 'save', array( $id, $data, $lifeTime ) );
@@ -164,7 +164,7 @@ class CacheService implements Cache
      *
      * @return boolean TRUE if the cache entry was successfully deleted, FALSE otherwise.
      */
-    function delete( $id )
+    public function delete( $id )
     {
         if ($this->isLogging()) {
             $call           = $this->timeCall( 'delete', array( $id ) );
@@ -248,7 +248,7 @@ class CacheService implements Cache
      *
      * @return array|null An associative array with server's statistics if available, NULL otherwise.
      */
-    function getStats()
+    public function getStats()
     {
         return $this->cache->getStats();
     }
