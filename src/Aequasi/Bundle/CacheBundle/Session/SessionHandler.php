@@ -49,7 +49,7 @@ class SessionHandler implements \SessionHandlerInterface
         $this->cache = $cache;
 
         $this->ttl    = isset( $options[ 'cookie_lifetime' ] ) ? (int)$options[ 'cookie_lifetime' ] : 86400;
-        $this->prefix = isset( $options[ 'prefix' ] ) ? $options[ 'prefix' ] : 'sf2s';
+        $this->prefix = isset( $options[ 'prefix' ] ) ? $options[ 'prefix' ] : 'sf2ses_';
     }
 
     /**
@@ -81,7 +81,7 @@ class SessionHandler implements \SessionHandlerInterface
      */
     public function write( $sessionId, $data )
     {
-        return $this->cache->save( $this->prefix . $sessionId, $data, time() + $this->ttl );
+        return $this->cache->save( $this->prefix . $sessionId, $data, $this->ttl );
     }
 
     /**

@@ -74,14 +74,14 @@ class ServiceBuilder extends BaseBuilder
     private function prepareCacheClass(Definition $service, $name, array $instance)
     {
         $type  = $instance['type'];
-        $id    = sprintf("%s.instance.%s.%s_instance", $this->getAlias(), $name, $type);
+        $id    = sprintf("%s.instance.%s.cache_instance", $this->getAlias(), $name);
         $cache = null;
 
         switch ($type) {
             case 'memcache':
                 if (empty($instance['id'])) {
                     $cache = new Definition('Memcache');
-                    $cache->setPublic(false);
+                    //$cache->setPublic(false);
                     foreach ($instance['hosts'] as $config) {
                         $host    = empty($config['host']) ? 'localhost' : $config['host'];
                         $port    = empty($config['port']) ? 11211 : $config['port'];
@@ -99,11 +99,12 @@ class ServiceBuilder extends BaseBuilder
             case 'memcached':
                 if (empty($instance['id'])) {
                     $cache = new Definition('Memcached');
+                    //$cache->setPublic(false);
+
                     if ($instance['persistent']) {
                         $cache->setArguments(array(serialize($instance['hosts'])));
                     }
 
-                    $cache->setPublic(false);
                     foreach ($instance['hosts'] as $config) {
                         $host   = is_null($config['host']) ? 'localhost' : $config['host'];
                         $port   = is_null($config['port']) ? 11211 : $config['port'];
@@ -121,7 +122,8 @@ class ServiceBuilder extends BaseBuilder
             case 'redis':
                 if (empty($instance['id'])) {
                     $cache = new Definition('Redis');
-                    $cache->setPublic(false);
+                    //$cache->setPublic(false);
+
                     foreach ($instance['hosts'] as $config) {
                         $host    = empty($config['host']) ? 'localhost' : $config['host'];
                         $port    = empty($config['port']) ? 6379 : $config['port'];

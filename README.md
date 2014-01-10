@@ -14,11 +14,13 @@ Redis uses the php redis extension.
 #### Requirements
 
 - PHP 5.3.x or 5.4.x
+- [Composer](http://getcomposer.org)
 
 #### To Install
 
+Run the following in your project root, assuming you have composer set up for your project
 ```sh
-	composer.phar require aequasi/cache-bundle dev-master
+composer.phar require aequasi/cache-bundle dev-master
 ```
 
 Add the bundle to app/AppKernel.php
