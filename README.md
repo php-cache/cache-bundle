@@ -87,7 +87,7 @@ This bundle also provides router caching, to help speed that section up. To enab
 ```yml
 aequasi_cache:
     router:
-        enable: true
+        enabled: true
         instance: default
 ```
 
