@@ -77,6 +77,10 @@ class ServiceBuilder extends BaseBuilder
         $id    = sprintf("%s.instance.%s.cache_instance", $this->getAlias(), $name);
         $cache = null;
 
+        if (isset($instance['hosts'])) {
+            $service->addMethodCall('setHosts', array($instance['hosts']));
+        }
+
         switch ($type) {
             case 'memcache':
                 if (empty($instance['id'])) {

@@ -60,6 +60,8 @@ class CacheService implements Cache
 
     private $calls = array();
 
+    protected $hosts = array();
+
     /**
      * Magic Extension of the Cache Providers
      *
@@ -291,5 +293,29 @@ class CacheService implements Cache
     public function getCalls()
     {
         return $this->calls;
+    }
+
+    /**
+     * @param array $host
+     */
+    public function addHost(array $host)
+    {
+        $this->hosts[] = $host;
+    }
+
+    /**
+     * @param array $hosts
+     */
+    public function setHosts(array $hosts)
+    {
+        $this->hosts = $hosts;
+    }
+
+    /**
+     * @return array
+     */
+    public function getHosts()
+    {
+        return $this->hosts;
     }
 }
