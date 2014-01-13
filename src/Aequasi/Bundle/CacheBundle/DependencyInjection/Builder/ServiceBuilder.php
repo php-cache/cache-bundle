@@ -57,18 +57,22 @@ class ServiceBuilder extends BaseBuilder
         $namespace = is_null($instance['namespace']) ? $name : $instance['namespace'];
 
         $coreName = $this->getAlias() . '.instance.' . $name . '.core';
-        $service  = $this->container->setDefinition($coreName, new Definition($this->container->getParameter($typeId . '.class')))
+        $doctrine = $this->container->setDefinition($coreName, new Definition($this->container->getParameter($typeId . '.class')))
                                     ->addMethodCall('setNamespace', array($namespace))
                                     ->setPublic(false);
-
-        $this->container->setDefinition($this->getAlias() . '.instance.' . $name, new Definition($this->container->getParameter('aequasi_cache.service.class')))
+        $service  = $this->container->setDefinition($this->getAlias() . '.instance.' . $name, new Definition($this->container->getParameter('aequasi_cache.service.class')))
                         ->addMethodCall('setCache', array(new Reference($coreName)))
                         ->addMethodCall('setLogging', array($this->container->getParameter('kernel.debug')));
+        
+        if (isset($instance['hosts'])) {
+            $service->addMethodCall('setHosts', array($instance['hosts']));
+        }
+
 
         $alias = new Alias($this->getAlias() . '.instance.' . $name);
         $this->container->setAlias($this->getAlias() . '.' . $name, $alias);
 
-        return $service;
+        return $doctrine;
     }
 
     private function prepareCacheClass(Definition $service, $name, array $instance)
@@ -76,10 +80,6 @@ class ServiceBuilder extends BaseBuilder
         $type  = $instance['type'];
         $id    = sprintf("%s.instance.%s.cache_instance", $this->getAlias(), $name);
         $cache = null;
-
-        if (isset($instance['hosts'])) {
-            $service->addMethodCall('setHosts', array($instance['hosts']));
-        }
 
         switch ($type) {
             case 'memcache':
