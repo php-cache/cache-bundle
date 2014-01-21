@@ -40,16 +40,16 @@ class AequasiCacheExtension extends Extension
         $container->setParameter($this->getAlias() . '.instance', $config['instances']);
         new Builder\ServiceBuilder($container);
 
-        if (isset($config['router'])) {
+        if ($config['router']['enabled']) {
             $container->setParameter($this->getAlias() . '.router', $config['router']);
             new Builder\RouterBuilder($container);
         }
 
-        if (isset($config['session'])) {
+        if ($config['session']['enabled']) {
             $container->setParameter($this->getAlias() . '.session', $config['session']);
         }
 
-        if (isset($config['doctrine'])) {
+        if ($config['doctrine']['enabled']) {
             $container->setParameter($this->getAlias() . '.doctrine', $config['doctrine']);
         }
     }

@@ -58,6 +58,7 @@ If you want doctrine to use this as the result and query cache, add this
 ```yml
 aequasi_cache:
     doctrine:
+        enabled: true
         metadata:
             instance: default
             entity_managers:   [ default ]          # the name of your entity_manager connection
@@ -77,6 +78,7 @@ This bundle even allows you to store your session data in one of your cache clus
 ```yml
 aequasi_cache:
     session:
+        enabled: true
         instance: default
         prefix: "session_"
         ttl: 7200

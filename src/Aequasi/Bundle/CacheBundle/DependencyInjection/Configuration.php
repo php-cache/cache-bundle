@@ -9,7 +9,6 @@ namespace Aequasi\Bundle\CacheBundle\DependencyInjection;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
-use aequasi_cache;
 
 /**
  * Class Configuration
@@ -148,6 +147,7 @@ class Configuration implements ConfigurationInterface
         $node
             ->addDefaultsIfNotSet()
             ->children()
+                ->booleanNode('enabled')->defaultFalse()->end()
                 ->scalarNode('instance')->isRequired()->end()
                 ->scalarNode('prefix')->defaultValue("session_")->end()
                 ->scalarNode('ttl')->end()
@@ -166,6 +166,11 @@ class Configuration implements ConfigurationInterface
         $tree = new TreeBuilder();
         $node = $tree->root('doctrine');
 
+        $node
+            ->children()
+                ->booleanNode('enabled')->defaultFalse()->end()
+            ->end();
+
         $types = array('metadata', 'result', 'query');
         foreach ($types as $type) {
             $node
@@ -173,7 +178,7 @@ class Configuration implements ConfigurationInterface
                     ->arrayNode( $type )
                         ->canBeUnset()
                         ->children()
-                            ->scalarNode('instance')->isRequired()->end()
+                            ->scalarNode('instance')->end()
                             ->arrayNode('entity_managers')
                                 ->defaultValue( array() )
                                 ->beforeNormalization()
