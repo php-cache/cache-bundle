@@ -49,7 +49,8 @@ class AequasiCacheExtensionTest extends TestCase
     {
         $container = $this->createContainerFromFile( 'router' );
 
-        t$config = $container->getParameter( $this->getAlias() . '.router' );
+        $config = $container->getParameter( $this->getAlias() . '.router' );
+        $config = $container->getParameter( $this->getAlias() . '.router' );
 
         $this->assertTrue( isset( $config[ 'enabled' ] ) );
         $this->assertTrue( isset( $config[ 'instance' ] ) );
