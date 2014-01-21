@@ -148,7 +148,7 @@ class Configuration implements ConfigurationInterface
             ->addDefaultsIfNotSet()
             ->children()
                 ->booleanNode('enabled')->defaultFalse()->end()
-                ->scalarNode('instance')->isRequired()->end()
+                ->scalarNode('instance')->end()
                 ->scalarNode('prefix')->defaultValue("session_")->end()
                 ->scalarNode('ttl')->end()
             ->end();

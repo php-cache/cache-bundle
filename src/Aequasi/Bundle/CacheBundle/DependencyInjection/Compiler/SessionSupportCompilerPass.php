@@ -38,6 +38,9 @@ class SessionSupportCompilerPass extends BaseCompilerPass
      */
     private function enableSessionSupport(array $config)
     {
+        if (empty($config['instance'])) {
+            throw new InvalidConfigurationException("Instance must be passed under the `session` config.");
+        }
 
         $instance  = $config['instance'];
         $instances = $this->container->getParameter($this->getAlias() . '.instance');
