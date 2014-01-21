@@ -167,8 +167,9 @@ class Configuration implements ConfigurationInterface
         $node = $tree->root('doctrine');
 
         $node
+            ->addDefaultsIfNotSet()
             ->children()
-                ->booleanNode('enabled')->defaultFalse()->end()
+                ->booleanNode('enabled')->defaultFalse()->isRequired()->end()
             ->end();
 
         $types = array('metadata', 'result', 'query');
