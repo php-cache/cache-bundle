@@ -45,7 +45,7 @@ class RouterBuilder extends BaseBuilder
         }
 
         if (!in_array(strtolower($instances[$instance]['type']), array('memcache', 'redis', 'memcached'))) {
-            throw new InvalidConfigurationException(sprintf("%s is not a valid cache type for session support. Please use Memcache, Memcached, or Redis. ", $instances[$instance]['type']));
+            throw new InvalidConfigurationException(sprintf("%s is not a valid cache type for router support. Please use Memcache, Memcached, or Redis. ", $instances[$instance]['type']));
         }
 
         $this->container->setParameter('router.class', 'Aequasi\Bundle\CacheBundle\Routing\Router');
