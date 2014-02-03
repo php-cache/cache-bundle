@@ -42,7 +42,5 @@ class CacheFlushCommand extends ContainerAwareCommand
         $service = $this->getContainer()
                         ->get( $serviceName );
         $service->flushAll();
-
-        return 1;
     }
 } 
