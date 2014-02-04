@@ -78,7 +78,7 @@ class Configuration implements ConfigurationInterface
                         ->defaultNull()
                         ->info("Namespace for doctrine keys.")
                     ->end()
-                    ->scalarNode('database')
+                    ->integerNode('database')
                         ->defaultNull()
                         ->info("For Redis: Specify what database you want.")
                     ->end()
