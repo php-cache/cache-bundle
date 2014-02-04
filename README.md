@@ -100,7 +100,7 @@ If you change any of your routes, you will need to clear all of the route_* keys
 
 #### To Use
 
-To use this with doctrine's entity manager, just make sure you have useResultCache` and/or `useQueryCache` set to true. If you want to use the user cache, just grab the service out of the container like so:
+To use this with doctrine's entity manager, just make sure you have `useResultCache` and/or `useQueryCache` set to true. If you want to use the user cache, just grab the service out of the container like so:
 
 ```php
 // Change default to the name of your instance
