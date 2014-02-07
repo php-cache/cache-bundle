@@ -134,6 +134,9 @@ class ServiceBuilder extends BaseBuilder
                         $timeout = is_null($config['timeout']) ? 2 : $config['timeout'];
                         $cache->addMethodCall('connect', array($host, $port, $timeout));
                     }
+                    if (isset($instance['auth_password']) && null !== $instance['auth_password']) {
+                        $cache->addMethodCall('auth', [$instance['auth_password']]);
+                    }
                     if (isset($instance['database'])) {
                         $cache->addMethodCall('select', [$instance['database']]);
                     }
