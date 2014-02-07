@@ -135,10 +135,10 @@ class ServiceBuilder extends BaseBuilder
                         $cache->addMethodCall('connect', array($host, $port, $timeout));
                     }
                     if (isset($instance['auth_password']) && null !== $instance['auth_password']) {
-                        $cache->addMethodCall('auth', [$instance['auth_password']]);
+                        $cache->addMethodCall('auth', array($instance['auth_password']));
                     }
                     if (isset($instance['database'])) {
-                        $cache->addMethodCall('select', [$instance['database']]);
+                        $cache->addMethodCall('select', array($instance['database']));
                     }
                     unset($config);
 
