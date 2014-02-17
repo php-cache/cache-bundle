@@ -27,8 +27,8 @@
 		<whitelist>
 			<directory>.</directory>
 			<exclude>
-				<directory>./src/Aequasi/Bundle/CacheBundle/Resources</directory>
-				<directory>./src/Aequasi/Bundle/CacheBundle/Tests</directory>
+				<directory>./src/Resources</directory>
+				<directory>./src/Tests</directory>
 			</exclude>
 		</whitelist>
 	</filter>
