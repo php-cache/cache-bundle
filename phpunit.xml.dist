@@ -9,7 +9,7 @@
          processIsolation="false"
          stopOnFailure="false"
          syntaxCheck="false"
-         bootstrap="src/Aequasi/Bundle/CacheBundle/Tests/bootstrap.php"
+         bootstrap="src/Tests/bootstrap.php"
 	>
 	<testsuites>
 		<testsuite name="CacheBundle for the Symfony2 Framework">
