@@ -132,7 +132,10 @@ class ServiceBuilder extends BaseBuilder
                         $host    = empty($config['host']) ? 'localhost' : $config['host'];
                         $port    = empty($config['port']) ? 6379 : $config['port'];
                         $timeout = is_null($config['timeout']) ? 2 : $config['timeout'];
-                        $cache->addMethodCall('connect', array($host, $port, $timeout));
+                        $cache->addMethodCall(
+                            $instance['persistent'] ? 'pconnect' : 'connect',
+                            array($host, $port, $timeout)
+                        );
                     }
                     if (isset($instance['auth_password']) && null !== $instance['auth_password']) {
                         $cache->addMethodCall('auth', array($instance['auth_password']));
