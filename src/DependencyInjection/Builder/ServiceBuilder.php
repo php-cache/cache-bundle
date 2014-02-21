@@ -102,7 +102,7 @@ class ServiceBuilder extends BaseBuilder
                 break;
             case 'memcached':
                 if (empty($instance['id'])) {
-                    $cache = new Definition('Memcached');
+                    $cache = new Definition('Aequasi\Bundle\CacheBundle\Cache\Memcached');
                     //$cache->setPublic(false);
 
                     if ($instance['persistent']) {
