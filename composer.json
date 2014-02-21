@@ -26,7 +26,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Aequasi\\Bundle\\CacheBundle\\": "src/"
+            "Aequasi\\Bundle\\CacheBundle\\": "src/",
             "Aequasi\\Bundle\\CacheBundle\\Tests\\": "tests/"
         }
     }
