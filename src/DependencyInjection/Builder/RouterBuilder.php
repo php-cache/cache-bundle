@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Aaron Scherer
  * @date      12/6/13
@@ -8,18 +9,14 @@
 namespace Aequasi\Bundle\CacheBundle\DependencyInjection\Builder;
 
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
-use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
-use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Class RouterBuilder
  *
- * @package Aequasi\Bundle\CacheBundle\DependencyInjection\Builder
+ * @author Aaron Scherer <aequasi@gmail.com>
  */
 class RouterBuilder extends BaseBuilder
 {
-
     /**
      * {@inheritDoc}
      */
@@ -32,20 +29,31 @@ class RouterBuilder extends BaseBuilder
         }
     }
 
+    /**
+     * @param array $config
+     *
+     * @throws InvalidConfigurationException
+     */
     private function buildRouter(array $config)
     {
-        $instance  = $config['instance'];
+        $instance = $config['instance'];
         $instances = $this->container->getParameter($this->getAlias() . '.instance');
 
         if (null === $instance) {
             throw new InvalidConfigurationException('Failed to hook into the router. No instance was passed.');
         }
         if (!isset($instances[$instance])) {
-            throw new InvalidConfigurationException(sprintf('Failed to hook into the router. The instance "%s" doesn\'t exist!', $instance));
+            throw new InvalidConfigurationException(sprintf(
+                'Failed to hook into the router. The instance "%s" doesn\'t exist!',
+                $instance
+            ));
         }
 
         if (!in_array(strtolower($instances[$instance]['type']), array('memcache', 'redis', 'memcached'))) {
-            throw new InvalidConfigurationException(sprintf("%s is not a valid cache type for router support. Please use Memcache, Memcached, or Redis. ", $instances[$instance]['type']));
+            throw new InvalidConfigurationException(sprintf(
+                "%s is not a valid cache type for router support. Please use Memcache, Memcached, or Redis. ",
+                $instances[$instance]['type']
+            ));
         }
 
         $this->container->setParameter('router.class', 'Aequasi\Bundle\CacheBundle\Routing\Router');

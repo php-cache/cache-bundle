@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author    Aaron Scherer <aequasi@gmail.com>
  * @date      2013
  * @license   http://www.apache.org/licenses/LICENSE-2.0.html Apache License, Version 2.0
  */
+
 namespace Aequasi\Bundle\CacheBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
@@ -13,7 +15,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 /**
  * Class Configuration
  *
- * @package Aequasi\Bundle\CacheBundle\DependencyInjection
+ * @author Aaron Scherer <aequasi@gmail.com>
  */
 class Configuration implements ConfigurationInterface
 {
@@ -28,7 +30,7 @@ class Configuration implements ConfigurationInterface
      *
      * @param Boolean $debug Whether to use the debug mode
      */
-    public function  __construct( $debug )
+    public function  __construct($debug)
     {
         $this->debug = (Boolean)$debug;
     }
@@ -43,12 +45,11 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $rootNode    = $treeBuilder->root('cache');
 
-        $rootNode
-            ->children()
-                ->append( $this->getClustersNode() )
-                ->append( $this->addSessionSupportSection() )
-                ->append( $this->addDoctrineSection() )
-                ->append( $this->addRouterSection() )
+        $rootNode->children()
+            ->append($this->getClustersNode())
+            ->append($this->addSessionSupportSection())
+            ->append($this->addDoctrineSection())
+            ->append($this->addRouterSection())
             ->end();
 
         return $treeBuilder;
@@ -62,77 +63,88 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $node        = $treeBuilder->root('instances');
 
-        $node
-            ->requiresAtLeastOneElement()
+        $node->requiresAtLeastOneElement()
             ->addDefaultChildrenIfNoneSet('default')
             ->useAttributeAsKey('name')
             ->prototype('array')
-                ->children()
-                    ->enumNode('type')
-                        ->values(array('redis', 'file', 'memcached', 'apc'))
-                    ->end()
-                    ->scalarNode('id')
-                        ->defaultNull()
-                    ->end()
-                    ->scalarNode('namespace')
-                        ->defaultNull()
-                        ->info("Namespace for doctrine keys.")
-                    ->end()
-                    ->integerNode('database')
-                        ->defaultNull()
-                        ->info("For Redis: Specify what database you want.")
-                    ->end()
-                    ->booleanNode('persistent')
-                        ->defaultNull()
-                        ->info("For Redis and Memcached: Specify if you want persistent connections.")
-                    ->end()
-                    ->scalarNode('auth_password')
-                        ->info("For Redis: Authorization info.")
-                    ->end()
-                    ->scalarNode('directory')
-                        ->info("For File System and PHP File: Directory to store cache.")
-                        ->defaultNull()
-                    ->end()
-                    ->scalarNode('extension')
-                        ->info("For File System and PHP File: Extension to use.")
-                        ->defaultNull()
-                    ->end()
-                    ->arrayNode('options')
-                        ->info("Options for Redis and Memcached.")
-                    ->end()
-                    ->arrayNode('hosts')
-                        ->prototype('array')
-                            ->children()
-                                ->scalarNode('host')
-                                    ->defaultNull()
-                                ->end()
-                                ->scalarNode('port')
-                                    ->defaultNull()
-                                    ->validate()
-                                        ->ifTrue(function ($v) { return !is_null($v) && !is_numeric($v); })
-                                        ->thenInvalid("Host port must be numeric")
-                                    ->end()
-                                ->end()
-                                ->scalarNode('weight')
-                                    ->info("For Memcached: Weight for given host.")
-                                    ->defaultNull()
-                                    ->validate()
-                                        ->ifTrue(function ($v) { return !is_null($v) && !is_numeric($v); })
-                                        ->thenInvalid('host weight must be numeric')
-                                    ->end()
-                                ->end()
-                                ->scalarNode('timeout')
-                                    ->info("For Redis and Memcache: Timeout for the given host.")
-                                    ->defaultNull()
-                                    ->validate()
-                                        ->ifTrue(function ($v) { return !is_null($v) && !is_numeric($v); })
-                                        ->thenInvalid('host timeout must be numeric')
-                                    ->end()
-                                ->end()
-                            ->end()
-                        ->end()
-                    ->end()
-                ->end()
+            ->children()
+            ->enumNode('type')
+            ->values(array('redis', 'file', 'memcached', 'apc'))
+            ->end()
+            ->scalarNode('id')
+            ->defaultNull()
+            ->end()
+            ->scalarNode('namespace')
+            ->defaultNull()
+            ->info("Namespace for doctrine keys.")
+            ->end()
+            ->integerNode('database')
+            ->defaultNull()
+            ->info("For Redis: Specify what database you want.")
+            ->end()
+            ->booleanNode('persistent')
+            ->defaultNull()
+            ->info("For Redis and Memcached: Specify if you want persistent connections.")
+            ->end()
+            ->scalarNode('auth_password')
+            ->info("For Redis: Authorization info.")
+            ->end()
+            ->scalarNode('directory')
+            ->info("For File System and PHP File: Directory to store cache.")
+            ->defaultNull()
+            ->end()
+            ->scalarNode('extension')
+            ->info("For File System and PHP File: Extension to use.")
+            ->defaultNull()
+            ->end()
+            ->arrayNode('options')
+            ->info("Options for Redis and Memcached.")
+            ->end()
+            ->arrayNode('hosts')
+            ->prototype('array')
+            ->children()
+            ->scalarNode('host')
+            ->defaultNull()
+            ->end()
+            ->scalarNode('port')
+            ->defaultNull()
+            ->validate()
+            ->ifTrue(
+                function ($v) {
+                    return !is_null($v) && !is_numeric($v);
+                }
+            )
+            ->thenInvalid("Host port must be numeric")
+            ->end()
+            ->end()
+            ->scalarNode('weight')
+            ->info("For Memcached: Weight for given host.")
+            ->defaultNull()
+            ->validate()
+            ->ifTrue(
+                function ($v) {
+                    return !is_null($v) && !is_numeric($v);
+                }
+            )
+            ->thenInvalid('host weight must be numeric')
+            ->end()
+            ->end()
+            ->scalarNode('timeout')
+            ->info("For Redis and Memcache: Timeout for the given host.")
+            ->defaultNull()
+            ->validate()
+            ->ifTrue(
+                function ($v) {
+                    return !is_null($v) && !is_numeric($v);
+                }
+            )
+            ->thenInvalid('host timeout must be numeric')
+            ->end()
+            ->end()
+            ->end()
+            ->end()
+            ->end()
+            ->end()
             ->end();
 
         return $node;
@@ -148,13 +160,18 @@ class Configuration implements ConfigurationInterface
         $tree = new TreeBuilder();
         $node = $tree->root('session');
 
-        $node
-            ->addDefaultsIfNotSet()
+        $node->addDefaultsIfNotSet()
             ->children()
-                ->booleanNode('enabled')->defaultFalse()->end()
-                ->scalarNode('instance')->end()
-                ->scalarNode('prefix')->defaultValue("session_")->end()
-                ->scalarNode('ttl')->end()
+            ->booleanNode('enabled')
+            ->defaultFalse()
+            ->end()
+            ->scalarNode('instance')
+            ->end()
+            ->scalarNode('prefix')
+            ->defaultValue("session_")
+            ->end()
+            ->scalarNode('ttl')
+            ->end()
             ->end();
 
         return $node;
@@ -170,37 +187,49 @@ class Configuration implements ConfigurationInterface
         $tree = new TreeBuilder();
         $node = $tree->root('doctrine');
 
-        $node
-            ->addDefaultsIfNotSet()
+        $node->addDefaultsIfNotSet()
             ->children()
-                ->booleanNode('enabled')->defaultFalse()->isRequired()->end()
+            ->booleanNode('enabled')
+            ->defaultFalse()
+            ->isRequired()
+            ->end()
             ->end();
 
         $types = array('metadata', 'result', 'query');
         foreach ($types as $type) {
-            $node
+            $node->children()
+                ->arrayNode($type)
+                ->canBeUnset()
                 ->children()
-                    ->arrayNode( $type )
-                        ->canBeUnset()
-                        ->children()
-                            ->scalarNode('instance')->end()
-                            ->arrayNode('entity_managers')
-                                ->defaultValue( array() )
-                                ->beforeNormalization()
-                                    ->ifString()
-                                    ->then( function ($v) { return (array)$v; } )
-                                ->end()
-                                ->prototype( 'scalar' )->end()
-                            ->end()
-                            ->arrayNode('document_managers')
-                                ->defaultValue(array())
-                                ->beforeNormalization()
-                                    ->ifString()
-                                    ->then(function ($v) { return (array)$v; } )
-                                ->end()
-                                ->prototype('scalar')->end()
-                        ->end()
-                    ->end()
+                ->scalarNode('instance')
+                ->end()
+                ->arrayNode('entity_managers')
+                ->defaultValue(array())
+                ->beforeNormalization()
+                ->ifString()
+                ->then(
+                    function ($v) {
+                        return (array)$v;
+                    }
+                )
+                ->end()
+                ->prototype('scalar')
+                ->end()
+                ->end()
+                ->arrayNode('document_managers')
+                ->defaultValue(array())
+                ->beforeNormalization()
+                ->ifString()
+                ->then(
+                    function ($v) {
+                        return (array)$v;
+                    }
+                )
+                ->end()
+                ->prototype('scalar')
+                ->end()
+                ->end()
+                ->end()
                 ->end();
         }
 
@@ -217,11 +246,14 @@ class Configuration implements ConfigurationInterface
         $tree = new TreeBuilder();
         $node = $tree->root('router');
 
-        $node
-            ->addDefaultsIfNotSet()
+        $node->addDefaultsIfNotSet()
             ->children()
-                ->booleanNode('enabled')->defaultFalse()->end()
-                ->scalarNode('instance')->defaultNull()->end()
+            ->booleanNode('enabled')
+            ->defaultFalse()
+            ->end()
+            ->scalarNode('instance')
+            ->defaultNull()
+            ->end()
             ->end();
 
         return $node;

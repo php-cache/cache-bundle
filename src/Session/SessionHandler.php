@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Aaron Scherer <aequasi@gmail.com>
  * @date      2013
@@ -12,11 +13,10 @@ use Doctrine\Common\Cache\Cache;
 /**
  * Class SessionHandler
  *
- * @package Aequasi\Bundle\CacheBundle\Session
+ * @author Aaron Scherer <aequasi@gmail.com>
  */
 class SessionHandler implements \SessionHandlerInterface
 {
-
     /**
      * @var Cache Cache driver.
      */
@@ -44,18 +44,18 @@ class SessionHandler implements \SessionHandlerInterface
      *
      * @throws \InvalidArgumentException When unsupported options are passed
      */
-    public function __construct( Cache $cache, array $options = array() )
+    public function __construct(Cache $cache, array $options = array())
     {
         $this->cache = $cache;
 
-        $this->ttl    = isset( $options[ 'cookie_lifetime' ] ) ? (int)$options[ 'cookie_lifetime' ] : 86400;
-        $this->prefix = isset( $options[ 'prefix' ] ) ? $options[ 'prefix' ] : 'sf2ses_';
+        $this->ttl    = isset($options['cookie_lifetime']) ? (int)$options['cookie_lifetime'] : 86400;
+        $this->prefix = isset($options['prefix']) ? $options['prefix'] : 'sf2ses_';
     }
 
     /**
      * {@inheritDoc}
      */
-    public function open( $savePath, $sessionName )
+    public function open($savePath, $sessionName)
     {
         return true;
     }
@@ -71,31 +71,31 @@ class SessionHandler implements \SessionHandlerInterface
     /**
      * {@inheritDoc}
      */
-    public function read( $sessionId )
+    public function read($sessionId)
     {
-        return $this->cache->fetch( $this->prefix . $sessionId ) ? : '';
+        return $this->cache->fetch($this->prefix . $sessionId) ? : '';
     }
 
     /**
      * {@inheritDoc}
      */
-    public function write( $sessionId, $data )
+    public function write($sessionId, $data)
     {
-        return $this->cache->save( $this->prefix . $sessionId, $data, $this->ttl );
+        return $this->cache->save($this->prefix . $sessionId, $data, $this->ttl);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function destroy( $sessionId )
+    public function destroy($sessionId)
     {
-        return $this->cache->delete( $this->prefix . $sessionId );
+        return $this->cache->delete($this->prefix . $sessionId);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function gc( $lifetime )
+    public function gc($lifetime)
     {
         // not required here because cache will auto expire the records anyhow.
         return true;
