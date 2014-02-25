@@ -44,4 +44,3 @@ class CacheFlushCommand extends ContainerAwareCommand
         $service->flushAll();
     }
 }
-

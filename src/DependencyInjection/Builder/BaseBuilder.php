@@ -46,4 +46,3 @@ abstract class BaseBuilder
      */
     abstract protected function prepare();
 }
-
