@@ -48,7 +48,7 @@ class SessionHandler implements \SessionHandlerInterface
     {
         $this->cache = $cache;
 
-        $this->ttl    = isset($options['cookie_lifetime']) ? (int)$options['cookie_lifetime'] : 86400;
+        $this->ttl    = isset($options['cookie_lifetime']) ? (int) $options['cookie_lifetime'] : 86400;
         $this->prefix = isset($options['prefix']) ? $options['prefix'] : 'sf2ses_';
     }
 

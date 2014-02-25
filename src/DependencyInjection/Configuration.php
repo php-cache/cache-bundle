@@ -56,7 +56,7 @@ class Configuration implements ConfigurationInterface
     }
 
     /**
-     * @return ArrayNodeDefinition|NodeDefinition
+     * @return ArrayNodeDefinition
      */
     private function getClustersNode()
     {
@@ -213,7 +213,7 @@ class Configuration implements ConfigurationInterface
                 ->ifString()
                 ->then(
                     function ($v) {
-                        return (array)$v;
+                        return (array) $v;
                     }
                 )
                 ->end()
@@ -226,7 +226,7 @@ class Configuration implements ConfigurationInterface
                 ->ifString()
                 ->then(
                     function ($v) {
-                        return (array)$v;
+                        return (array) $v;
                     }
                 )
                 ->end()

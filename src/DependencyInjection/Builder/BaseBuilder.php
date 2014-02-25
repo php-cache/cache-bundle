@@ -8,7 +8,6 @@
 
 namespace Aequasi\Bundle\CacheBundle\DependencyInjection\Builder;
 
-use Symfony\Component\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
