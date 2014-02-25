@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Aaron Scherer
  * @date      12/6/13
@@ -11,13 +12,12 @@ use Symfony\Component\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
- * Class BaseCompilerPass
+ * Class BaseBuilder
  *
- * @package Aequasi\Bundle\CacheBundle\DependencyInjection\Compiler
+ * @author Aaron Scherer <aequasi@gmail.com>
  */
 abstract class BaseBuilder
 {
-
     /**
      * @var ContainerBuilder
      */
@@ -45,4 +45,4 @@ abstract class BaseBuilder
      * @return mixed
      */
     abstract protected function prepare();
-} 
+}

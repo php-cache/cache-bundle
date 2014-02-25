@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Aaron Scherer
  * @date      12/10/13
@@ -16,7 +17,7 @@ use Symfony\Component\Console\Input\InputArgument;
 /**
  * Class CacheFlushCommand
  *
- * @package Aequasi\Bundle\CacheBundle\Command
+ * @author Aaron Scherer <aequasi@gmail.com>
  */
 class CacheFlushCommand extends ContainerAwareCommand
 {
@@ -26,21 +27,20 @@ class CacheFlushCommand extends ContainerAwareCommand
      */
     protected function configure()
     {
-        $this->setName( 'cache:flush' );
-        $this->setDescription( 'Flushes the given cache' );
-        $this->addArgument( 'instance', InputArgument::REQUIRED, 'Which instance do you want to clean?' );
+        $this->setName('cache:flush');
+        $this->setDescription('Flushes the given cache');
+        $this->addArgument('instance', InputArgument::REQUIRED, 'Which instance do you want to clean?');
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function execute( InputInterface $input, OutputInterface $output )
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $serviceName = 'aequasi_cache.instance.' . $input->getArgument( 'instance' );
+        $serviceName = 'aequasi_cache.instance.' . $input->getArgument('instance');
 
         /** @var CacheService $service */
-        $service = $this->getContainer()
-                        ->get( $serviceName );
+        $service = $this->getContainer()->get($serviceName);
         $service->flushAll();
     }
-} 
+}

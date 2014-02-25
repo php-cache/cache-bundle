@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author    Aaron Scherer <aequasi@gmail.com>
  * @date      2013
  * @license   http://www.apache.org/licenses/LICENSE-2.0.html Apache License, Version 2.0
  */
+
 namespace Aequasi\Bundle\CacheBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
@@ -11,11 +13,15 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * SessionSupportCompilerPass is a compiler pass to set the session handler.
+ * Class SessionSupportCompilerPass
+ *
+ * @author Aaron Scherer <aequasi@gmail.com>
  */
 class SessionSupportCompilerPass extends BaseCompilerPass
 {
-
+    /**
+     *
+     */
     protected function prepare()
     {
         // If there is no active session support, return
@@ -42,18 +48,24 @@ class SessionSupportCompilerPass extends BaseCompilerPass
             throw new InvalidConfigurationException("Instance must be passed under the `session` config.");
         }
 
-        $instance  = $config['instance'];
+        $instance = $config['instance'];
         $instances = $this->container->getParameter($this->getAlias() . '.instance');
 
         if (null === $instance) {
             return;
         }
         if (!isset($instances[$instance])) {
-            throw new InvalidConfigurationException(sprintf('Failed to hook into the session. The instance "%s" doesn\'t exist!', $instance));
+            throw new InvalidConfigurationException(sprintf(
+                'Failed to hook into the session. The instance "%s" doesn\'t exist!',
+                $instance
+            ));
         }
 
         if (!in_array(strtolower($instances[$instance]['type']), array('memcache', 'redis', 'memcached'))) {
-            throw new InvalidConfigurationException(sprintf("%s is not a valid cache type for session support. Please use Memcache, Memcached, or Redis. ", $instances[$instance]['type']));
+            throw new InvalidConfigurationException(sprintf(
+                "%s is not a valid cache type for session support. Please use Memcache, Memcached, or Redis. ",
+                $instances[$instance]['type']
+            ));
         }
 
         // calculate options
@@ -62,9 +74,10 @@ class SessionSupportCompilerPass extends BaseCompilerPass
             $config['cookie_lifetime'] = $sessionOptions['cookie_lifetime'];
         }
         // load the session handler
-        $definition = new Definition($this->container->getParameter(sprintf('%s.session.handler.class', $this->getAlias())));
+        $definition =
+            new Definition($this->container->getParameter(sprintf('%s.session.handler.class', $this->getAlias())));
         $definition->addArgument(new Reference(sprintf('%s.instance.%s', $this->getAlias(), $instance)))
-                   ->addArgument($config);
+            ->addArgument($config);
 
         $this->container->setDefinition(sprintf('%s.session_handler', $this->getAlias()), $definition);
         $this->container->setAlias('cache.session_handler', sprintf('%s.session_handler', $this->getAlias()));

@@ -5,6 +5,7 @@
  * @date      2014
  * @license   http://www.apache.org/licenses/LICENSE-2.0.html Apache License, Version 2.0
  */
+
 namespace Aequasi\Bundle\CacheBundle\Cache;
 
 /**

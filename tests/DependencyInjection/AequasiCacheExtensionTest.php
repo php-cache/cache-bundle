@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Aaron Scherer
  * @date      12/11/13
@@ -9,59 +10,73 @@ namespace Aequasi\Bundle\CacheBundle\Tests\DependencyInjection;
 
 use Aequasi\Bundle\CacheBundle\Tests\TestCase;
 
+/**
+ * Class AequasiCacheExtensionTest
+ *
+ * @author Aaron Scherer <aequasi@gmail.com>
+ */
 class AequasiCacheExtensionTest extends TestCase
 {
 
+    /**
+     *
+     */
     public function testServiceBuilder()
     {
-        $container = $this->createContainerFromFile( 'service' );
+        $container = $this->createContainerFromFile('service');
 
-        $config = $container->getParameter( $this->getAlias() . '.instance' );
+        $config = $container->getParameter($this->getAlias() . '.instance');
 
-        foreach (array( 'memcached', 'redis' ) as $type) {
+        foreach (array('memcached', 'redis') as $type) {
 
-            $this->assertTrue( isset( $config[ $type ] ) );
+            $this->assertTrue(isset($config[$type]));
 
-            $this->assertTrue( $container->hasDefinition( $this->getAlias() . '.instance.' . $type ) );
-            $this->assertTrue( $container->hasAlias( $this->getAlias() . '.' . $type ) );
+            $this->assertTrue($container->hasDefinition($this->getAlias() . '.instance.' . $type));
+            $this->assertTrue($container->hasAlias($this->getAlias() . '.' . $type));
 
             $this->assertInstanceOf(
-                 'Aequasi\Bundle\CacheBundle\Service\CacheService',
-                     $container->get( $this->getAlias() . '.instance.' . $type )
+                'Aequasi\Bundle\CacheBundle\Service\CacheService',
+                $container->get($this->getAlias() . '.instance.' . $type)
             );
             $this->assertInstanceOf(
-                 'Doctrine\Common\Cache\Cache',
-                     $container->get( $this->getAlias() . '.instance.' . $type )
-                               ->getCache()
+                'Doctrine\Common\Cache\Cache',
+                $container->get($this->getAlias() . '.instance.' . $type)
+                    ->getCache()
             );
 
-            $function = 'get' . ucwords( $type );
+            $function = 'get' . ucwords($type);
             $this->assertInstanceOf(
-                 ucwords( $type ),
-                     $container->get( $this->getAlias() . '.instance.' . $type )
-                               ->getCache()
-                               ->{$function}()
+                ucwords($type),
+                $container->get($this->getAlias() . '.instance.' . $type)
+                    ->getCache()
+                    ->{$function}()
             );
         }
     }
 
+    /**
+     *
+     */
     public function testRouterBuilder()
     {
-        $container = $this->createContainerFromFile( 'router' );
+        $container = $this->createContainerFromFile('router');
 
-        $config = $container->getParameter( $this->getAlias() . '.router' );
+        $config = $container->getParameter($this->getAlias() . '.router');
 
-        $this->assertTrue( isset( $config[ 'enabled' ] ) );
-        $this->assertTrue( isset( $config[ 'instance' ] ) );
+        $this->assertTrue(isset($config['enabled']));
+        $this->assertTrue(isset($config['instance']));
 
-        $this->assertTrue( $config[ 'enabled' ] );
-        $this->assertEquals( $config[ 'instance' ], 'default' );
+        $this->assertTrue($config['enabled']);
+        $this->assertEquals($config['instance'], 'default');
 
-        $this->assertEquals( 'Aequasi\Bundle\CacheBundle\Routing\Router', $container->getParameter( 'router.class' ) );
+        $this->assertEquals('Aequasi\Bundle\CacheBundle\Routing\Router', $container->getParameter('router.class'));
     }
 
+    /**
+     * @return string
+     */
     private function getAlias()
     {
         return 'aequasi_cache';
     }
-} 
+}

@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author    Aaron Scherer <aequasi@gmail.com>
  * @date      2013
  * @license   http://www.apache.org/licenses/LICENSE-2.0.html Apache License, Version 2.0
  */
+
 namespace Aequasi\Bundle\CacheBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
@@ -13,7 +15,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 /**
  * Class Configuration
  *
- * @package Aequasi\Bundle\CacheBundle\DependencyInjection
+ * @author Aaron Scherer <aequasi@gmail.com>
  */
 class Configuration implements ConfigurationInterface
 {
@@ -28,7 +30,7 @@ class Configuration implements ConfigurationInterface
      *
      * @param Boolean $debug Whether to use the debug mode
      */
-    public function  __construct( $debug )
+    public function __construct($debug)
     {
         $this->debug = (Boolean)$debug;
     }
@@ -36,26 +38,25 @@ class Configuration implements ConfigurationInterface
     /**
      * Generates the configuration tree builder.
      *
-     * @return \Symfony\Component\Config\Definition\Builder\TreeBuilder The tree builder
+     * @return TreeBuilder The tree builder
      */
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
         $rootNode    = $treeBuilder->root('cache');
 
-        $rootNode
-            ->children()
-                ->append( $this->getClustersNode() )
-                ->append( $this->addSessionSupportSection() )
-                ->append( $this->addDoctrineSection() )
-                ->append( $this->addRouterSection() )
+        $rootNode->children()
+            ->append($this->getClustersNode())
+            ->append($this->addSessionSupportSection())
+            ->append($this->addDoctrineSection())
+            ->append($this->addRouterSection())
             ->end();
 
         return $treeBuilder;
     }
 
     /**
-     * @return \Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition|\Symfony\Component\Config\Definition\Builder\NodeDefinition
+     * @return ArrayNodeDefinition|NodeDefinition
      */
     private function getClustersNode()
     {
@@ -109,7 +110,11 @@ class Configuration implements ConfigurationInterface
                                 ->scalarNode('port')
                                     ->defaultNull()
                                     ->validate()
-                                        ->ifTrue(function ($v) { return !is_null($v) && !is_numeric($v); })
+                                        ->ifTrue(
+                                            function ($v) {
+                                                return !is_null($v) && !is_numeric($v);
+                                            }
+                                        )
                                         ->thenInvalid("Host port must be numeric")
                                     ->end()
                                 ->end()
@@ -117,7 +122,11 @@ class Configuration implements ConfigurationInterface
                                     ->info("For Memcached: Weight for given host.")
                                     ->defaultNull()
                                     ->validate()
-                                        ->ifTrue(function ($v) { return !is_null($v) && !is_numeric($v); })
+                                        ->ifTrue(
+                                            function ($v) {
+                                                return !is_null($v) && !is_numeric($v);
+                                            }
+                                        )
                                         ->thenInvalid('host weight must be numeric')
                                     ->end()
                                 ->end()
@@ -125,7 +134,11 @@ class Configuration implements ConfigurationInterface
                                     ->info("For Redis and Memcache: Timeout for the given host.")
                                     ->defaultNull()
                                     ->validate()
-                                        ->ifTrue(function ($v) { return !is_null($v) && !is_numeric($v); })
+                                        ->ifTrue(
+                                            function ($v) {
+                                                return !is_null($v) && !is_numeric($v);
+                                            }
+                                        )
                                         ->thenInvalid('host timeout must be numeric')
                                     ->end()
                                 ->end()
@@ -133,7 +146,8 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
-            ->end();
+            ->end()
+        ;
 
         return $node;
     }
@@ -151,11 +165,16 @@ class Configuration implements ConfigurationInterface
         $node
             ->addDefaultsIfNotSet()
             ->children()
-                ->booleanNode('enabled')->defaultFalse()->end()
+                ->booleanNode('enabled')
+                    ->defaultFalse()
+                ->end()
                 ->scalarNode('instance')->end()
-                ->scalarNode('prefix')->defaultValue("session_")->end()
+                ->scalarNode('prefix')
+                    ->defaultValue("session_")
+                ->end()
                 ->scalarNode('ttl')->end()
-            ->end();
+            ->end()
+        ;
 
         return $node;
     }
@@ -173,34 +192,48 @@ class Configuration implements ConfigurationInterface
         $node
             ->addDefaultsIfNotSet()
             ->children()
-                ->booleanNode('enabled')->defaultFalse()->isRequired()->end()
-            ->end();
+                ->booleanNode('enabled')
+                    ->defaultFalse()
+                    ->isRequired()
+                ->end()
+            ->end()
+        ;
 
         $types = array('metadata', 'result', 'query');
         foreach ($types as $type) {
-            $node
+            $node->children()
+                ->arrayNode($type)
+                ->canBeUnset()
                 ->children()
-                    ->arrayNode( $type )
-                        ->canBeUnset()
-                        ->children()
-                            ->scalarNode('instance')->end()
-                            ->arrayNode('entity_managers')
-                                ->defaultValue( array() )
-                                ->beforeNormalization()
-                                    ->ifString()
-                                    ->then( function ($v) { return (array)$v; } )
-                                ->end()
-                                ->prototype( 'scalar' )->end()
-                            ->end()
-                            ->arrayNode('document_managers')
-                                ->defaultValue(array())
-                                ->beforeNormalization()
-                                    ->ifString()
-                                    ->then(function ($v) { return (array)$v; } )
-                                ->end()
-                                ->prototype('scalar')->end()
-                        ->end()
-                    ->end()
+                ->scalarNode('instance')
+                ->end()
+                ->arrayNode('entity_managers')
+                ->defaultValue(array())
+                ->beforeNormalization()
+                ->ifString()
+                ->then(
+                    function ($v) {
+                        return (array)$v;
+                    }
+                )
+                ->end()
+                ->prototype('scalar')
+                ->end()
+                ->end()
+                ->arrayNode('document_managers')
+                ->defaultValue(array())
+                ->beforeNormalization()
+                ->ifString()
+                ->then(
+                    function ($v) {
+                        return (array)$v;
+                    }
+                )
+                ->end()
+                ->prototype('scalar')
+                ->end()
+                ->end()
+                ->end()
                 ->end();
         }
 
@@ -217,11 +250,14 @@ class Configuration implements ConfigurationInterface
         $tree = new TreeBuilder();
         $node = $tree->root('router');
 
-        $node
-            ->addDefaultsIfNotSet()
+        $node->addDefaultsIfNotSet()
             ->children()
-                ->booleanNode('enabled')->defaultFalse()->end()
-                ->scalarNode('instance')->defaultNull()->end()
+            ->booleanNode('enabled')
+            ->defaultFalse()
+            ->end()
+            ->scalarNode('instance')
+            ->defaultNull()
+            ->end()
             ->end();
 
         return $node;

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Aaron Scherer
  * @date      12/6/13
@@ -10,16 +11,34 @@ namespace Aequasi\Bundle\CacheBundle\DependencyInjection\Builder;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Class ServiceBuilderCompilerPass
+ * Class ServiceBuilder
  *
- * @package Aequasi\Bundle\CacheBundle\DependencyInjection\Compiler
+ * @author Aaron Scherer <aequasi@gmail.com>
  */
 class ServiceBuilder extends BaseBuilder
 {
+    /**
+     * Array of types, and their options
+     *
+     * @var array $types
+     */
+    protected static $types = [
+        'memcache' => [
+            'class' => 'Memcache',
+            'connect' => 'addServer'
+        ],
+        'memcached' => [
+            'class' => 'Aequasi\Bundle\CacheBundle\Cache\Memcached',
+            'connect' => 'addServer'
+        ],
+        'redis' => [
+            'class' => 'Redis',
+            'connect' => 'connect'
+        ]
+    ];
 
     /**
      * {@inheritDoc}
@@ -33,11 +52,20 @@ class ServiceBuilder extends BaseBuilder
         }
     }
 
+    /**
+     * @param string $name
+     * @param array  $instance
+     *
+     * @throws InvalidConfigurationException
+     */
     private function buildInstance($name, array $instance)
     {
         $typeId = $this->getAlias() . '.abstract.' . $instance['type'];
         if (!$this->container->hasDefinition($typeId)) {
-            throw new InvalidConfigurationException(sprintf("`%s` is not a valid cache type. If you are using a custom type, make sure to add your service. ", $instance['type']));
+            throw new InvalidConfigurationException(sprintf(
+                "`%s` is not a valid cache type. If you are using a custom type, make sure to add your service. ",
+                $instance['type']
+            ));
         }
 
         $service = $this->buildService($typeId, $name, $instance);
@@ -46,9 +74,9 @@ class ServiceBuilder extends BaseBuilder
     }
 
     /**
-     * @param       $typeId
-     * @param       $name
-     * @param array $instance
+     * @param string $typeId
+     * @param string $name
+     * @param array  $instance
      *
      * @return Definition
      */
@@ -57,17 +85,24 @@ class ServiceBuilder extends BaseBuilder
         $namespace = is_null($instance['namespace']) ? $name : $instance['namespace'];
 
         $coreName = $this->getAlias() . '.instance.' . $name . '.core';
-        $doctrine = $this->container->setDefinition($coreName, new Definition($this->container->getParameter($typeId . '.class')))
-                                    ->addMethodCall('setNamespace', array($namespace))
-                                    ->setPublic(false);
-        $service  = $this->container->setDefinition($this->getAlias() . '.instance.' . $name, new Definition($this->container->getParameter('aequasi_cache.service.class')))
-                        ->addMethodCall('setCache', array(new Reference($coreName)))
-                        ->addMethodCall('setLogging', array($this->container->getParameter('kernel.debug')));
-        
+        $doctrine =
+            $this->container->setDefinition(
+                $coreName,
+                new Definition($this->container->getParameter($typeId . '.class'))
+            )
+                ->addMethodCall('setNamespace', array($namespace))
+                ->setPublic(false);
+        $service  =
+            $this->container->setDefinition(
+                $this->getAlias() . '.instance.' . $name,
+                new Definition($this->container->getParameter('aequasi_cache.service.class'))
+            )
+                ->addMethodCall('setCache', array(new Reference($coreName)))
+                ->addMethodCall('setLogging', array($this->container->getParameter('kernel.debug')));
+
         if (isset($instance['hosts'])) {
             $service->addMethodCall('setHosts', array($instance['hosts']));
         }
-
 
         $alias = new Alias($this->getAlias() . '.instance.' . $name);
         $this->container->setAlias($this->getAlias() . '.' . $name, $alias);
@@ -75,87 +110,79 @@ class ServiceBuilder extends BaseBuilder
         return $doctrine;
     }
 
+    /**
+     * @param Definition $service
+     * @param string     $name
+     * @param array      $instance
+     */
     private function prepareCacheClass(Definition $service, $name, array $instance)
     {
-        $type  = $instance['type'];
-        $id    = sprintf("%s.instance.%s.cache_instance", $this->getAlias(), $name);
+        $type = $instance['type'];
+        $id   = sprintf("%s.instance.%s.cache_instance", $this->getAlias(), $name);
         switch ($type) {
             case 'memcache':
-                if (empty($instance['id'])) {
-                    $cache = new Definition('Memcache');
-                    //$cache->setPublic(false);
-                    foreach ($instance['hosts'] as $config) {
-                        $host    = empty($config['host']) ? 'localhost' : $config['host'];
-                        $port    = empty($config['port']) ? 11211 : $config['port'];
-                        $timeout = is_null($config['timeout']) ? 0 : $config['timeout'];
-                        $cache->addMethodCall('addServer', array($host, $port, $timeout));
-                    }
-                    unset($config);
-
-                    $this->container->setDefinition($id, $cache);
-                } else {
-                    $id = $instance['id'];
-                }
-                $service->addMethodCall(sprintf('set%s', ucwords($type)), array(new Reference($id)));
-                break;
             case 'memcached':
-                if (empty($instance['id'])) {
-                    $cache = new Definition('Aequasi\Bundle\CacheBundle\Cache\Memcached');
-                    //$cache->setPublic(false);
-
-                    if ($instance['persistent']) {
-                        $cache->setArguments(array(serialize($instance['hosts'])));
-                    }
-
-                    foreach ($instance['hosts'] as $config) {
-                        $host   = is_null($config['host']) ? 'localhost' : $config['host'];
-                        $port   = is_null($config['port']) ? 11211 : $config['port'];
-                        $weight = is_null($config['weight']) ? 0 : $config['weight'];
-                        $cache->addMethodCall('addServer', array($host, $port, $weight));
-                    }
-                    unset($config);
-
-                    $this->container->setDefinition($id, $cache);
-                } else {
-                    $id = $instance['id'];
-                }
-                $service->addMethodCall(sprintf('set%s', ucwords($type)), array(new Reference($id)));
-                break;
             case 'redis':
-                if (empty($instance['id'])) {
-                    $cache = new Definition('Redis');
-                    //$cache->setPublic(false);
-
-                    foreach ($instance['hosts'] as $config) {
-                        $host    = empty($config['host']) ? 'localhost' : $config['host'];
-                        $port    = empty($config['port']) ? 6379 : $config['port'];
-                        $timeout = is_null($config['timeout']) ? 2 : $config['timeout'];
-                        $cache->addMethodCall(
-                            $instance['persistent'] ? 'pconnect' : 'connect',
-                            array($host, $port, $timeout)
-                        );
-                    }
-                    if (isset($instance['auth_password']) && null !== $instance['auth_password']) {
-                        $cache->addMethodCall('auth', array($instance['auth_password']));
-                    }
-                    if (isset($instance['database'])) {
-                        $cache->addMethodCall('select', array($instance['database']));
-                    }
-                    unset($config);
-
-                    $this->container->setDefinition($id, $cache);
-                } else {
-                    $id = $instance['id'];
-                }
-                $service->addMethodCall(sprintf('set%s', ucwords($type)), array(new Reference($id)));
-                break;
+                return $this->createCacheInstance($service, $type, $id, $instance);
             case 'file_system':
             case 'php_file':
-                $directory = is_null($instance['directory']) ? '%kernel.cache_dir%/doctrine/cache' : $instance['directory'];
+                $directory =
+                    is_null($instance['directory']) ? '%kernel.cache_dir%/doctrine/cache' : $instance['directory'];
                 $extension = is_null($instance['extension']) ? null : $instance['extension'];
 
                 $service->setArguments(array($directory, $extension));
                 break;
         }
+    }
+
+    /**
+     * Creates a cache instance
+     *
+     * @param Definition $service
+     * @param string     $type
+     * @param string     $id
+     * @param array      $instance
+     */
+    public function createCacheInstance(Definition $service, $type, $id, array $instance)
+    {
+        if (empty($instance['id'])) {
+            $cache = new Definition(self::$types[$type]['class']);
+
+            if (isset($instance['persistent'])) {
+                if ($type === 'memcached') {
+                    $cache->setArguments(array(serialize($instance['hosts'])));
+                }
+                if ($type === 'redis') {
+                    self::$types[$type]['connect'] = 'pconnect';
+                }
+            }
+
+            foreach ($instance['hosts'] as $config) {
+                $host    = empty($config['host']) ? 'localhost' : $config['host'];
+                $port    = empty($config['port']) ? 11211 : $config['port'];
+                if ($type === 'memcached') {
+                    $thirdParam = is_null($config['weight']) ? 0 : $config['weight'];
+                } else {
+                    $thirdParam = is_null($config['timeout']) ? 0 : $config['timeout'];
+                }
+
+                $cache->addMethodCall(self::$types[$type]['connect'], array($host, $port, $thirdParam));
+            }
+            unset($config);
+
+            if ($type === 'redis') {
+                if (isset($instance['auth_password']) && null !== $instance['auth_password']) {
+                    $cache->addMethodCall('auth', array($instance['auth_password']));
+                }
+                if (isset($instance['database'])) {
+                    $cache->addMethodCall('select', array($instance['database']));
+                }
+            }
+
+            $this->container->setDefinition($id, $cache);
+        } else {
+            $id = $instance['id'];
+        }
+        $service->addMethodCall(sprintf('set%s', ucwords($type)), array(new Reference($id)));
     }
 }
