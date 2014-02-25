@@ -1,0 +1,13 @@
+language: php
+php:
+  - "5.4"
+  - "5.3"
+
+services:
+    - redis-server
+    - memcached
+
+before_script:
+    - ./.travis.cache.sh
+    - composer self-update
+    - composer install --dev --prefer-source --no-interaction

@@ -1,9 +1,9 @@
-Aequasi cache-bundle
+Aequasi cache-bundle [![Build Status](https://travis-ci.org/aequasi/cache-bundle.png?branch=master)](https://travis-ci.org/aequasi/cache-bundle)
 ====================
 
-### Cache Bundle for Symfony 2
+#### Cache Bundle for Symfony 2
 
-Creates services in Symfony 2, for cache, that can also be used with doctrines three cache types (metadata, result, and query). It also provides functionality for session handler support, and I am working on Router support.
+Creates services in Symfony 2, for cache, that can also be used with doctrines three cache types (metadata, result, and query). It also provides functionality for session handler support, and Router support.
 
 Should work in all versions of Symfony, and php 5.3
 
@@ -11,14 +11,16 @@ The respective cache extensions will be required for your project.
 
 Redis uses the php redis extension.
 
-### Requirements
+#### Requirements
 
 - PHP 5.3.x or 5.4.x
+- [Composer](http://getcomposer.org)
 
-### To Install
+#### To Install
 
+Run the following in your project root, assuming you have composer set up for your project
 ```sh
-	composer.phar require aequasi/cache-bundle dev-master
+composer.phar require aequasi/cache-bundle dev-master
 ```
 
 Add the bundle to app/AppKernel.php
@@ -26,7 +28,7 @@ Add the bundle to app/AppKernel.php
 ```php
 $bundles(
     ...
-       new Aequasi\Bundle\CacheBundle\CacheBundle(),
+       new Aequasi\Bundle\CacheBundle\AequasiCacheBundle(),
     ...
 );
 ```
@@ -36,7 +38,7 @@ Then add parameters (probably in config.yml) for your servers, and options
 ```yml
 aequasi_cache:
     instances:
-        memcache:
+        default:
           persistent: true
           namespace: mc
           type: memcached
@@ -56,45 +58,77 @@ If you want doctrine to use this as the result and query cache, add this
 ```yml
 aequasi_cache:
     doctrine:
+        enabled: true
         metadata:
-            instance: memcached
-            entity_manager: default          # the name of your entity_manager connection
-            document_manager: default        # the name of your document_manager connection
+            instance: default
+            entity_managers:   [ default ]          # the name of your entity_manager connection
+            document_managers: [ default ]       # the name of your document_manager connection
         result:
-            instance: memcached
-            entity_manager: [default, read]  # you may specify multiple entity_managers
-            prefix: "result_"                # you may specify a prefix for the entries
+            instance: default
+            entity_managers:   [ default, read ]  # you may specify multiple entity_managers
         query:
-            instance: memcached
-            entity_manager: default
+            instance: default
+            entity_managers: [ default ]
 ```
 
 #### Session
 
-This bundle even allows you to store your session data in one of your memcache clusters. To enable:
+This bundle even allows you to store your session data in one of your cache clusters. To enable:
 
 ```yml
 aequasi_cache:
     session:
-        instance: memcached
+        enabled: true
+        instance: default
         prefix: "session_"
         ttl: 7200
 ```
 
-### To Use
+#### Router
 
-You can use the default cache functions, doctrine's `useResultCache` and `useQueryCache`, along with the default doctrine functions. Heres an example
+This bundle also provides router caching, to help speed that section up. To enable:
+
+```yml
+aequasi_cache:
+    router:
+        enabled: true
+        instance: default
+```
+
+If you change any of your routes, you will need to clear all of the route_* keys in your cache.
+
+
+#### To Use
+
+To use this with doctrine's entity manager, just make sure you have `useResultCache` and/or `useQueryCache` set to true. If you want to use the user cache, just grab the service out of the container like so:
 
 ```php
-/** @var $em \Doctrine\ORM\EntityManager */
-$cache = $this->get( 'aequasi_cache.instance.memcached' );
+// Change default to the name of your instance
+$cache = $container->get( 'aequasi_cache.instance.default' );
+// Or
+$cache = $container->get( 'aequasi_cache.default' );
+```
+
+Here is an example usage of the service:
+
+```php
+$cache = $this->get( 'aequasi_cache.instance.default' );
 $key = 'test';
 if( $data = $cache->fetch( $key ) ) {
 	print_r( $data );
 } else {
+	/** @var $em \Doctrine\ORM\EntityManager */
 	$data = $em->find( 'AcmeDemoBundle:User', 1 );
 	$cache->save( $key, $data, 3600 );
 }
+```
+
+There is also the `cache()` function on the service that allows you to wrap the above, into a single function:
+
+```php
+$cache = $this->get( 'aequasi_cache.instance.default' );
+$user = $cache->cache( 'test', function() use( $em ) { return $em->find( "AcmeDemoBundle:User", 1 ); }, 3600 );
+var_dump( $user );
 ```
 
 ### Need Help?
@@ -102,3 +136,8 @@ if( $data = $cache->fetch( $key ) ) {
 Create an issue if you've found a bug,
 
 or email me at aequasi@gmail.com
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/aequasi/cache-bundle/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
+
