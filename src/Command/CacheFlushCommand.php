@@ -40,9 +40,8 @@ class CacheFlushCommand extends ContainerAwareCommand
         $serviceName = 'aequasi_cache.instance.' . $input->getArgument('instance');
 
         /** @var CacheService $service */
-        $service =
-            $this->getContainer()
-                ->get($serviceName);
+        $service = $this->getContainer()->get($serviceName);
         $service->flushAll();
     }
-} 
+}
+

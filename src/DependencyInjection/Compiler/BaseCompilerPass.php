@@ -45,4 +45,5 @@ abstract class BaseCompilerPass implements CompilerPassInterface
      * @return mixed
      */
     abstract protected function prepare();
-} 
+}
+

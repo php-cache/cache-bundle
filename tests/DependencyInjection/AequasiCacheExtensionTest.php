@@ -79,4 +79,5 @@ class AequasiCacheExtensionTest extends TestCase
     {
         return 'aequasi_cache';
     }
-} 
+}
+
