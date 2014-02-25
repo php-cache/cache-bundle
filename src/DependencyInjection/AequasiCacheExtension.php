@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author    Aaron Scherer <aequasi@gmail.com>
  * @date      2013
  * @license   http://www.apache.org/licenses/LICENSE-2.0.html Apache License, Version 2.0
  */
+
 namespace Aequasi\Bundle\CacheBundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
@@ -14,11 +16,10 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 /**
  * Class AequasiCacheExtension
  *
- * @package Aequasi\Bundle\CacheBundle\DependencyInjection
+ * @author Aaron Scherer <aequasi@gmail.com>
  */
 class AequasiCacheExtension extends Extension
 {
-
     /**
      * Loads the configs for Cache and puts data into the container
      *

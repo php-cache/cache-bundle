@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Aaron Scherer
  * @date      12/9/13
@@ -16,11 +17,12 @@ use Doctrine\Common\Cache\Cache;
  * @method boolean flushAll() flushAll() Flushes all cache entries
  * @method boolean deleteAll() deleteAll() Deletes all cache entries
  * @method string  getNamespace() getNamespace() Retrieves the namespace that prefixes all cache ids.
- * @method boolean setNamespace() setNamespace( string $namespace ) Sets the namespace to prefix all cache ids wtih.
+ * @method boolean setNamespace() setNamespace(string $namespace) Sets the namespace to prefix all cache ids wtih.
+ *
+ * @author Aaron Scherer <aequasi@gmail.com>
  */
 class CacheService implements Cache
 {
-
     /**
      * 60 Second Cache
      */
@@ -56,10 +58,19 @@ class CacheService implements Cache
      */
     private $cache;
 
+    /**
+     * @var Boolean $logging
+     */
     private $logging = false;
 
+    /**
+     * @var array $calls
+     */
     private $calls = array();
 
+    /**
+     * @var array $hosts
+     */
     protected $hosts = array();
 
     /**
@@ -71,26 +82,32 @@ class CacheService implements Cache
      * @return mixed
      * @throws \InvalidArgumentException
      */
-    public function __call( $name, $arguments )
+    public function __call($name, $arguments)
     {
-        if (!method_exists( $this->cache, $name )) {
-            throw new \InvalidArgumentException( sprintf(
+        if (!method_exists($this->cache, $name)) {
+            throw new \InvalidArgumentException(sprintf(
                 "%s is not a valid function of the %s cache type.",
                 $name,
-                get_class( $this->cache )
-            ) );
+                get_class($this->cache)
+            ));
         }
 
-        return call_user_func_array( array( $this->cache, $name ), $arguments );
+        return call_user_func_array(array($this->cache, $name), $arguments);
     }
 
-    private function timeCall( $name, $arguments )
+    /**
+     * @param $name
+     * @param $arguments
+     *
+     * @return object
+     */
+    private function timeCall($name, $arguments)
     {
-        $start  = microtime( true );
-        $result = call_user_func_array( array( $this->cache, $name ), $arguments );
-        $time   = microtime( true ) - $start;
+        $start  = microtime(true);
+        $result = call_user_func_array(array($this->cache, $name), $arguments);
+        $time   = microtime(true) - $start;
 
-        $object = (object)compact( 'name', 'arguments', 'start', 'time', 'result' );
+        $object = (object)compact('name', 'arguments', 'start', 'time', 'result');
 
         return $object;
     }
@@ -102,19 +119,19 @@ class CacheService implements Cache
      *
      * @return mixed The cached data or FALSE, if no cache entry exists for the given id.
      */
-    public function fetch( $id )
+    public function fetch($id)
     {
         if ($this->isLogging()) {
-            $call         = $this->timeCall( 'fetch', array( $id ) );
+            $call         = $this->timeCall('fetch', array($id));
             $result       = $call->result;
             $call->result = '<DATA>';
 
-            $this->calls[ ] = $call;
+            $this->calls[] = $call;
 
             return $result;
         }
 
-        return $this->cache->fetch( $id );
+        return $this->cache->fetch($id);
     }
 
     /**
@@ -124,16 +141,16 @@ class CacheService implements Cache
      *
      * @return boolean TRUE if a cache entry exists for the given cache id, FALSE otherwise.
      */
-    public function contains( $id )
+    public function contains($id)
     {
         if ($this->isLogging()) {
-            $call           = $this->timeCall( 'contains', array( $id ) );
-            $this->calls[ ] = $call;
+            $call          = $this->timeCall('contains', array($id));
+            $this->calls[] = $call;
 
             return $call->result;
         }
 
-        return $this->cache->contains( $id );
+        return $this->cache->contains($id);
     }
 
     /**
@@ -146,17 +163,17 @@ class CacheService implements Cache
      *
      * @return boolean TRUE if the entry was successfully stored in the cache, FALSE otherwise.
      */
-    public function save( $id, $data, $lifeTime = self::NO_EXPIRE )
+    public function save($id, $data, $lifeTime = self::NO_EXPIRE)
     {
         if ($this->isLogging()) {
-            $call            = $this->timeCall( 'save', array( $id, $data, $lifeTime ) );
-            $call->arguments = array( $id, '<DATA>', $lifeTime );
-            $this->calls[ ]  = $call;
+            $call            = $this->timeCall('save', array($id, $data, $lifeTime));
+            $call->arguments = array($id, '<DATA>', $lifeTime);
+            $this->calls[]   = $call;
 
             return $call->result;
         }
 
-        return $this->cache->save( $id, $data, $lifeTime );
+        return $this->cache->save($id, $data, $lifeTime);
     }
 
     /**
@@ -166,16 +183,16 @@ class CacheService implements Cache
      *
      * @return boolean TRUE if the cache entry was successfully deleted, FALSE otherwise.
      */
-    public function delete( $id )
+    public function delete($id)
     {
         if ($this->isLogging()) {
-            $call           = $this->timeCall( 'delete', array( $id ) );
-            $this->calls[ ] = $call;
+            $call          = $this->timeCall('delete', array($id));
+            $this->calls[] = $call;
 
             return $call->result;
         }
 
-        return $this->cache->delete( $id );
+        return $this->cache->delete($id);
     }
 
     /**
@@ -189,18 +206,18 @@ class CacheService implements Cache
      *
      * @return mixed
      */
-    public function cache( $id, $data, $lifeTime = self::NO_EXPIRE )
+    public function cache($id, $data, $lifeTime = self::NO_EXPIRE)
     {
         if ($lifeTime === self::NO_CACHE) {
-            return $this->getDataFromPayload( $data );
+            return $this->getDataFromPayload($data);
         }
 
-        if ($this->contains( $id )) {
-            return $this->fetch( $id );
+        if ($this->contains($id)) {
+            return $this->fetch($id);
         }
 
-        $result = $this->getDataFromPayload( $data );
-        $this->save( $id, $result, $lifeTime );
+        $result = $this->getDataFromPayload($data);
+        $this->save($id, $result, $lifeTime);
         return $result;
     }
 
@@ -212,15 +229,15 @@ class CacheService implements Cache
      *
      * @return callable|mixed
      */
-    private function getDataFromPayload( $payload )
+    private function getDataFromPayload($payload)
     {
         /** @var $payload \Closure|callable|mixed */
-        if (is_callable( $payload )) {
-            if (is_object( $payload ) && get_class( $payload ) == 'Closure') {
+        if (is_callable($payload)) {
+            if (is_object($payload) && get_class($payload) == 'Closure') {
                 return $payload();
             }
 
-            return call_user_func( $payload );
+            return call_user_func($payload);
         }
 
         return $payload;
@@ -258,7 +275,7 @@ class CacheService implements Cache
     /**
      * @param \Doctrine\Common\Cache\Cache $cache
      */
-    public function setCache( $cache )
+    public function setCache($cache)
     {
         $this->cache = $cache;
     }
@@ -274,7 +291,7 @@ class CacheService implements Cache
     /**
      * @param boolean $logging
      */
-    public function setLogging( $logging )
+    public function setLogging($logging)
     {
         $this->logging = $logging;
     }

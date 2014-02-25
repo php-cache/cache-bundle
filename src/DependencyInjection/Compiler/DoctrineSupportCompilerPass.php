@@ -1,19 +1,22 @@
 <?php
+
 /**
  * @author    Aaron Scherer <aequasi@gmail.com>
  * @date      2013
  * @license   http://www.apache.org/licenses/LICENSE-2.0.html Apache License, Version 2.0
  */
+
 namespace Aequasi\Bundle\CacheBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 /**
- * DoctrineCompilerPass is a compiler pass to set the doctrine caches.
+ * Class DoctrineSupportCompilerPass
+ *
+ * @author Aaron Scherer <aequasi@gmail.com>
  */
 class DoctrineSupportCompilerPass extends BaseCompilerPass
 {
-
     /**
      * @return mixed|void
      */
@@ -47,12 +50,21 @@ class DoctrineSupportCompilerPass extends BaseCompilerPass
                 }
 
                 if (!isset($cacheData['instance'])) {
-                    throw new InvalidConfigurationException(sprintf("There was no instance passed. Please specify a instance under the %s type", $cacheType));
+                    throw new InvalidConfigurationException(sprintf(
+                        "There was no instance passed. Please specify a instance under the %s type",
+                        $cacheType
+                    ));
                 }
                 $cacheDefinitionName = sprintf('%s.instance.%s', $this->getAlias(), $cacheData['instance']);
 
                 foreach ($cacheData[$type] as $manager) {
-                    $doctrineDefinitionName = sprintf("doctrine.%s.%s_%s_cache", ($type == 'entity_managers' ? 'orm' : 'odm'), $manager, $cacheType);
+                    $doctrineDefinitionName =
+                        sprintf(
+                            "doctrine.%s.%s_%s_cache",
+                            ($type == 'entity_managers' ? 'orm' : 'odm'),
+                            $manager,
+                            $cacheType
+                        );
                     $this->container->setAlias($doctrineDefinitionName, $cacheDefinitionName);
                 }
             }

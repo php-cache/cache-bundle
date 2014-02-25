@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Aaron Scherer
  * @date      12/11/13
@@ -13,9 +14,13 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\RequestContext;
 use Aequasi\Bundle\CacheBundle\Service\CacheService;
 
+/**
+ * Class Router
+ *
+ * @author Aaron Scherer <aequasi@gmail.com>
+ */
 class Router extends BaseRouter
 {
-
     /**
      * @var ContainerInterface
      */
@@ -26,6 +31,12 @@ class Router extends BaseRouter
      */
     protected $cache;
 
+    /**
+     * @param ContainerInterface $container
+     * @param mixed              $resource
+     * @param array              $options
+     * @param RequestContext     $context
+     */
     public function __construct(
         ContainerInterface $container,
         $resource,
@@ -36,26 +47,32 @@ class Router extends BaseRouter
 
         $this->initializeCache();
 
-        parent::__construct( $container, $resource, $options, $context );
+        parent::__construct($container, $resource, $options, $context);
     }
 
+    /**
+     *
+     */
     private function initializeCache()
     {
-        $config = $this->container->getParameter( 'aequasi_cache.router' );
-        $instance = $config[ 'instance' ];
+        $config   = $this->container->getParameter('aequasi_cache.router');
+        $instance = $config['instance'];
 
         /** @var CacheService $cache */
-        $this->cache = $this->container->get( 'aequasi_cache.instance.' . $instance );
+        $this->cache = $this->container->get('aequasi_cache.instance.' . $instance);
     }
 
+    /**
+     * @return CacheUrlMatcher|null|\Symfony\Component\Routing\Matcher\UrlMatcherInterface
+     */
     public function getMatcher()
     {
         if (null !== $this->matcher) {
             return $this->matcher;
         }
 
-        $matcher = new CacheUrlMatcher( $this->getRouteCollection(), $this->context );
-        $matcher->setCache( $this->cache );
+        $matcher = new CacheUrlMatcher($this->getRouteCollection(), $this->context);
+        $matcher->setCache($this->cache);
 
         return $this->matcher = $matcher;
     }
@@ -68,12 +85,12 @@ class Router extends BaseRouter
         $key = 'route_collection';
 
         if (null === $this->collection) {
-            if ($this->cache->contains( $key )) {
-                return $this->collection = $this->cache->fetch( $key );
+            if ($this->cache->contains($key)) {
+                return $this->collection = $this->cache->fetch($key);
             }
 
             $this->collection = parent::getRouteCollection();
-            $this->cache->save( $key, $this->collection, 60 * 60 * 24 * 7 );
+            $this->cache->save($key, $this->collection, 60 * 60 * 24 * 7);
         }
 
         return $this->collection;

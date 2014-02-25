@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Aaron Scherer
  * @date      12/6/13
@@ -10,17 +11,15 @@ namespace Aequasi\Bundle\CacheBundle\DependencyInjection\Builder;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Class ServiceBuilderCompilerPass
+ * Class ServiceBuilder
  *
- * @package Aequasi\Bundle\CacheBundle\DependencyInjection\Compiler
+ * @author Aaron Scherer <aequasi@gmail.com>
  */
 class ServiceBuilder extends BaseBuilder
 {
-
     /**
      * {@inheritDoc}
      */
@@ -33,11 +32,20 @@ class ServiceBuilder extends BaseBuilder
         }
     }
 
+    /**
+     * @param       $name
+     * @param array $instance
+     *
+     * @throws \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     */
     private function buildInstance($name, array $instance)
     {
         $typeId = $this->getAlias() . '.abstract.' . $instance['type'];
         if (!$this->container->hasDefinition($typeId)) {
-            throw new InvalidConfigurationException(sprintf("`%s` is not a valid cache type. If you are using a custom type, make sure to add your service. ", $instance['type']));
+            throw new InvalidConfigurationException(sprintf(
+                "`%s` is not a valid cache type. If you are using a custom type, make sure to add your service. ",
+                $instance['type']
+            ));
         }
 
         $service = $this->buildService($typeId, $name, $instance);
@@ -57,17 +65,24 @@ class ServiceBuilder extends BaseBuilder
         $namespace = is_null($instance['namespace']) ? $name : $instance['namespace'];
 
         $coreName = $this->getAlias() . '.instance.' . $name . '.core';
-        $doctrine = $this->container->setDefinition($coreName, new Definition($this->container->getParameter($typeId . '.class')))
-                                    ->addMethodCall('setNamespace', array($namespace))
-                                    ->setPublic(false);
-        $service  = $this->container->setDefinition($this->getAlias() . '.instance.' . $name, new Definition($this->container->getParameter('aequasi_cache.service.class')))
-                        ->addMethodCall('setCache', array(new Reference($coreName)))
-                        ->addMethodCall('setLogging', array($this->container->getParameter('kernel.debug')));
-        
+        $doctrine =
+            $this->container->setDefinition(
+                $coreName,
+                new Definition($this->container->getParameter($typeId . '.class'))
+            )
+                ->addMethodCall('setNamespace', array($namespace))
+                ->setPublic(false);
+        $service  =
+            $this->container->setDefinition(
+                $this->getAlias() . '.instance.' . $name,
+                new Definition($this->container->getParameter('aequasi_cache.service.class'))
+            )
+                ->addMethodCall('setCache', array(new Reference($coreName)))
+                ->addMethodCall('setLogging', array($this->container->getParameter('kernel.debug')));
+
         if (isset($instance['hosts'])) {
             $service->addMethodCall('setHosts', array($instance['hosts']));
         }
-
 
         $alias = new Alias($this->getAlias() . '.instance.' . $name);
         $this->container->setAlias($this->getAlias() . '.' . $name, $alias);
@@ -75,10 +90,15 @@ class ServiceBuilder extends BaseBuilder
         return $doctrine;
     }
 
+    /**
+     * @param Definition $service
+     * @param            $name
+     * @param array      $instance
+     */
     private function prepareCacheClass(Definition $service, $name, array $instance)
     {
-        $type  = $instance['type'];
-        $id    = sprintf("%s.instance.%s.cache_instance", $this->getAlias(), $name);
+        $type = $instance['type'];
+        $id   = sprintf("%s.instance.%s.cache_instance", $this->getAlias(), $name);
         switch ($type) {
             case 'memcache':
                 if (empty($instance['id'])) {
@@ -151,7 +171,8 @@ class ServiceBuilder extends BaseBuilder
                 break;
             case 'file_system':
             case 'php_file':
-                $directory = is_null($instance['directory']) ? '%kernel.cache_dir%/doctrine/cache' : $instance['directory'];
+                $directory =
+                    is_null($instance['directory']) ? '%kernel.cache_dir%/doctrine/cache' : $instance['directory'];
                 $extension = is_null($instance['extension']) ? null : $instance['extension'];
 
                 $service->setArguments(array($directory, $extension));

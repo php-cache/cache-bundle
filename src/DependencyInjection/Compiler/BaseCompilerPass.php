@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Aaron Scherer
  * @date      12/6/13
@@ -13,11 +14,10 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 /**
  * Class BaseCompilerPass
  *
- * @package Aequasi\Bundle\CacheBundle\DependencyInjection\Compiler
+ * @author Aaron Scherer <aequasi@gmail.com>
  */
 abstract class BaseCompilerPass implements CompilerPassInterface
 {
-
     /**
      * @var ContainerBuilder
      */
