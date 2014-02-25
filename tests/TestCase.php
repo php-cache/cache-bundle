@@ -8,10 +8,7 @@
 
 namespace Aequasi\Bundle\CacheBundle\Tests;
 
-use Doctrine\Common\Annotations\AnnotationReader;
-
 use Aequasi\Bundle\CacheBundle\DependencyInjection\AequasiCacheExtension;
-
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
@@ -56,7 +53,7 @@ class TestCase extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param       $file
+     * @param       string $file
      * @param array $data
      *
      * @return ContainerBuilder

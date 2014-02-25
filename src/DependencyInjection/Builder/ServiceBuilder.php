@@ -54,7 +54,7 @@ class ServiceBuilder extends BaseBuilder
     }
 
     /**
-     * @param       $typeId
+     * @param       string $typeId
      * @param       $name
      * @param array $instance
      *

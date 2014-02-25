@@ -96,7 +96,7 @@ class CacheService implements Cache
     }
 
     /**
-     * @param $name
+     * @param string $name
      * @param $arguments
      *
      * @return object
@@ -107,7 +107,7 @@ class CacheService implements Cache
         $result = call_user_func_array(array($this->cache, $name), $arguments);
         $time   = microtime(true) - $start;
 
-        $object = (object)compact('name', 'arguments', 'start', 'time', 'result');
+        $object = (object) compact('name', 'arguments', 'start', 'time', 'result');
 
         return $object;
     }
@@ -218,6 +218,7 @@ class CacheService implements Cache
 
         $result = $this->getDataFromPayload($data);
         $this->save($id, $result, $lifeTime);
+
         return $result;
     }
 
