@@ -45,4 +45,5 @@ abstract class BaseBuilder
      * @return mixed
      */
     abstract protected function prepare();
-} 
+}
+
