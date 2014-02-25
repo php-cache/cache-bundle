@@ -79,8 +79,6 @@ class ServiceBuilder extends BaseBuilder
     {
         $type  = $instance['type'];
         $id    = sprintf("%s.instance.%s.cache_instance", $this->getAlias(), $name);
-        $cache = null;
-
         switch ($type) {
             case 'memcache':
                 if (empty($instance['id'])) {

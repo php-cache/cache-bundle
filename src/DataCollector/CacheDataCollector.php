@@ -66,7 +66,7 @@ class CacheDataCollector extends DataCollector
     /**
      * Method returns amount of logged Cache reads: "get" calls
      *
-     * @return number
+     * @return array
      */
     public function getStatistics()
     {
@@ -76,7 +76,7 @@ class CacheDataCollector extends DataCollector
     /**
      * Method returns the statistic totals
      *
-     * @return number
+     * @return array
      */
     public function getTotals()
     {
