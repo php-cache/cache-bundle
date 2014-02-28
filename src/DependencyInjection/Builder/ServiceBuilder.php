@@ -135,6 +135,7 @@ class ServiceBuilder extends BaseBuilder
                 $extension = is_null($instance['extension']) ? null : $instance['extension'];
 
                 $service->setArguments(array($directory, $extension));
+
                 return true;
         }
 
