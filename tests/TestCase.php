@@ -24,7 +24,7 @@ class TestCase extends \PHPUnit_Framework_TestCase
 
     /**
      * @param ContainerBuilder $container
-     * @param                  $file
+     * @param string           $file
      */
     protected function loadFromFile(ContainerBuilder $container, $file)
     {
@@ -53,8 +53,8 @@ class TestCase extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param       string $file
-     * @param array $data
+     * @param string $file
+     * @param array  $data
      *
      * @return ContainerBuilder
      */
