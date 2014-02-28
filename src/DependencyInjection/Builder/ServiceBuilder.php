@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class ServiceBuilder extends BaseBuilder
 {
-    private static $types = [
+    protected static $types = [
         'memcache' => [
             'class' => 'Memcache',
             'connect' => 'addServer'
@@ -141,14 +141,14 @@ class ServiceBuilder extends BaseBuilder
     public function createInstance(Definition $service, $type, $id, array $instance)
     {
         if (empty($instance['id'])) {
-            $cache = new Definition(static::$types[$type]['class']);
+            $cache = new Definition(self::$types[$type]['class']);
 
             if (isset($instance['persistent'])) {
                 if ($type === 'memcached') {
                     $cache->setArguments(array(serialize($instance['hosts'])));
                 }
                 if ($type === 'redis') {
-                    static::$types[$type]['connect'] = 'pconnect';
+                    self::$types[$type]['connect'] = 'pconnect';
                 }
             }
 
@@ -158,10 +158,10 @@ class ServiceBuilder extends BaseBuilder
                 if ($type === 'memcached') {
                     $thirdParam = is_null($config['weight']) ? 0 : $config['weight'];
                 } else {
-                    $timeout = is_null($config['timeout']) ? 0 : $config['timeout'];
+                    $thirdParam = is_null($config['timeout']) ? 0 : $config['timeout'];
                 }
 
-                $cache->addMethodCall(static::$types[$type]['connect'], array($host, $port, $thirdParam));
+                $cache->addMethodCall(self::$types[$type]['connect'], array($host, $port, $thirdParam));
             }
             unset($config);
 
