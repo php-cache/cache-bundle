@@ -17,7 +17,7 @@ use Doctrine\Common\Cache\Cache;
  * @method boolean flushAll() flushAll() Flushes all cache entries
  * @method boolean deleteAll() deleteAll() Deletes all cache entries
  * @method string  getNamespace() getNamespace() Retrieves the namespace that prefixes all cache ids.
- * @method boolean setNamespace() setNamespace(string $namespace) Sets the namespace to prefix all cache ids wtih.
+ * @method boolean setNamespace() setNamespace(string $namespace) Sets the namespace to prefix all cache ids with.
  *
  * @author Aaron Scherer <aequasi@gmail.com>
  */

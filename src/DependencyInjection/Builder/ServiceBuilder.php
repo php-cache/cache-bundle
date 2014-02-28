@@ -114,6 +114,8 @@ class ServiceBuilder extends BaseBuilder
      * @param Definition $service
      * @param string     $name
      * @param array      $instance
+     *
+     * @return Boolean
      */
     private function prepareCacheClass(Definition $service, $name, array $instance)
     {
@@ -126,13 +128,17 @@ class ServiceBuilder extends BaseBuilder
                 return $this->createCacheInstance($service, $type, $id, $instance);
             case 'file_system':
             case 'php_file':
-                $directory =
-                    is_null($instance['directory']) ? '%kernel.cache_dir%/doctrine/cache' : $instance['directory'];
+                $directory = '%kernel.cache_dir%/doctrine/cache';
+                if (null !== $instance['directory']) {
+                    $directory = $instance['directory'];
+                }
                 $extension = is_null($instance['extension']) ? null : $instance['extension'];
 
                 $service->setArguments(array($directory, $extension));
-                break;
+                return true;
         }
+
+        return false;
     }
 
     /**
@@ -142,6 +148,8 @@ class ServiceBuilder extends BaseBuilder
      * @param string     $type
      * @param string     $id
      * @param array      $instance
+     *
+     * @return Boolean
      */
     public function createCacheInstance(Definition $service, $type, $id, array $instance)
     {
@@ -184,5 +192,7 @@ class ServiceBuilder extends BaseBuilder
             $id = $instance['id'];
         }
         $service->addMethodCall(sprintf('set%s', ucwords($type)), array(new Reference($id)));
+
+        return true;
     }
 }

@@ -27,6 +27,6 @@ class Memcached extends \Memcached
             }
         }
 
-        parent::addServer($host, $port, $weight);
+        return parent::addServer($host, $port, $weight);
     }
 }

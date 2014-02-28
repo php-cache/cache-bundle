@@ -44,7 +44,7 @@ class RouterBuilder extends BaseBuilder
         }
         if (!isset($instances[$instance])) {
             throw new InvalidConfigurationException(sprintf(
-                'Failed to hook into the router. The instance "%s" doesn\'t exist!',
+                "Failed to hook into the router. The instance \"%s\" doesn't exist!",
                 $instance
             ));
         }
