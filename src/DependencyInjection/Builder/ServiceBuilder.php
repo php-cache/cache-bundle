@@ -138,7 +138,7 @@ class ServiceBuilder extends BaseBuilder
      * @param string     $id
      * @param array      $instance
      */
-    public function createInstance(Definition $service, $type, $id, array $instance)
+    public function createCacheInstance(Definition $service, $type, $id, array $instance)
     {
         if (empty($instance['id'])) {
             $cache = new Definition(self::$types[$type]['class']);
