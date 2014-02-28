@@ -10,8 +10,6 @@ namespace Aequasi\Bundle\CacheBundle\Routing\Matcher;
 
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Aequasi\Bundle\CacheBundle\Service\CacheService;
-use Symfony\Component\Routing\RequestContext;
-use Symfony\Component\Routing\RouteCollection;
 
 /**
  * Class CacheUrlMatcher
