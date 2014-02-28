@@ -20,6 +20,11 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class ServiceBuilder extends BaseBuilder
 {
+    /**
+     * Array of types, and their options
+     *
+     * @var array $types
+     */
     protected static $types = [
         'memcache' => [
             'class' => 'Memcache',
@@ -48,10 +53,10 @@ class ServiceBuilder extends BaseBuilder
     }
 
     /**
-     * @param       $name
-     * @param array $instance
+     * @param string $name
+     * @param array  $instance
      *
-     * @throws \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @throws InvalidConfigurationException
      */
     private function buildInstance($name, array $instance)
     {
@@ -69,9 +74,9 @@ class ServiceBuilder extends BaseBuilder
     }
 
     /**
-     * @param       $typeId
-     * @param       $name
-     * @param array $instance
+     * @param string $typeId
+     * @param string $name
+     * @param array  $instance
      *
      * @return Definition
      */
@@ -107,7 +112,7 @@ class ServiceBuilder extends BaseBuilder
 
     /**
      * @param Definition $service
-     * @param            $name
+     * @param string     $name
      * @param array      $instance
      */
     private function prepareCacheClass(Definition $service, $name, array $instance)
