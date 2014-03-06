@@ -54,4 +54,12 @@ class AequasiCacheExtension extends Extension
             $container->setParameter($this->getAlias() . '.doctrine', $config['doctrine']);
         }
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getConfiguration(array $config, ContainerBuilder $container)
+    {
+      return new Configuration($container->getParameter('kernel.debug'));
+    }
 }
