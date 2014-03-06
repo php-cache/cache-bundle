@@ -25,20 +25,20 @@ class ServiceBuilder extends BaseBuilder
      *
      * @var array $types
      */
-    protected static $types = [
-        'memcache' => [
+    protected static $types = array(
+        'memcache' => array(
             'class' => 'Memcache',
             'connect' => 'addServer'
-        ],
-        'memcached' => [
+        ),
+        'memcached' => array(
             'class' => 'Aequasi\Bundle\CacheBundle\Cache\Memcached',
             'connect' => 'addServer'
-        ],
-        'redis' => [
+        ),
+        'redis' => array(
             'class' => 'Redis',
             'connect' => 'connect'
-        ]
-    ];
+        )
+    );
 
     /**
      * {@inheritDoc}
@@ -135,6 +135,7 @@ class ServiceBuilder extends BaseBuilder
                 $extension = is_null($instance['extension']) ? null : $instance['extension'];
 
                 $service->setArguments(array($directory, $extension));
+
                 return true;
         }
 

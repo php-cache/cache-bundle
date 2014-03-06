@@ -3,7 +3,7 @@
 /**
  * @author    Aaron Scherer
  * @date      12/11/13
- * @license   http://www.apache.org/licenses/LICENSE-2.0.html Apache License, Version 2.0Elephant
+ * @license   http://www.apache.org/licenses/LICENSE-2.0.html Apache License, Version 2.0
  */
 
 if (!@include __DIR__ . '/../../../../../vendor/autoload.php') {
