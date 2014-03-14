@@ -157,7 +157,7 @@ class ServiceBuilder extends BaseBuilder
         if (empty($instance['id'])) {
             $cache = new Definition(self::$types[$type]['class']);
 
-            if (isset($instance['persistent'])) {
+            if (isset($instance['persistent']) && $instance['persistent'] === true) {
                 if ($type === 'memcached') {
                     $cache->setArguments(array(serialize($instance['hosts'])));
                 }
