@@ -85,6 +85,18 @@ class Configuration implements ConfigurationInterface
                     ->end()
                     ->scalarNode('persistent')
                         ->defaultNull()
+                        ->beforeNormalization()
+                            ->ifTrue(
+                                function($v) { 
+                                    return $v === 'true' || $v === 'false'; 
+                                }
+                            )
+                            ->then(
+                                function($v) { 
+                                    return (bool) $v; 
+                                }
+                            )
+                        ->end()
                         ->info("For Redis and Memcached: Specify the persistent id if you want persistent connections.")
                     ->end()
                     ->scalarNode('auth_password')

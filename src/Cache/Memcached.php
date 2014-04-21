@@ -22,7 +22,7 @@ class Memcached extends \Memcached
     {
         $serverList = $this->getServerList();
         foreach ($serverList as $server) {
-            if ($server['host'] == $host && $server['port'] == $port) {
+            if ($server['host'] === $host && $server['port'] === $port) {
                 return false;
             }
         }
