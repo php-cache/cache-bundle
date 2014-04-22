@@ -39,7 +39,7 @@ Then add parameters (probably in config.yml) for your servers, and options
 aequasi_cache:
     instances:
         default:
-          persistent: true
+          persistent: true # Boolean or persistent_id
           namespace: mc
           type: memcached
           hosts:
@@ -115,11 +115,11 @@ Here is an example usage of the service:
 $cache = $this->get( 'aequasi_cache.instance.default' );
 $key = 'test';
 if( $data = $cache->fetch( $key ) ) {
-	print_r( $data );
+    print_r( $data );
 } else {
-	/** @var $em \Doctrine\ORM\EntityManager */
-	$data = $em->find( 'AcmeDemoBundle:User', 1 );
-	$cache->save( $key, $data, 3600 );
+    /** @var $em \Doctrine\ORM\EntityManager */
+    $data = $em->find( 'AcmeDemoBundle:User', 1 );
+    $cache->save( $key, $data, 3600 );
 }
 ```
 

@@ -157,9 +157,14 @@ class ServiceBuilder extends BaseBuilder
         if (empty($instance['id'])) {
             $cache = new Definition(self::$types[$type]['class']);
 
-            if (isset($instance['persistent']) && $instance['persistent'] === true) {
+            if (isset($instance['persistent']) && $instance['persistent'] !== false) {
+                if ($instance['persistent'] !== true) {
+                    $persistentId = $instance['persistent'];
+                } else {
+                    $persistentId = substr(md5(serialize($instance['hosts'])), 0, 5);
+                }
                 if ($type === 'memcached') {
-                    $cache->setArguments(array(serialize($instance['hosts'])));
+                    $cache->setArguments(array($persistentId));
                 }
                 if ($type === 'redis') {
                     self::$types[$type]['connect'] = 'pconnect';
@@ -167,15 +172,20 @@ class ServiceBuilder extends BaseBuilder
             }
 
             foreach ($instance['hosts'] as $config) {
-                $host    = empty($config['host']) ? 'localhost' : $config['host'];
-                $port    = empty($config['port']) ? 11211 : $config['port'];
+                $arguments = array(
+                    'host' => empty($config['host']) ? 'localhost' : $config['host'],
+                    'port' => empty($config['port']) ? 11211 : $config['port']
+                );
                 if ($type === 'memcached') {
-                    $thirdParam = is_null($config['weight']) ? 0 : $config['weight'];
+                    $arguments[] = is_null($config['weight']) ? 0 : $config['weight'];
                 } else {
-                    $thirdParam = is_null($config['timeout']) ? 0 : $config['timeout'];
+                    $arguments[] = is_null($config['timeout']) ? 0 : $config['timeout'];
+                    if (isset($persistentId)) {
+                        $arguments[] = $persistentId;
+                    }
                 }
 
-                $cache->addMethodCall(self::$types[$type]['connect'], array($host, $port, $thirdParam));
+                $cache->addMethodCall(self::$types[$type]['connect'], $arguments);
             }
             unset($config);
 
