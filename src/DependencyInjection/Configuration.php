@@ -70,7 +70,7 @@ class Configuration implements ConfigurationInterface
             ->prototype('array')
                 ->children()
                     ->enumNode('type')
-                        ->values(array('redis', 'file', 'memcached', 'apc'))
+                        ->values(array('redis', 'php_file', 'file_system', 'array', 'memcached', 'apc'))
                     ->end()
                     ->scalarNode('id')
                         ->defaultNull()
