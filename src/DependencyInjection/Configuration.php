@@ -170,7 +170,8 @@ class Configuration implements ConfigurationInterface
     /**
      * @return ArrayNodeDefinition
      */
-    private function getMemcachedOptions() {
+    private function getMemcachedOptions()
+    {
         $treeBuilder = new TreeBuilder();
         $node        = $treeBuilder->root('memcached');
 
