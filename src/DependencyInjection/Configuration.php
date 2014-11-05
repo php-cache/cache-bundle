@@ -87,13 +87,13 @@ class Configuration implements ConfigurationInterface
                         ->defaultNull()
                         ->beforeNormalization()
                             ->ifTrue(
-                                function($v) { 
-                                    return $v === 'true' || $v === 'false'; 
+                                function ($v) {
+                                    return $v === 'true' || $v === 'false';
                                 }
                             )
                             ->then(
-                                function($v) { 
-                                    return (bool) $v; 
+                                function ($v) {
+                                    return (bool) $v;
                                 }
                             )
                         ->end()
