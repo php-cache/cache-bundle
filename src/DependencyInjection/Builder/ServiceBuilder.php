@@ -157,6 +157,22 @@ class ServiceBuilder extends BaseBuilder
         if (empty($instance['id'])) {
             $cache = new Definition(self::$types[$type]['class']);
 
+            // set memcached options first as they need to be set before the servers are added.
+            if ($type === 'memcached') {
+                if (!empty($instance['options']['memcached'])) {
+                    foreach ($instance['options']['memcached'] as $option => $value) {
+                        switch ($option) {
+                            case 'serializer':
+                            case 'hash':
+                            case 'distribution':
+                                $value = constant(sprintf('\Memcached::%s_%s', strtoupper($option), strtoupper($value)));
+                                break;
+                        }
+                        $cache->addMethodCall('setOption', array(constant(sprintf('\Memcached::OPT_%s', strtoupper($option))), $value));
+                    }
+                }
+            }
+
             if (isset($instance['persistent']) && $instance['persistent'] !== false) {
                 if ($instance['persistent'] !== true) {
                     $persistentId = $instance['persistent'];
