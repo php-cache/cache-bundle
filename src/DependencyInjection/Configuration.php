@@ -87,13 +87,13 @@ class Configuration implements ConfigurationInterface
                         ->defaultNull()
                         ->beforeNormalization()
                             ->ifTrue(
-                                function($v) { 
-                                    return $v === 'true' || $v === 'false'; 
+                                function ($v) {
+                                    return $v === 'true' || $v === 'false';
                                 }
                             )
                             ->then(
-                                function($v) { 
-                                    return (bool) $v; 
+                                function ($v) {
+                                    return (bool) $v;
                                 }
                             )
                         ->end()
@@ -112,6 +112,9 @@ class Configuration implements ConfigurationInterface
                     ->end()
                     ->arrayNode('options')
                         ->info("Options for Redis and Memcached.")
+                        ->children()
+                            ->append($this->getMemcachedOptions())
+                        ->end()
                     ->end()
                     ->arrayNode('hosts')
                         ->prototype('array')
@@ -160,6 +163,64 @@ class Configuration implements ConfigurationInterface
                 ->end()
             ->end()
         ;
+
+        return $node;
+    }
+
+    /**
+     * @return ArrayNodeDefinition
+     */
+    private function getMemcachedOptions()
+    {
+        $treeBuilder = new TreeBuilder();
+        $node        = $treeBuilder->root('memcached');
+
+        if (class_exists('\Memcached')) {
+            $node
+                ->children()
+                    ->booleanNode('compression')
+                    ->end()
+                    ->enumNode('serializer')
+                        ->values(array('php', 'igbinary', 'json'))
+                    ->end()
+                    ->scalarNode('prefix_key')
+                    ->end()
+                    ->enumNode('hash')
+                        ->values(array('default', 'md5', 'crc', 'fnv1_64', 'fnv1a_64', 'fnv1_32', 'fnv1a_32', 'hsieh', 'murmur'))
+                    ->end()
+                    ->enumNode('distribution')
+                        ->values(array('modula', 'consistent'))
+                    ->end()
+                    ->booleanNode('libketama_compatible')
+                    ->end()
+                    ->booleanNode('uffer_writes')
+                    ->end()
+                    ->booleanNode('binary_protocol')
+                    ->end()
+                    ->booleanNode('no_block')
+                    ->end()
+                    ->booleanNode('tcp_nodelay')
+                    ->end()
+                    ->integerNode('socket_send_size')
+                    ->end()
+                    ->integerNode('socket_recv_size')
+                    ->end()
+                    ->integerNode('connect_timeout')
+                    ->end()
+                    ->integerNode('retry_timeout')
+                    ->end()
+                    ->integerNode('send_timeout')
+                    ->end()
+                    ->integerNode('recv_timeout')
+                    ->end()
+                    ->integerNode('poll_timeout')
+                    ->end()
+                    ->booleanNode('cache_lookups')
+                    ->end()
+                    ->integerNode('server_failure_limit')
+                    ->end()
+                ->end();
+        }
 
         return $node;
     }
