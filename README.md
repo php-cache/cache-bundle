@@ -20,8 +20,10 @@ Redis uses the php redis extension.
 
 Run the following in your project root, assuming you have composer set up for your project
 ```sh
-composer.phar require aequasi/cache-bundle dev-master
+composer.phar require aequasi/cache-bundle ~2.4.0
 ```
+
+Switching `~2.4.0` for the most recent tag.
 
 Add the bundle to app/AppKernel.php
 
