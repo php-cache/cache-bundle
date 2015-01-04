@@ -13,7 +13,7 @@ Redis uses the php redis extension.
 
 #### Requirements
 
-- PHP 5.3.x or 5.4.x
+- PHP >= 5.3 or hhvm
 - [Composer](http://getcomposer.org)
 
 #### To Install
