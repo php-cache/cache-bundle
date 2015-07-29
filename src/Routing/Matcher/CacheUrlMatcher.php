@@ -30,7 +30,10 @@ class CacheUrlMatcher extends UrlMatcher
      */
     public function match($pathInfo)
     {
-        $key = 'route_' . strtolower($this->context->getMethod()) . '_' . $pathInfo;
+        $host   = strtr($this->context->getHost(), '.', '_');
+        $method = strtolower($this->context->getMethod());
+        $key    = 'route_' . $method . '_' . $host . '_' . $pathInfo;
+
         if ($this->cache->contains($key)) {
             return $this->cache->fetch($key);
         }
