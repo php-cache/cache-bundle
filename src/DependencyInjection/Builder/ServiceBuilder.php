@@ -8,6 +8,9 @@
 
 namespace Aequasi\Bundle\CacheBundle\DependencyInjection\Builder;
 
+use Aequasi\Bundle\CacheBundle\Cache\LoggingCachePool;
+use Aequasi\Cache\CachePool;
+use Aequasi\Cache\DoctrineCacheBridge;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Definition;
@@ -25,27 +28,27 @@ class ServiceBuilder extends BaseBuilder
      *
      * @var array $types
      */
-    protected static $types = array(
-        'memcache' => array(
-            'class' => 'Memcache',
+    protected static $types = [
+        'memcache'   => [
+            'class'   => 'Memcache',
             'connect' => 'addServer'
-        ),
-        'memcached' => array(
-            'class' => 'Aequasi\Bundle\CacheBundle\Cache\Memcached',
+        ],
+        'memcached'  => [
+            'class'   => 'Aequasi\Bundle\CacheBundle\Cache\Memcached',
             'connect' => 'addServer'
-        ),
-        'redis' => array(
-            'class' => 'Redis',
+        ],
+        'redis'      => [
+            'class'   => 'Redis',
             'connect' => 'connect'
-        )
-    );
+        ]
+    ];
 
     /**
      * {@inheritDoc}
      */
     protected function prepare()
     {
-        $instances = $this->container->getParameter($this->getAlias() . '.instance');
+        $instances = $this->container->getParameter($this->getAlias().'.instance');
 
         foreach ($instances as $name => $instance) {
             $this->buildInstance($name, $instance);
@@ -60,12 +63,14 @@ class ServiceBuilder extends BaseBuilder
      */
     private function buildInstance($name, array $instance)
     {
-        $typeId = $this->getAlias() . '.abstract.' . $instance['type'];
+        $typeId = $this->getAlias().'.abstract.'.$instance['type'];
         if (!$this->container->hasDefinition($typeId)) {
-            throw new InvalidConfigurationException(sprintf(
-                "`%s` is not a valid cache type. If you are using a custom type, make sure to add your service. ",
-                $instance['type']
-            ));
+            throw new InvalidConfigurationException(
+                sprintf(
+                    "`%s` is not a valid cache type. If you are using a custom type, make sure to add your service. ",
+                    $instance['type']
+                )
+            );
         }
 
         $service = $this->buildService($typeId, $name, $instance);
@@ -84,28 +89,31 @@ class ServiceBuilder extends BaseBuilder
     {
         $namespace = is_null($instance['namespace']) ? $name : $instance['namespace'];
 
-        $coreName = $this->getAlias() . '.instance.' . $name . '.core';
-        $doctrine =
-            $this->container->setDefinition(
+        // Create the core doctrine cache class
+        $coreName = $this->getAlias().'.instance.'.$name.'.core';
+        $doctrine = $this->container->setDefinition(
                 $coreName,
-                new Definition($this->container->getParameter($typeId . '.class'))
-            )
-                ->addMethodCall('setNamespace', array($namespace))
+                new Definition($this->container->getParameter($typeId.'.class'))
+            );
+        $doctrine->addMethodCall('setNamespace', [$namespace])
                 ->setPublic(false);
-        $service  =
-            $this->container->setDefinition(
-                $this->getAlias() . '.instance.' . $name,
-                new Definition($this->container->getParameter('aequasi_cache.service.class'))
-            )
-                ->addMethodCall('setCache', array(new Reference($coreName)))
-                ->addMethodCall('setLogging', array($this->container->getParameter('kernel.debug')));
 
-        if (isset($instance['hosts'])) {
-            $service->addMethodCall('setHosts', array($instance['hosts']));
-        }
+        // Create the CacheItemPoolInterface object, Logging or not
+        $service  = $this->container->setDefinition(
+            $this->getAlias().'.instance.'.$name,
+            new Definition($this->getCachePoolClassName(), [new Reference($coreName)])
+        );
 
-        $alias = new Alias($this->getAlias() . '.instance.' . $name);
-        $this->container->setAlias($this->getAlias() . '.' . $name, $alias);
+        // Set up the simple alias
+        $alias = new Alias($this->getAlias().'.instance.'.$name);
+        $this->container->setAlias($this->getAlias().'.'.$name, $alias);
+
+        // Create the Doctrine/PSR-6 Bridge, for the doctrine cache piece
+        $bridge  = $this->container->setDefinition(
+            $this->getAlias().'.instance.'.$name.'.bridge',
+            new Definition(DoctrineCacheBridge::class, [$service])
+        );
+        $bridge->setPublic(false);
 
         return $doctrine;
     }
@@ -134,12 +142,18 @@ class ServiceBuilder extends BaseBuilder
                 }
                 $extension = is_null($instance['extension']) ? null : $instance['extension'];
 
-                $service->setArguments(array($directory, $extension));
+                $service->setArguments([$directory, $extension]);
 
                 return true;
+            case 'mongo':
+            case 'sqlite3':
+            case 'sqlite':
+            case 'riak':
+            case 'chain':
+                return false;
+            default:
+                return true;
         }
-
-        return false;
     }
 
     /**
@@ -165,10 +179,15 @@ class ServiceBuilder extends BaseBuilder
                             case 'serializer':
                             case 'hash':
                             case 'distribution':
-                                $value = constant(sprintf('\Memcached::%s_%s', strtoupper($option), strtoupper($value)));
+                                $value = constant(
+                                    sprintf('\Memcached::%s_%s', strtoupper($option), strtoupper($value))
+                                );
                                 break;
                         }
-                        $cache->addMethodCall('setOption', array(constant(sprintf('\Memcached::OPT_%s', strtoupper($option))), $value));
+                        $cache->addMethodCall(
+                            'setOption',
+                            [constant(sprintf('\Memcached::OPT_%s', strtoupper($option))), $value]
+                        );
                     }
                 }
             }
@@ -180,7 +199,7 @@ class ServiceBuilder extends BaseBuilder
                     $persistentId = substr(md5(serialize($instance['hosts'])), 0, 5);
                 }
                 if ($type === 'memcached') {
-                    $cache->setArguments(array($persistentId));
+                    $cache->setArguments([$persistentId]);
                 }
                 if ($type === 'redis') {
                     self::$types[$type]['connect'] = 'pconnect';
@@ -188,10 +207,10 @@ class ServiceBuilder extends BaseBuilder
             }
 
             foreach ($instance['hosts'] as $config) {
-                $arguments = array(
+                $arguments = [
                     'host' => empty($config['host']) ? 'localhost' : $config['host'],
                     'port' => empty($config['port']) ? 11211 : $config['port']
-                );
+                ];
                 if ($type === 'memcached') {
                     $arguments[] = is_null($config['weight']) ? 0 : $config['weight'];
                 } else {
@@ -207,10 +226,10 @@ class ServiceBuilder extends BaseBuilder
 
             if ($type === 'redis') {
                 if (isset($instance['auth_password']) && null !== $instance['auth_password']) {
-                    $cache->addMethodCall('auth', array($instance['auth_password']));
+                    $cache->addMethodCall('auth', [$instance['auth_password']]);
                 }
                 if (isset($instance['database'])) {
-                    $cache->addMethodCall('select', array($instance['database']));
+                    $cache->addMethodCall('select', [$instance['database']]);
                 }
             }
 
@@ -218,8 +237,13 @@ class ServiceBuilder extends BaseBuilder
         } else {
             $id = $instance['id'];
         }
-        $service->addMethodCall(sprintf('set%s', ucwords($type)), array(new Reference($id)));
+        $service->addMethodCall(sprintf('set%s', ucwords($type)), [new Reference($id)]);
 
         return true;
+    }
+
+    private function getCachePoolClassName()
+    {
+        return $this->container->getParameter('kernel.debug') ? LoggingCachePool::class : CachePool::class;
     }
 }

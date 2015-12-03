@@ -10,7 +10,6 @@ parameters:
     aequasi_cache.abstract.xcache.class: Doctrine\Common\Cache\XcacheCache
     aequasi_cache.abstract.zend_data.class: Doctrine\Common\Cache\ZendDataCache
     aequasi_cache.session.handler.class: Aequasi\Bundle\CacheBundle\Session\SessionHandler
-    aequasi_cache.service.class: Aequasi\Bundle\CacheBundle\Service\CacheService
 
 services:
     aequasi_cache.abstract.apc:

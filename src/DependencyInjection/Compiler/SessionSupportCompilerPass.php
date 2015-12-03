@@ -49,7 +49,7 @@ class SessionSupportCompilerPass extends BaseCompilerPass
         }
 
         $instance = $config['instance'];
-        $instances = $this->container->getParameter($this->getAlias() . '.instance');
+        $instances = $this->container->getParameter($this->getAlias() . '.instance.bridge');
 
         if (null === $instance) {
             return;
@@ -58,13 +58,6 @@ class SessionSupportCompilerPass extends BaseCompilerPass
             throw new InvalidConfigurationException(sprintf(
                 "Failed to hook into the session. The instance \"%s\" doesn't exist!",
                 $instance
-            ));
-        }
-
-        if (!in_array(strtolower($instances[$instance]['type']), array('memcache', 'redis', 'memcached'))) {
-            throw new InvalidConfigurationException(sprintf(
-                "%s is not a valid cache type for session support. Please use Memcache, Memcached, or Redis. ",
-                $instances[$instance]['type']
             ));
         }
 

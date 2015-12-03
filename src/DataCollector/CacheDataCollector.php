@@ -8,6 +8,7 @@
 
 namespace Aequasi\Bundle\CacheBundle\DataCollector;
 
+use Aequasi\Bundle\CacheBundle\Cache\LoggingCachePool;
 use Aequasi\Bundle\CacheBundle\Service\CacheService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,15 +22,15 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 class CacheDataCollector extends DataCollector
 {
     /**
-     * @var CacheService[]
+     * @var LoggingCachePool[]
      */
-    private $instances = array();
+    private $instances = [];
 
     /**
-     * @param              $name
-     * @param CacheService $instance
+     * @param                               $name
+     * @param LoggingCachePool              $instance
      */
-    public function addInstance($name, CacheService $instance)
+    public function addInstance($name, LoggingCachePool $instance)
     {
         $this->instances[$name] = $instance;
     }
@@ -45,8 +46,8 @@ class CacheDataCollector extends DataCollector
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
-        $empty      = array('calls' => array(), 'config' => array(), 'options' => array(), 'statistics' => array());
-        $this->data = array('instances' => $empty, 'total' => $empty);
+        $empty      = ['calls' => [], 'config' => [], 'options' => [], 'statistics' => []];
+        $this->data = ['instances' => $empty, 'total' => $empty];
         foreach ($this->instances as $name => $instance) {
             $calls                                   = $instance->getCalls();
             $this->data['instances']['calls'][$name] = $calls;
@@ -102,9 +103,9 @@ class CacheDataCollector extends DataCollector
      */
     private function calculateStatistics()
     {
-        $statistics = array();
+        $statistics = [];
         foreach ($this->data['instances']['calls'] as $name => $calls) {
-            $statistics[$name] = array(
+            $statistics[$name] = [
                 'calls'   => 0,
                 'time'    => 0,
                 'reads'   => 0,
@@ -112,7 +113,7 @@ class CacheDataCollector extends DataCollector
                 'misses'  => 0,
                 'writes'  => 0,
                 'deletes' => 0
-            );
+            ];
             foreach ($calls as $call) {
                 $statistics[$name]['calls'] += 1;
                 $statistics[$name]['time'] += $call->time;
@@ -133,7 +134,7 @@ class CacheDataCollector extends DataCollector
                 }
             }
             if ($statistics[$name]['reads']) {
-                $statistics[$name]['ratio'] = 100 * $statistics[$name]['hits'] / $statistics[$name]['reads'] . '%';
+                $statistics[$name]['ratio'] = 100 * $statistics[$name]['hits'] / $statistics[$name]['reads'].'%';
             } else {
                 $statistics[$name]['ratio'] = 'N/A';
             }
@@ -148,14 +149,14 @@ class CacheDataCollector extends DataCollector
     private function calculateTotalStatistics()
     {
         $statistics = $this->getStatistics();
-        $totals     = array('calls' => 0, 'time' => 0, 'reads' => 0, 'hits' => 0, 'misses' => 0, 'writes' => 0);
+        $totals     = ['calls' => 0, 'time' => 0, 'reads' => 0, 'hits' => 0, 'misses' => 0, 'writes' => 0];
         foreach ($statistics as $name => $values) {
             foreach ($totals as $key => $value) {
                 $totals[$key] += $statistics[$name][$key];
             }
         }
         if ($totals['reads']) {
-            $totals['ratio'] = 100 * $totals['hits'] / $totals['reads'] . '%';
+            $totals['ratio'] = 100 * $totals['hits'] / $totals['reads'].'%';
         } else {
             $totals['ratio'] = 'N/A';
         }
