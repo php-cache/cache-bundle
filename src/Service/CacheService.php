@@ -8,6 +8,8 @@
 
 namespace Aequasi\Bundle\CacheBundle\Service;
 
+use Aequasi\Bundle\CacheBundle\CachePool;
+use Aequasi\Bundle\CacheBundle\DoctrineCacheBridge;
 use Doctrine\Common\Cache\Cache;
 
 /**
@@ -278,7 +280,7 @@ class CacheService implements Cache
      */
     public function setCache($cache)
     {
-        $this->cache = $cache;
+        $this->cache = new DoctrineCacheBridge(new CachePool($cache));
     }
 
     /**
