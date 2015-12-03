@@ -61,13 +61,6 @@ class SessionSupportCompilerPass extends BaseCompilerPass
             ));
         }
 
-        if (!in_array(strtolower($instances[$instance]['type']), array('memcache', 'redis', 'memcached'))) {
-            throw new InvalidConfigurationException(sprintf(
-                "%s is not a valid cache type for session support. Please use Memcache, Memcached, or Redis. ",
-                $instances[$instance]['type']
-            ));
-        }
-
         // calculate options
         $sessionOptions = $this->container->getParameter('session.storage.options');
         if (isset($sessionOptions['cookie_lifetime']) && !isset($config['cookie_lifetime'])) {
