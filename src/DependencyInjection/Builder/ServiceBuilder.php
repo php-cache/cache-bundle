@@ -29,15 +29,15 @@ class ServiceBuilder extends BaseBuilder
      * @var array $types
      */
     protected static $types = [
-        'memcache'   => [
+        'memcache'  => [
             'class'   => 'Memcache',
             'connect' => 'addServer'
         ],
-        'memcached'  => [
+        'memcached' => [
             'class'   => 'Aequasi\Bundle\CacheBundle\Cache\Memcached',
             'connect' => 'addServer'
         ],
-        'redis'      => [
+        'redis'     => [
             'class'   => 'Redis',
             'connect' => 'connect'
         ]
@@ -92,14 +92,14 @@ class ServiceBuilder extends BaseBuilder
         // Create the core doctrine cache class
         $coreName = $this->getAlias().'.instance.'.$name.'.core';
         $doctrine = $this->container->setDefinition(
-                $coreName,
-                new Definition($this->container->getParameter($typeId.'.class'))
-            );
+            $coreName,
+            new Definition($this->container->getParameter($typeId.'.class'))
+        );
         $doctrine->addMethodCall('setNamespace', [$namespace])
-                ->setPublic(false);
+            ->setPublic(false);
 
         // Create the CacheItemPoolInterface object, Logging or not
-        $service  = $this->container->setDefinition(
+        $service = $this->container->setDefinition(
             $this->getAlias().'.instance.'.$name,
             new Definition($this->getCachePoolClassName(), [new Reference($coreName)])
         );
@@ -109,7 +109,7 @@ class ServiceBuilder extends BaseBuilder
         $this->container->setAlias($this->getAlias().'.'.$name, $alias);
 
         // Create the Doctrine/PSR-6 Bridge, for the doctrine cache piece
-        $bridge  = $this->container->setDefinition(
+        $bridge = $this->container->setDefinition(
             $this->getAlias().'.instance.'.$name.'.bridge',
             new Definition(DoctrineCacheBridge::class, [$service])
         );

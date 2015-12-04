@@ -10,7 +10,6 @@ namespace Aequasi\Bundle\CacheBundle\Tests\DependencyInjection;
 
 use Aequasi\Bundle\CacheBundle\Tests\TestCase;
 use Aequasi\Cache\DoctrineCacheBridge;
-use Doctrine\Common\Cache\ArrayCache;
 use Psr\Cache\CacheItemPoolInterface;
 
 /**
