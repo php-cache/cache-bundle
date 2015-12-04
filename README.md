@@ -1,11 +1,9 @@
-Aequasi cache-bundle [![Build Status](https://travis-ci.org/aequasi/cache-bundle.png?branch=master)](https://travis-ci.org/aequasi/cache-bundle) [![HHVM Status](http://hhvm.h4cc.de/badge/aequasi/cache-bundle.svg)](http://hhvm.h4cc.de/package/aequasi/cache-bundle)
+Aequasi cache-bundle [![Build Status](https://travis-ci.org/aequasi/cache-bundle.png?branch=master)](https://travis-ci.org/aequasi/cache-bundle)
 ====================
 
 #### Cache Bundle for Symfony 2
 
 Creates services in Symfony 2, for cache, that can also be used with doctrines three cache types (metadata, result, and query). It also provides functionality for session handler support, and Router support.
-
-Should work in all versions of Symfony, and php 5.3
 
 The respective cache extensions will be required for your project.
 
@@ -13,17 +11,16 @@ Redis uses the php redis extension.
 
 #### Requirements
 
-- PHP >= 5.3 or hhvm
+- PHP >= 5.6, < 7.1
+- Symfony >= 2.7, < 4.0 
 - [Composer](http://getcomposer.org)
 
 #### To Install
 
 Run the following in your project root, assuming you have composer set up for your project
 ```sh
-composer.phar require aequasi/cache-bundle ~2.4.0
+composer.phar require aequasi/cache-bundle
 ```
-
-Switching `~2.4.0` for the most recent tag.
 
 Add the bundle to app/AppKernel.php
 

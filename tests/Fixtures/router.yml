@@ -1,9 +1,7 @@
 aequasi_cache:
     instances:
         default:
-            type: redis
-            hosts:
-                - { host: localhost, port: 6379 }
+            type: array
     router:
         enabled: true
         instance: default
