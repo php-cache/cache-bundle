@@ -112,31 +112,16 @@ Here is an example usage of the service:
 
 ```php
 $cache = $this->get( 'aequasi_cache.instance.default' );
-$key = 'test';
-if( $data = $cache->fetch( $key ) ) {
-    print_r( $data );
-} else {
-    /** @var $em \Doctrine\ORM\EntityManager */
-    $data = $em->find( 'AcmeDemoBundle:User', 1 );
-    $cache->save( $key, $data, 3600 );
+$item = $cache->getItem('test');
+if ($item->isHit()) {
+	var_dump($item->get());
+	
+	return;
 }
-```
 
-There is also the `cache()` function on the service that allows you to wrap the above, into a single function:
-
-```php
-$cache = $this->get( 'aequasi_cache.instance.default' );
-$user = $cache->cache( 'test', function() use( $em ) { return $em->find( "AcmeDemoBundle:User", 1 ); }, 3600 );
-var_dump( $user );
+$cache->save($cache->createItem('test', $em->find('AcmeDemoBundle:User', 1), new \DateTime(strtotime('now +6 hours'))));
 ```
 
 ### Need Help?
 
-Create an issue if you've found a bug,
-
-or email me at aequasi@gmail.com
-
-
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/aequasi/cache-bundle/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
-
-
+Create an issue if you've found a bug, or ping me on twitter: @aequasi
