@@ -9,6 +9,8 @@
 namespace Aequasi\Bundle\CacheBundle\Tests\DependencyInjection;
 
 use Aequasi\Bundle\CacheBundle\Tests\TestCase;
+use Aequasi\Cache\DoctrineCacheBridge;
+use Doctrine\Common\Cache\ArrayCache;
 
 /**
  * Class AequasiCacheExtensionTest
@@ -25,33 +27,22 @@ class AequasiCacheExtensionTest extends TestCase
     {
         $container = $this->createContainerFromFile('service');
 
-        $config = $container->getParameter($this->getAlias() . '.instance');
+        $this->assertTrue($container->hasDefinition($this->getAlias().'.instance.default'));
+        $this->assertTrue($container->hasAlias($this->getAlias().'.default'));
 
-        foreach (array('memcached', 'redis') as $type) {
+        $this->assertInstanceOf(
+            'Aequasi\Bundle\CacheBundle\Service\CacheService',
+            $container->get($this->getAlias().'.instance.default')
+        );
+        $this->assertInstanceOf(
+            'Doctrine\Common\Cache\Cache',
+            $container->get($this->getAlias().'.instance.default')->getCache()
+        );
 
-            $this->assertTrue(isset($config[$type]));
-
-            $this->assertTrue($container->hasDefinition($this->getAlias() . '.instance.' . $type));
-            $this->assertTrue($container->hasAlias($this->getAlias() . '.' . $type));
-
-            $this->assertInstanceOf(
-                'Aequasi\Bundle\CacheBundle\Service\CacheService',
-                $container->get($this->getAlias() . '.instance.' . $type)
-            );
-            $this->assertInstanceOf(
-                'Doctrine\Common\Cache\Cache',
-                $container->get($this->getAlias() . '.instance.' . $type)
-                    ->getCache()
-            );
-
-            $function = 'get' . ucwords($type);
-            $this->assertInstanceOf(
-                ucwords($type),
-                $container->get($this->getAlias() . '.instance.' . $type)
-                    ->getCache()
-                    ->{$function}()
-            );
-        }
+        $this->assertInstanceOf(
+            DoctrineCacheBridge::class,
+            $container->get($this->getAlias().'.instance.default')->getCache()
+        );
     }
 
     /**
@@ -61,7 +52,7 @@ class AequasiCacheExtensionTest extends TestCase
     {
         $container = $this->createContainerFromFile('router');
 
-        $config = $container->getParameter($this->getAlias() . '.router');
+        $config = $container->getParameter($this->getAlias().'.router');
 
         $this->assertTrue(isset($config['enabled']));
         $this->assertTrue(isset($config['instance']));

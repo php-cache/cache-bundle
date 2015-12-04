@@ -15,7 +15,6 @@ namespace Aequasi\Bundle\CacheBundle\Tests;
  */
 class ContainerTest extends TestCase
 {
-
     /**
      *
      */
