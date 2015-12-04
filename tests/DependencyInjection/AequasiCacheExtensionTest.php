@@ -10,7 +10,7 @@ namespace Aequasi\Bundle\CacheBundle\Tests\DependencyInjection;
 
 use Aequasi\Bundle\CacheBundle\Tests\TestCase;
 use Aequasi\Cache\DoctrineCacheBridge;
-use Doctrine\Common\Cache\ArrayCache;
+use Psr\Cache\CacheItemPoolInterface;
 
 /**
  * Class AequasiCacheExtensionTest
@@ -31,17 +31,13 @@ class AequasiCacheExtensionTest extends TestCase
         $this->assertTrue($container->hasAlias($this->getAlias().'.default'));
 
         $this->assertInstanceOf(
-            'Aequasi\Bundle\CacheBundle\Service\CacheService',
+            CacheItemPoolInterface::class,
             $container->get($this->getAlias().'.instance.default')
-        );
-        $this->assertInstanceOf(
-            'Doctrine\Common\Cache\Cache',
-            $container->get($this->getAlias().'.instance.default')->getCache()
         );
 
         $this->assertInstanceOf(
             DoctrineCacheBridge::class,
-            $container->get($this->getAlias().'.instance.default')->getCache()
+            $container->get($this->getAlias().'.instance.default.bridge')
         );
     }
 

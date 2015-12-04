@@ -8,6 +8,9 @@
 
 namespace Aequasi\Bundle\CacheBundle\DependencyInjection\Builder;
 
+use Aequasi\Bundle\CacheBundle\Cache\LoggingCachePool;
+use Aequasi\Cache\CachePool;
+use Aequasi\Cache\DoctrineCacheBridge;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Definition;
@@ -26,15 +29,15 @@ class ServiceBuilder extends BaseBuilder
      * @var array $types
      */
     protected static $types = [
-        'memcache'   => [
+        'memcache'  => [
             'class'   => 'Memcache',
             'connect' => 'addServer'
         ],
-        'memcached'  => [
+        'memcached' => [
             'class'   => 'Aequasi\Bundle\CacheBundle\Cache\Memcached',
             'connect' => 'addServer'
         ],
-        'redis'      => [
+        'redis'     => [
             'class'   => 'Redis',
             'connect' => 'connect'
         ]
@@ -86,28 +89,31 @@ class ServiceBuilder extends BaseBuilder
     {
         $namespace = is_null($instance['namespace']) ? $name : $instance['namespace'];
 
+        // Create the core doctrine cache class
         $coreName = $this->getAlias().'.instance.'.$name.'.core';
-        $doctrine =
-            $this->container->setDefinition(
-                $coreName,
-                new Definition($this->container->getParameter($typeId.'.class'))
-            )
-                ->addMethodCall('setNamespace', [$namespace])
-                ->setPublic(false);
-        $service  =
-            $this->container->setDefinition(
-                $this->getAlias().'.instance.'.$name,
-                new Definition($this->container->getParameter('aequasi_cache.service.class'))
-            )
-                ->addMethodCall('setCache', [new Reference($coreName)])
-                ->addMethodCall('setLogging', [$this->container->getParameter('kernel.debug')]);
+        $doctrine = $this->container->setDefinition(
+            $coreName,
+            new Definition($this->container->getParameter($typeId.'.class'))
+        );
+        $doctrine->addMethodCall('setNamespace', [$namespace])
+            ->setPublic(false);
 
-        if (isset($instance['hosts'])) {
-            $service->addMethodCall('setHosts', [$instance['hosts']]);
-        }
+        // Create the CacheItemPoolInterface object, Logging or not
+        $service = $this->container->setDefinition(
+            $this->getAlias().'.instance.'.$name,
+            new Definition($this->getCachePoolClassName(), [new Reference($coreName)])
+        );
 
+        // Set up the simple alias
         $alias = new Alias($this->getAlias().'.instance.'.$name);
         $this->container->setAlias($this->getAlias().'.'.$name, $alias);
+
+        // Create the Doctrine/PSR-6 Bridge, for the doctrine cache piece
+        $bridge = $this->container->setDefinition(
+            $this->getAlias().'.instance.'.$name.'.bridge',
+            new Definition(DoctrineCacheBridge::class, [$service])
+        );
+        $bridge->setPublic(false);
 
         return $doctrine;
     }
@@ -234,5 +240,10 @@ class ServiceBuilder extends BaseBuilder
         $service->addMethodCall(sprintf('set%s', ucwords($type)), [new Reference($id)]);
 
         return true;
+    }
+
+    private function getCachePoolClassName()
+    {
+        return $this->container->getParameter('kernel.debug') ? LoggingCachePool::class : CachePool::class;
     }
 }

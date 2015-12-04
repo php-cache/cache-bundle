@@ -49,7 +49,7 @@ class SessionSupportCompilerPass extends BaseCompilerPass
         }
 
         $instance = $config['instance'];
-        $instances = $this->container->getParameter($this->getAlias() . '.instance');
+        $instances = $this->container->getParameter($this->getAlias() . '.instance.bridge');
 
         if (null === $instance) {
             return;

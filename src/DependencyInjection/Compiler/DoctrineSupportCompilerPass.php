@@ -55,7 +55,7 @@ class DoctrineSupportCompilerPass extends BaseCompilerPass
                         $cacheType
                     ));
                 }
-                $cacheDefinitionName = sprintf('%s.instance.%s', $this->getAlias(), $cacheData['instance']);
+                $cacheDefinitionName = sprintf('%s.instance.%s.bridge', $this->getAlias(), $cacheData['instance']);
 
                 foreach ($cacheData[$type] as $manager) {
                     $doctrineDefinitionName =
