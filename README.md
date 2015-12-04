@@ -119,7 +119,7 @@ if ($item->isHit()) {
 	return;
 }
 
-$cache->save($cache->createItem('test', $em->find('AcmeDemoBundle:User', 1), new \DateTime(strtotime('now +6 hours'))));
+$cache->saveItem('test', $em->find('AcmeDemoBundle:User', 1), 3600);
 ```
 
 ### Need Help?
