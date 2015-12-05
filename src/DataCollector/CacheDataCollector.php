@@ -49,7 +49,7 @@ class CacheDataCollector extends DataCollector
         $empty      = ['calls' => [], 'config' => [], 'options' => [], 'statistics' => []];
         $this->data = ['instances' => $empty, 'total' => $empty];
         foreach ($this->instances as $name => $instance) {
-            $calls                                   = $instance->getCalls();
+            $calls = $instance->getCalls();
             $this->data['instances']['calls'][$name] = $calls;
         }
         $this->data['instances']['statistics'] = $this->calculateStatistics();
