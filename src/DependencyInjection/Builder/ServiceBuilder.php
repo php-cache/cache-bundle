@@ -100,7 +100,7 @@ class ServiceBuilder extends BaseBuilder
             ->setPublic(false);
 
         // Create the CacheItemPoolInterface object, Logging or not
-        $service = $this->container->setDefinition(
+        $this->container->setDefinition(
             $serviceId,
             new Definition($this->getCachePoolClassName(), [new Reference($coreName)])
         );

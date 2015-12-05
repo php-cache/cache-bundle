@@ -1,53 +1,41 @@
-parameters:
-    aequasi_cache.abstract.apc.class: Doctrine\Common\Cache\ApcCache
-    aequasi_cache.abstract.array.class: Doctrine\Common\Cache\ArrayCache
-    aequasi_cache.abstract.file_system.class: Doctrine\Common\Cache\FilesystemCache
-    aequasi_cache.abstract.memcache.class: Doctrine\Common\Cache\MemcacheCache
-    aequasi_cache.abstract.memcached.class: Doctrine\Common\Cache\MemcachedCache
-    aequasi_cache.abstract.redis.class: Doctrine\Common\Cache\RedisCache
-    aequasi_cache.abstract.php_file.class: Doctrine\Common\Cache\PhpFileCache
-    aequasi_cache.abstract.win_cache.class: Doctrine\Common\Cache\WinCacheCache
-    aequasi_cache.abstract.xcache.class: Doctrine\Common\Cache\XcacheCache
-    aequasi_cache.abstract.zend_data.class: Doctrine\Common\Cache\ZendDataCache
-    aequasi_cache.session.handler.class: Aequasi\Bundle\CacheBundle\Session\SessionHandler
 
 services:
     aequasi_cache.abstract.apc:
-        class: %aequasi_cache.abstract.apc.class%
+        class: Doctrine\Common\Cache\ApcCache
         abstract: true
 
     aequasi_cache.abstract.array:
-        class: %aequasi_cache.abstract.array.class%
+        class: Doctrine\Common\Cache\ArrayCache
         abstract: true
 
     aequasi_cache.abstract.file_system:
-        class: %aequasi_cache.abstract.file_system.class%
+        class: Doctrine\Common\Cache\FilesystemCache
         abstract: true
 
     aequasi_cache.abstract.memcache:
-        class: %aequasi_cache.abstract.memcache.class%
+        class: Doctrine\Common\Cache\MemcacheCache
         abstract: true
 
     aequasi_cache.abstract.memcached:
-        class: %aequasi_cache.abstract.memcached.class%
+        class: Doctrine\Common\Cache\MemcachedCache
         abstract: true
 
     aequasi_cache.abstract.redis:
-        class: %aequasi_cache.abstract.redis.class%
+        class: Doctrine\Common\Cache\RedisCache
         abstract: true
 
     aequasi_cache.abstract.php_file:
-        class: %aequasi_cache.abstract.php_file.class%
+        class: Doctrine\Common\Cache\PhpFileCache
         abstract: true
 
     aequasi_cache.abstract.win_cache:
-        class: %aequasi_cache.abstract.win_cache.class%
+        class: Doctrine\Common\Cache\WinCacheCache
         abstract: true
 
     aequasi_cache.abstract.xcache:
-        class: %aequasi_cache.abstract.xcache.class%
+        class: Doctrine\Common\Cache\XcacheCache
         abstract: true
 
     aequasi_cache.zend_data:
-        class: %aequasi_cache.abstract.zend_data.class%
+        class: Doctrine\Common\Cache\ZendDataCache
         abstract: true

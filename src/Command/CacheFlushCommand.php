@@ -8,8 +8,8 @@
 
 namespace Aequasi\Bundle\CacheBundle\Command;
 
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Aequasi\Bundle\CacheBundle\Service\CacheService;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
@@ -37,10 +37,10 @@ class CacheFlushCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $serviceName = 'aequasi_cache.instance.' . $input->getArgument('instance');
+        $serviceName = sprintf('aequasi_cache.instance.%s.bridge', $input->getArgument('instance'));
 
-        /** @var CacheService $service */
+        /** @var CacheItemPoolInterface $service */
         $service = $this->getContainer()->get($serviceName);
-        $service->flushAll();
+        $service->clear();
     }
 }
