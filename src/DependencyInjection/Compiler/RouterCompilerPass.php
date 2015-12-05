@@ -32,6 +32,6 @@ class RouterCompilerPass extends BaseCompilerPass
 
         $def = $this->container->findDefinition('router');
         $def->setClass('Aequasi\Bundle\CacheBundle\Routing\Router');
-        $def->addMethodCall('setCache', [new Reference(sprintf('aequasi_cache.instance.%s.bridge', $instance))]);
+        $def->addMethodCall('setCache', [new Reference(sprintf('aequasi_cache.instance.%s', $instance))]);
     }
 }

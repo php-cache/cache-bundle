@@ -37,7 +37,7 @@ class CacheFlushCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $serviceName = sprintf('aequasi_cache.instance.%s.bridge', $input->getArgument('instance'));
+        $serviceName = sprintf('aequasi_cache.instance.%s', $input->getArgument('instance'));
 
         /** @var CacheItemPoolInterface $service */
         $service = $this->getContainer()->get($serviceName);
