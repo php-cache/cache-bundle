@@ -9,6 +9,7 @@
 namespace Aequasi\Bundle\CacheBundle\Session;
 
 use Doctrine\Common\Cache\Cache;
+use Psr\Cache\CacheItemPoolInterface;
 
 /**
  * Class SessionHandler
@@ -18,7 +19,7 @@ use Doctrine\Common\Cache\Cache;
 class SessionHandler implements \SessionHandlerInterface
 {
     /**
-     * @var Cache Cache driver.
+     * @var CacheItemPoolInterface Cache driver.
      */
     private $cache;
 
@@ -39,12 +40,12 @@ class SessionHandler implements \SessionHandlerInterface
      *  * prefix: The prefix to use for the cache keys in order to avoid collision
      *  * expiretime: The time to live in seconds
      *
-     * @param Cache $cache   A Cache instance
+     * @param CacheItemPoolInterface $cache   A Cache instance
      * @param array $options An associative array of cache options
      *
      * @throws \InvalidArgumentException When unsupported options are passed
      */
-    public function __construct(Cache $cache, array $options = array())
+    public function __construct(CacheItemPoolInterface $cache, array $options = array())
     {
         $this->cache = $cache;
 
@@ -73,7 +74,12 @@ class SessionHandler implements \SessionHandlerInterface
      */
     public function read($sessionId)
     {
-        return $this->cache->fetch($this->prefix . $sessionId) ? : '';
+        $item = $this->cache->getItem($this->prefix.$sessionId);
+        if ($item->isHit()) {
+            return $item->get();
+        }
+
+        return '';
     }
 
     /**
@@ -81,7 +87,12 @@ class SessionHandler implements \SessionHandlerInterface
      */
     public function write($sessionId, $data)
     {
-        return $this->cache->save($this->prefix . $sessionId, $data, $this->ttl);
+        $item = $this->cache->getItem($this->prefix . $sessionId);
+        $item->set($data)
+            // TODO is this the correct function?
+            ->expiresAfter($this->ttl);
+
+        return $this->cache->save($item);
     }
 
     /**
@@ -89,7 +100,9 @@ class SessionHandler implements \SessionHandlerInterface
      */
     public function destroy($sessionId)
     {
-        return $this->cache->delete($this->prefix . $sessionId);
+        $item = $this->cache->getItem($this->prefix . $sessionId);
+
+        return $this->cache->deleteItem($item);
     }
 
     /**
