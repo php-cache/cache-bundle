@@ -69,7 +69,7 @@ class SessionSupportCompilerPass extends BaseCompilerPass
         // load the session handler
         $definition =
             new Definition($this->container->getParameter(sprintf('%s.session.handler.class', $this->getAlias())));
-        $definition->addArgument(new Reference(sprintf('%s.instance.%s', $this->getAlias(), $instance)))
+        $definition->addArgument(new Reference(sprintf('%s.instance.%s.bridge', $this->getAlias(), $instance)))
             ->addArgument($config);
 
         $this->container->setDefinition(sprintf('%s.session_handler', $this->getAlias()), $definition);
