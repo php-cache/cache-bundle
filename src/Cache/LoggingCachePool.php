@@ -29,7 +29,7 @@ class LoggingCachePool extends CachePool
     {
         $call         = $this->timeCall(__FUNCTION__, [$key]);
         $result       = $call->result;
-        $call->result = '<DATA>';
+        $call->result = sprintf('<DATA:%s>', gettype($result));
 
         $this->calls[] = $call;
 
