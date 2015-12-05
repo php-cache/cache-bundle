@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\Reference;
 class RouterCompilerPass extends BaseCompilerPass
 {
     /**
-     * @return mixed|void
+     * @return void
      */
     protected function prepare()
     {
@@ -28,9 +28,7 @@ class RouterCompilerPass extends BaseCompilerPass
         if (!$router['enabled']) {
             return;
         }
-
-        $config   = $this->container->getParameter('aequasi_cache.router');
-        $instance = $config['instance'];
+        $instance = $router['instance'];
 
         $def = $this->container->findDefinition('router');
         $def->setClass('Aequasi\Bundle\CacheBundle\Routing\Router');

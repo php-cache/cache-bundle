@@ -19,8 +19,10 @@ use Symfony\Component\Routing\Matcher\UrlMatcher;
  */
 class CacheUrlMatcher extends UrlMatcher
 {
+    const CACHE_LIFETIME = 604800; // a week
+
     /**
-     * @var CachePool
+     * @var CacheItemPoolInterface
      */
     protected $cache;
 
@@ -40,7 +42,9 @@ class CacheUrlMatcher extends UrlMatcher
         }
 
         $match = parent::match($pathInfo);
-        $this->cache->saveItem($key, $match, 60 * 60 * 24 * 7);
+        $item = $this->cache->getItem($key);
+            $item->set($match)
+                ->expiresAfter(self::CACHE_LIFETIME);
 
         return $match;
     }

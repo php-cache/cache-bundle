@@ -89,7 +89,6 @@ class SessionHandler implements \SessionHandlerInterface
     {
         $item = $this->cache->getItem($this->prefix . $sessionId);
         $item->set($data)
-            // TODO is this the correct function?
             ->expiresAfter($this->ttl);
 
         return $this->cache->save($item);
