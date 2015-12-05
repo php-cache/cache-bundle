@@ -65,6 +65,8 @@ class DoctrineSupportCompilerPass extends BaseCompilerPass
                             $manager,
                             $cacheType
                         );
+
+                    // Replace the doctrine entity manager cache with our bridge
                     $this->container->setAlias($doctrineDefinitionName, $cacheDefinitionName);
                 }
             }
