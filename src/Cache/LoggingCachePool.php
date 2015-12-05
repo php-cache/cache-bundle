@@ -54,9 +54,10 @@ class LoggingCachePool extends CachePool
 
     public function save(CacheItemInterface $item)
     {
-        $call            = $this->timeCall(__FUNCTION__, [$item]);
-        $itemClone = clone $item;
+        $itemClone       = clone $item;
         $itemClone->set(sprintf('<DATA:%s', gettype($item->get())));
+
+        $call            = $this->timeCall(__FUNCTION__, [$item]);
         $call->arguments = ['<CacheItem>', $itemClone];
         $this->calls[]   = $call;
 
