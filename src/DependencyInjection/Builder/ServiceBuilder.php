@@ -88,9 +88,10 @@ class ServiceBuilder extends BaseBuilder
     private function buildService($typeId, $name, array $instance)
     {
         $namespace = is_null($instance['namespace']) ? $name : $instance['namespace'];
+        $serviceId = $this->getAlias().'.instance.'.$name;
 
         // Create the core doctrine cache class
-        $coreName = $this->getAlias().'.instance.'.$name.'.core';
+        $coreName = $serviceId.'.core';
         $doctrine = $this->container->setDefinition(
             $coreName,
             new Definition($this->container->getParameter($typeId.'.class'))
@@ -100,17 +101,17 @@ class ServiceBuilder extends BaseBuilder
 
         // Create the CacheItemPoolInterface object, Logging or not
         $service = $this->container->setDefinition(
-            $this->getAlias().'.instance.'.$name,
+            $serviceId,
             new Definition($this->getCachePoolClassName(), [new Reference($coreName)])
         );
 
         // Set up the simple alias  (aequasi_cache.instance.xxx => aequasi_cache.xxx)
-        $this->container->setAlias($this->getAlias().'.'.$name, $this->getAlias().'.instance.'.$name);
+        $this->container->setAlias($this->getAlias().'.'.$name, $serviceId);
 
         // Create the Doctrine/PSR-6 Bridge, for the doctrine cache piece
         $bridge = $this->container->setDefinition(
-            $this->getAlias().'.instance.'.$name.'.bridge',
-            new Definition(DoctrineCacheBridge::class, [$service])
+            $serviceId.'.bridge',
+            new Definition(DoctrineCacheBridge::class, [new Reference($serviceId)])
         );
         $bridge->setPublic(false);
 
