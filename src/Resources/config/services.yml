@@ -1,5 +1,3 @@
-parameters:
-    aequasi_cache.session.handler.class: Aequasi\Bundle\CacheBundle\Session\SessionHandler
 
 services:
     aequasi_cache.abstract.apc:
