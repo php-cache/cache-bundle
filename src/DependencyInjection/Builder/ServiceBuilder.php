@@ -104,9 +104,8 @@ class ServiceBuilder extends BaseBuilder
             new Definition($this->getCachePoolClassName(), [new Reference($coreName)])
         );
 
-        // Set up the simple alias
-        $alias = new Alias($this->getAlias().'.instance.'.$name);
-        $this->container->setAlias($this->getAlias().'.'.$name, $alias);
+        // Set up the simple alias  (aequasi_cache.instance.xxx => aequasi_cache.xxx)
+        $this->container->setAlias($this->getAlias().'.'.$name, $this->getAlias().'.instance.'.$name);
 
         // Create the Doctrine/PSR-6 Bridge, for the doctrine cache piece
         $bridge = $this->container->setDefinition(
