@@ -21,14 +21,14 @@
         "email": "aequasi@gmail.com"
     },
     "require":      {
-        "php":                           "^5.6|^7",
+        "php":                           "^5.5|^7",
         "symfony/framework-bundle":      "^2.7|^3.0",
         "doctrine/cache":                "^1.3",
         "aequasi/psr-6-doctrine-bridge": "^1.2",
         "psr/cache":                     "dev-master"
     },
     "require-dev":  {
-        "phpunit/phpunit": "^5.1"
+        "phpunit/phpunit": "^5.1|^4.0"
     },
     "repositories": [
         {
