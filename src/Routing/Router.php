@@ -10,6 +10,7 @@ namespace Aequasi\Bundle\CacheBundle\Routing;
 
 use Aequasi\Bundle\CacheBundle\Routing\Matcher\CacheUrlMatcher;
 use Aequasi\Cache\CachePool;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Bundle\FrameworkBundle\Routing\Router as BaseRouter;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\RequestContext;
@@ -21,13 +22,15 @@ use Symfony\Component\Routing\RequestContext;
  */
 class Router extends BaseRouter
 {
+    const CACHE_LIFETIME = 604800; // a week
+
     /**
      * @var ContainerInterface
      */
     protected $container;
 
     /**
-     * @var CachePool
+     * @var CacheItemPoolInterface
      */
     protected $cache;
 
@@ -64,18 +67,20 @@ class Router extends BaseRouter
             }
 
             $this->collection = parent::getRouteCollection();
-            $this->cache->saveItem($key, $this->collection, 60 * 60 * 24 * 7);
+            $item = $this->cache->getItem($key);
+            $item->set($this->collection)
+                ->expiresAfter(self::CACHE_LIFETIME);
         }
 
         return $this->collection;
     }
 
     /**
-     * @param CachePool $cache
+     * @param CacheItemPoolInterface $cache
      *
      * @return Router
      */
-    public function setCache(CachePool $cache)
+    public function setCache(CacheItemPoolInterface $cache)
     {
         $this->cache = $cache;
 
