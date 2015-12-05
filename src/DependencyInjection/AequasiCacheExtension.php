@@ -43,7 +43,7 @@ class AequasiCacheExtension extends Extension
 
         if ($config['router']['enabled']) {
             $container->setParameter($this->getAlias() . '.router', $config['router']);
-            new Builder\RouterBuilder($container);
+            //new Builder\RouterBuilder($container);
         }
 
         if ($config['session']['enabled']) {

@@ -9,65 +9,31 @@
 namespace Aequasi\Bundle\CacheBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Class DoctrineSupportCompilerPass
  *
- * @author Aaron Scherer <aequasi@gmail.com>
+ *
+ * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-class DoctrineSupportCompilerPass extends BaseCompilerPass
+class RouterCompilerPass extends BaseCompilerPass
 {
     /**
      * @return mixed|void
      */
     protected function prepare()
     {
-        // If there is no active session support, return
-        if (!$this->container->hasAlias('doctrine.orm.entity_manager')) {
+        $router = $this->container->getParameter($this->getAlias() . '.router');
+
+        if (!$router['enabled']) {
             return;
         }
 
-        // If the aequasi.cache.session_handler service is loaded set the alias
-        if ($this->container->hasParameter($this->getAlias() . '.doctrine')) {
-            $this->enableDoctrineSupport($this->container->getParameter($this->getAlias() . '.doctrine'));
-        }
-    }
+        $config   = $this->container->getParameter('aequasi_cache.router');
+        $instance = $config['instance'];
 
-    /**
-     * Loads the Doctrine configuration.
-     *
-     * @param array $config A configuration array
-     *
-     * @throws InvalidConfigurationException
-     */
-    protected function enableDoctrineSupport(array $config)
-    {
-        $types = array('entity_managers', 'document_managers');
-        foreach ($config as $cacheType => $cacheData) {
-            foreach ($types as $type) {
-                if (!isset($cacheData[$type])) {
-                    continue;
-                }
-
-                if (!isset($cacheData['instance'])) {
-                    throw new InvalidConfigurationException(sprintf(
-                        "There was no instance passed. Please specify a instance under the %s type",
-                        $cacheType
-                    ));
-                }
-                $cacheDefinitionName = sprintf('%s.instance.%s.bridge', $this->getAlias(), $cacheData['instance']);
-
-                foreach ($cacheData[$type] as $manager) {
-                    $doctrineDefinitionName =
-                        sprintf(
-                            "doctrine.%s.%s_%s_cache",
-                            ($type == 'entity_managers' ? 'orm' : 'odm'),
-                            $manager,
-                            $cacheType
-                        );
-                    $this->container->setAlias($doctrineDefinitionName, $cacheDefinitionName);
-                }
-            }
-        }
+        $def = $this->container->findDefinition('router');
+        $def->setClass('Aequasi\Bundle\CacheBundle\Routing\Router');
+        $def->addMethodCall('setCache', [new Reference('aequasi_cache.instance.' . $instance)]);
     }
 }

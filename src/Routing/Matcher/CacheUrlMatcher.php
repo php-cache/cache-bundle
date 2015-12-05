@@ -8,8 +8,9 @@
 
 namespace Aequasi\Bundle\CacheBundle\Routing\Matcher;
 
+use Aequasi\Cache\CachePool;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
-use Aequasi\Bundle\CacheBundle\Service\CacheService;
 
 /**
  * Class CacheUrlMatcher
@@ -19,7 +20,7 @@ use Aequasi\Bundle\CacheBundle\Service\CacheService;
 class CacheUrlMatcher extends UrlMatcher
 {
     /**
-     * @var CacheService
+     * @var CachePool
      */
     protected $cache;
 
@@ -34,26 +35,26 @@ class CacheUrlMatcher extends UrlMatcher
         $method = strtolower($this->context->getMethod());
         $key    = 'route_' . $method . '_' . $host . '_' . $pathInfo;
 
-        if ($this->cache->contains($key)) {
-            return $this->cache->fetch($key);
+        if ($this->cache->hasItem($key)) {
+            return $this->cache->getItem($key)->get();
         }
 
         $match = parent::match($pathInfo);
-        $this->cache->save($key, $match, 60 * 60 * 24 * 7);
+        $this->cache->saveItem($key, $match, 60 * 60 * 24 * 7);
 
         return $match;
     }
 
     /**
-     * @param CacheService $cache
+     * @param CacheItemPoolInterface $cache
      */
-    public function setCache($cache)
+    public function setCache(CacheItemPoolInterface $cache)
     {
         $this->cache = $cache;
     }
 
     /**
-     * @return CacheService
+     * @return CacheItemPoolInterface
      */
     public function getCache()
     {

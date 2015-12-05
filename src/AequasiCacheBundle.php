@@ -28,6 +28,7 @@ class AequasiCacheBundle extends Bundle
 
         $container->addCompilerPass(new Compiler\SessionSupportCompilerPass());
         $container->addCompilerPass(new Compiler\DoctrineSupportCompilerPass());
+        $container->addCompilerPass(new Compiler\RouterCompilerPass());
 
         if ($container->getParameter('kernel.debug')) {
             $container->addCompilerPass(new Compiler\DataCollectorCompilerPass());
