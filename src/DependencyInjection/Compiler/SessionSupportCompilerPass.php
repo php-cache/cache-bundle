@@ -27,15 +27,17 @@ class SessionSupportCompilerPass extends BaseCompilerPass
      */
     protected function prepare()
     {
-        // If there is no active session support, return
-        if (!$this->container->hasAlias('session.storage')) {
+        // Check if session support is enabled
+        if (!$this->container->hasParameter($this->getAlias().'.session')) {
             return;
         }
 
-        // If the aequasi.cache.session_handler service is loaded set the alias
-        if ($this->container->hasParameter($this->getAlias() . '.session')) {
-            $this->enableSessionSupport($this->container->getParameter($this->getAlias() . '.session'));
+        // If there is no active session support, throw
+        if (!$this->container->hasAlias('session.storage')) {
+            throw new \Exception("Session cache support cannot be enabled if there is no session.storage service");
         }
+
+        $this->enableSessionSupport($this->container->getParameter($this->getAlias().'.session'));
     }
 
     /**
@@ -51,17 +53,16 @@ class SessionSupportCompilerPass extends BaseCompilerPass
             throw new InvalidConfigurationException("Instance must be passed under the `session` config.");
         }
 
-        $instance = $config['instance'];
-        $instances = $this->container->getParameter($this->getAlias() . '.instance');
+        $instance  = $config['instance'];
+        $instances = $this->container->getParameter($this->getAlias().'.instance');
 
-        if (null === $instance) {
-            return;
-        }
         if (!isset($instances[$instance])) {
-            throw new InvalidConfigurationException(sprintf(
-                "Failed to hook into the session. The instance \"%s\" doesn't exist!",
-                $instance
-            ));
+            throw new InvalidConfigurationException(
+                sprintf(
+                    "Failed to hook into the session. The instance \"%s\" doesn't exist!",
+                    $instance
+                )
+            );
         }
 
         // calculate options
