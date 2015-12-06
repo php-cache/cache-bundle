@@ -11,8 +11,10 @@
 
 namespace Cache\CacheBundle\DependencyInjection;
 
+use Cache\CacheBundle\Cache\LoggingCachePool;
 use Cache\CacheBundle\DataCollector\CacheDataCollector;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 /**
@@ -33,6 +35,8 @@ class CacheExtension extends Extension
         $config = $this->processConfiguration(new Configuration(), $configs);
 
         if ($container->getParameter('kernel.debug')) {
+            $this->transformLoggableCachePools($container);
+
             $container->register('data_collector.cache', CacheDataCollector::class)
                 ->addTag('data_collector', ['template' => CacheDataCollector::TEMPLATE, 'id' => 'cache']);
         }
@@ -42,10 +46,23 @@ class CacheExtension extends Extension
                 $container->setParameter($this->getAlias().'.'.$section, $config[$section]);
             }
         }
+
     }
 
     public function getAlias()
     {
         return 'cache';
+    }
+
+    private function transformLoggableCachePools(ContainerBuilder $container)
+    {
+        $serviceIds = $container->findTaggedServiceIds('cache.provider');
+        foreach (array_keys($serviceIds) as $id) {
+            $container->setDefinition($id.'.logged', $container->findDefinition($id));
+            $def = $container->register($id.'.logger', LoggingCachePool::class);
+            $def->addArgument(new Reference($id));
+
+            $container->setAlias($id, $id.'.logger');
+        }
     }
 }

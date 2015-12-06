@@ -14,6 +14,7 @@ namespace Cache\CacheBundle\Cache;
 use Aequasi\Cache\CacheItem;
 use Aequasi\Cache\CachePool;
 use Psr\Cache\CacheItemInterface;
+use Psr\Cache\CacheItemPoolInterface;
 
 /**
  * @author Aaron Scherer <aequasi@gmail.com>
@@ -24,6 +25,21 @@ class LoggingCachePool extends CachePool
      * @var array $calls
      */
     private $calls = [];
+
+    /**
+     * @type CacheItemPoolInterface
+     */
+    private $cachePool;
+
+    /**
+     * LoggingCachePool constructor.
+     *
+     * @param CacheItemPoolInterface $cachePool
+     */
+    public function __construct(CacheItemPoolInterface $cachePool)
+    {
+        $this->cachePool = $cachePool;
+    }
 
     public function getItem($key)
     {
@@ -73,7 +89,7 @@ class LoggingCachePool extends CachePool
     private function timeCall($name, $arguments)
     {
         $start  = microtime(true);
-        $result = call_user_func_array(['parent', $name], $arguments);
+        $result = call_user_func_array([$this->cachePool, $name], $arguments);
         $time   = microtime(true) - $start;
 
         $object = (object) compact('name', 'arguments', 'start', 'time', 'result');
