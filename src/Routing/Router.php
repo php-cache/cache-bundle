@@ -12,11 +12,9 @@
 namespace Cache\CacheBundle\Routing;
 
 use Cache\CacheBundle\Routing\Matcher\CacheUrlMatcher;
-use Aequasi\Cache\CachePool;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Bundle\FrameworkBundle\Routing\Router as BaseRouter;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Routing\RequestContext;
 
 /**
  * Class Router
@@ -36,6 +34,11 @@ class Router extends BaseRouter
      * @var CacheItemPoolInterface
      */
     protected $cache;
+
+    /**
+     * @type int
+     */
+    protected $ttl;
 
     /**
      * @return CacheUrlMatcher|null|\Symfony\Component\Routing\Matcher\UrlMatcherInterface
@@ -60,19 +63,16 @@ class Router extends BaseRouter
         $key = 'route_collection';
 
         if (null === $this->collection) {
-            if ($this->cache->hasItem($key)) {
-                $collection = $this->cache->getItem($key)->get();
-                if ($collection !== null) {
-                    $this->collection = $collection;
+            $cacheItem = $this->cache->getItem($key);
+            if ($cacheItem->isHit()) {
+                $this->collection = $cacheItem->get();
+            } else {
+                $this->collection = parent::getRouteCollection();
+                $cacheItem->set($this->collection);
+                $cacheItem->expiresAfter($this->getTtl());
 
-                    return $this->collection;
-                }
+                $this->cache->save($cacheItem);
             }
-
-            $this->collection = parent::getRouteCollection();
-            $item = $this->cache->getItem($key);
-            $item->set($this->collection)
-                ->expiresAfter(self::CACHE_LIFETIME);
         }
 
         return $this->collection;
@@ -88,5 +88,13 @@ class Router extends BaseRouter
         $this->cache = $cache;
 
         return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTtl()
+    {
+        return $this->ttl;
     }
 }
