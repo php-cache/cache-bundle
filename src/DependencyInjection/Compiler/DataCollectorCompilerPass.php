@@ -25,6 +25,8 @@ class DataCollectorCompilerPass extends BaseCompilerPass
      */
     protected function prepare()
     {
+        $this->transformLoggableCachePools();
+
         $instances = $this->container->getParameter($this->getAlias() . '.instance');
 
         $definition = $this->container->getDefinition('data_collector.cache');
@@ -35,5 +37,22 @@ class DataCollectorCompilerPass extends BaseCompilerPass
         }
 
         $this->container->setDefinition('data_collector.cache', $definition);
+    }
+
+    private function transformLoggableCachePools()
+    {
+        $serviceIds = $this->container->findTaggedServiceIds('cache.provider');
+        foreach (array_keys($serviceIds) as $id) {
+
+            // Duplicating definition to $originalServiceId.logged
+            $this->container->setDefinition($id.'.logged', $this->container->findDefinition($id));
+
+            // Creating a LoggingCachePool instance, and passing it the new definition from above
+            $def = $this->container->register($id.'.logger', LoggingCachePool::class);
+            $def->addArgument(new Reference($id.'.logged'));
+
+            // Overwrite the original service id with the new LoggingCachePool instance
+            $this->container->setAlias($id, $id.'.logger');
+        }
     }
 }
