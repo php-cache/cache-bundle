@@ -1,15 +1,8 @@
 {
     "name":         "cache/cache-bundle",
-    "type":         "library",
-    "description":  "Symfony 2 library providing PSR-6 compliant cache services for the user. Many other features.",
-    "keywords":     [
-        "php",
-        "cache",
-        "redis",
-        "memcached",
-        "router",
-        "session"
-    ],
+    "type":         "Symfony bundle",
+    "description":  "Symfony 2 bundle providing PSR-6 compliant cache services for the user. Many other features.",
+    "keywords":     ["cache", "psr6", "doctrine", "router", "session"],
     "homepage":     "https://github.com/php-cache/cache-bundle",
     "license":      "MIT",
     "authors":      [
@@ -24,9 +17,6 @@
             "homepage": "https://github.com/nyholm"
         }
     ],
-    "support":      {
-        "email": "aequasi@gmail.com"
-    },
     "require":      {
         "php":                      "^5.5|^7",
         "symfony/framework-bundle": "^2.7|^3.0",
@@ -34,7 +24,7 @@
     },
     "require-dev":  {
         "phpunit/phpunit":      "^5.1|^4.0",
-        "cache/doctrine-cache": "dev-master@dev",
+        "cache/doctrine-cache": "dev-master",
         "psr/cache":            "dev-master"
     },
     "repositories": [
@@ -44,8 +34,7 @@
         }
     ],
     "suggest":      {
-        "ext-memcached": "Allows for caching with Memcached",
-        "ext-redis":     "Allows for caching with Redis"
+        "php-cache/doctrine-adapter-bundle": "A bundle to register PSR-6 complient services based on Doctrine cache"
     },
     "autoload":     {
         "psr-4": {
