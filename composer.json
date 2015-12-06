@@ -1,6 +1,6 @@
 {
     "name":         "cache/cache-bundle",
-    "type":         "Symfony bundle",
+    "type":         "library",
     "description":  "Symfony 2 bundle providing PSR-6 compliant cache services for the user. Many other features.",
     "keywords":     ["cache", "psr6", "doctrine", "router", "session"],
     "homepage":     "https://github.com/php-cache/cache-bundle",
