@@ -89,7 +89,8 @@ class DoctrineSupportCompilerPass extends BaseCompilerPass
      */
     private function hasDoctrine()
     {
-        return $this->container->hasAlias('doctrine.orm.entity_manager') ||
-        $this->container->hasAlias('doctrine_mongodb.document_manager');
+        return
+            $this->container->hasAlias('doctrine.orm.entity_manager') ||
+            $this->container->hasAlias('doctrine_mongodb.document_manager');
     }
 }

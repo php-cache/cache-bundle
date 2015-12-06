@@ -11,15 +11,14 @@
 
 namespace Cache\CacheBundle\Cache;
 
-use Aequasi\Cache\CacheItem;
-use Aequasi\Cache\CachePool;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
+use Psr\Cache\InvalidArgumentException;
 
 /**
  * @author Aaron Scherer <aequasi@gmail.com>
  */
-class LoggingCachePool extends CachePool
+class LoggingCachePool implements CacheItemPoolInterface
 {
     /**
      * @var array $calls
@@ -70,7 +69,7 @@ class LoggingCachePool extends CachePool
 
     public function save(CacheItemInterface $item)
     {
-        $itemClone       = clone $item;
+        $itemClone = clone $item;
         $itemClone->set(sprintf('<DATA:%s', gettype($item->get())));
 
         $call            = $this->timeCall(__FUNCTION__, [$item]);
@@ -82,19 +81,66 @@ class LoggingCachePool extends CachePool
 
     /**
      * @param string $name
-     * @param        $arguments
+     * @param array  $arguments
      *
      * @return object
      */
-    private function timeCall($name, $arguments)
+    private function timeCall($name, array $arguments = null)
     {
         $start  = microtime(true);
         $result = call_user_func_array([$this->cachePool, $name], $arguments);
         $time   = microtime(true) - $start;
 
-        $object = (object) compact('name', 'arguments', 'start', 'time', 'result');
+        $object = (object)compact('name', 'arguments', 'start', 'time', 'result');
 
         return $object;
+    }
+
+    public function getItems(array $keys = [])
+    {
+        $call         = $this->timeCall(__FUNCTION__, [$keys]);
+        $result       = $call->result;
+        $call->result = sprintf('<DATA:%s>', gettype($result));
+
+        $this->calls[] = $call;
+
+        return $result;
+    }
+
+    public function clear()
+    {
+        $call          = $this->timeCall(__FUNCTION__);
+        $this->calls[] = $call;
+
+        return $call->result;
+    }
+
+    public function deleteItems(array $keys)
+    {
+        $call          = $this->timeCall(__FUNCTION__, [$keys]);
+        $this->calls[] = $call;
+
+        return $call->result;
+    }
+
+    public function saveDeferred(CacheItemInterface $item)
+    {
+        $itemClone = clone $item;
+        $itemClone->set(sprintf('<DATA:%s', gettype($item->get())));
+
+        $call            = $this->timeCall(__FUNCTION__, [$item]);
+        $call->arguments = ['<CacheItem>', $itemClone];
+        $this->calls[]   = $call;
+
+        return $call->result;
+    }
+
+    public function commit()
+    {
+        $call          = $this->timeCall(__FUNCTION__);
+        $this->calls[] = $call;
+
+        return $call->result;
     }
 
     /**
