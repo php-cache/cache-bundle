@@ -30,12 +30,11 @@ class RouterCompilerPass extends BaseCompilerPass
         }
 
         $def = clone $this->container->findDefinition('router');
-
-
         $def->setClass('Cache\CacheBundle\Routing\Router');
-        $def->addMethodCall('setCache', [new Reference(sprintf('aequasi_cache.instance.%s', $router['instance']))]);
+        $def->addMethodCall('setCache', [new Reference(sprintf('cache.instance.%s', $router['instance']))]);
 
-        $this->container->setDefinition('router.cache', $def);
+        $this->container->setDefinition('cache.router', $def);
+        $this->container->setAlias('router.alias', 'cache.router');
 
         if ($router['auto-register']) {
             $this->container->setAlias('router', 'router.cache');
