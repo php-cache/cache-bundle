@@ -1,5 +1,5 @@
 parameters:
-    aequasi_cache.data_collector.class: Aequasi\Bundle\CacheBundle\DataCollector\CacheDataCollector
+    aequasi_cache.data_collector.class: Cache\CacheBundle\DataCollector\CacheDataCollector
     aequasi_cache.data_collector.template: AequasiCacheBundle:Collector:cache.html.twig
 
 services:

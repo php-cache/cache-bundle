@@ -1,14 +1,17 @@
 <?php
 
-/**
- * @author    Aaron Scherer
- * @date      12/11/13
- * @copyright Underground Elephant
+/*
+ * This file is part of php-cache\cache-bundle package.
+ *
+ * (c) 2015-2015 Aaron Scherer <aequasi@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
  */
 
-namespace Aequasi\Bundle\CacheBundle\Tests\DependencyInjection;
+namespace Cache\CacheBundle\Tests\DependencyInjection;
 
-use Aequasi\Bundle\CacheBundle\Tests\TestCase;
+use Cache\CacheBundle\Tests\TestCase;
 use Aequasi\Cache\DoctrineCacheBridge;
 use Psr\Cache\CacheItemPoolInterface;
 
@@ -56,7 +59,7 @@ class AequasiCacheExtensionTest extends TestCase
         $this->assertTrue($config['enabled']);
         $this->assertEquals($config['instance'], 'default');
 
-        $this->assertEquals('Aequasi\Bundle\CacheBundle\Routing\Router', $container->getParameter('router.class'));
+        $this->assertEquals('Cache\CacheBundle\Routing\Router', $container->getParameter('router.class'));
     }
 
     /**

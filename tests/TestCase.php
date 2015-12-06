@@ -1,14 +1,17 @@
 <?php
 
-/**
- * @author    Aaron Scherer <aequasi@gmail.com>
- * @date      2013
- * @license   http://www.apache.org/licenses/LICENSE-2.0.html Apache License, Version 2.0
+/*
+ * This file is part of php-cache\cache-bundle package.
+ *
+ * (c) 2015-2015 Aaron Scherer <aequasi@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
  */
 
-namespace Aequasi\Bundle\CacheBundle\Tests;
+namespace Cache\CacheBundle\Tests;
 
-use Aequasi\Bundle\CacheBundle\DependencyInjection\AequasiCacheExtension;
+use Cache\CacheBundle\DependencyInjection\AequasiCacheExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;

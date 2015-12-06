@@ -1,12 +1,15 @@
 <?php
 
-/**
- * @author    Aaron Scherer
- * @date      12/6/13
- * @license   http://www.apache.org/licenses/LICENSE-2.0.html Apache License, Version 2.0
+/*
+ * This file is part of php-cache\cache-bundle package.
+ *
+ * (c) 2015-2015 Aaron Scherer <aequasi@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
  */
 
-namespace Aequasi\Bundle\CacheBundle\DependencyInjection\Compiler;
+namespace Cache\CacheBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Reference;
 

@@ -1,0 +1,8 @@
+# Gush configuration file, any comments will be lost.
+repo_adapter: github
+issue_tracker: github
+repo_org: php-cache
+repo_name: cache-bundle
+issue_project_org: php-cache
+issue_project_name: cache-bundle
+meta-header: "This file is part of php-cache\\cache-bundle package.\n\n(c) 2015-2015 Aaron Scherer <aequasi@gmail.com>\n\nThis source file is subject to the MIT license that is bundled\nwith this source code in the file LICENSE."

@@ -1,23 +1,26 @@
 <?php
 
-/**
- * @author    Aaron Scherer <aequasi@gmail.com>
- * @date      2013
- * @license   http://www.apache.org/licenses/LICENSE-2.0.html Apache License, Version 2.0
+/*
+ * This file is part of php-cache\cache-bundle package.
+ *
+ * (c) 2015-2015 Aaron Scherer <aequasi@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
  */
 
-namespace Aequasi\Bundle\CacheBundle;
+namespace Cache\CacheBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Aequasi\Bundle\CacheBundle\DependencyInjection\Compiler;
+use Cache\CacheBundle\DependencyInjection\Compiler;
 
 /**
  * Class AequasiCacheBundle
  *
  * @author Aaron Scherer <aequasi@gmail.com>
  */
-class AequasiCacheBundle extends Bundle
+class CacheBundle extends Bundle
 {
     /**
      * {@inheritDoc}
