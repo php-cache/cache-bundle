@@ -25,6 +25,13 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 class CacheDataCollector extends DataCollector
 {
     /**
+     * Template name
+     *
+     * @type string
+     */
+    const TEMPLATE = 'CacheCacheBundle:Collector:cache.html.twig';
+
+    /**
      * @var LoggingCachePool[]
      */
     private $instances = [];

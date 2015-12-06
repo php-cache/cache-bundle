@@ -11,9 +11,8 @@
 
 namespace Cache\CacheBundle\DependencyInjection;
 
-use Symfony\Component\Config\FileLocator;
+use Cache\CacheBundle\DataCollector\CacheDataCollector;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 /**
@@ -31,38 +30,18 @@ class CacheExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        $configuration = new Configuration($container->getParameter('kernel.debug'));
-        $config        = $this->processConfiguration($configuration, $configs);
-
-        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
-        $loader->load('services.yml');
+        $config = $this->processConfiguration(new Configuration(), $configs);
 
         if ($container->getParameter('kernel.debug')) {
-            $loader->load('collector.yml');
+            $container->register('data_collector.cache', CacheDataCollector::class)
+                ->addTag('data_collector', ['template' => CacheDataCollector::TEMPLATE, 'id' => 'cache']);
         }
 
-        $container->setParameter($this->getAlias() . '.instance', $config['instances']);
-        new Builder\ServiceBuilder($container);
-
-        if ($config['router']['enabled']) {
-            $container->setParameter($this->getAlias() . '.router', $config['router']);
+        foreach (['router', 'session', 'doctrine'] as $section) {
+            if ($container[$section]['enabled']) {
+                $container->setParameter($this->getAlias().'.'.$section, $config[$section]);
+            }
         }
-
-        if ($config['session']['enabled']) {
-            $container->setParameter($this->getAlias() . '.session', $config['session']);
-        }
-
-        if ($config['doctrine']['enabled']) {
-            $container->setParameter($this->getAlias() . '.doctrine', $config['doctrine']);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getConfiguration(array $config, ContainerBuilder $container)
-    {
-      return new Configuration($container->getParameter('kernel.debug'));
     }
 
     public function getAlias()

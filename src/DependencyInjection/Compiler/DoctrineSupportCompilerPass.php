@@ -21,19 +21,23 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 class DoctrineSupportCompilerPass extends BaseCompilerPass
 {
     /**
-     * @return mixed|void
+     * @return void
+     * @throws \Exception
      */
     protected function prepare()
     {
-        // If there is no active session support, return
-        if (!$this->container->hasAlias('doctrine.orm.entity_manager')) {
+        // If disabled, continue
+        if (!$this->container->hasParameter($this->getAlias().'.doctrine')) {
             return;
         }
 
-        // If the aequasi.cache.session_handler service is loaded set the alias
-        if ($this->container->hasParameter($this->getAlias() . '.doctrine')) {
-            $this->enableDoctrineSupport($this->container->getParameter($this->getAlias() . '.doctrine'));
+        if (!$this->hasDoctrine()) {
+            throw new \Exception(
+                "Not able to find any doctrine caches to implement. Ensure you have Doctrine ORM or ODM"
+            );
         }
+
+        $this->enableDoctrineSupport($this->container->getParameter($this->getAlias().'.doctrine'));
     }
 
     /**
@@ -45,7 +49,7 @@ class DoctrineSupportCompilerPass extends BaseCompilerPass
      */
     protected function enableDoctrineSupport(array $config)
     {
-        $types = array('entity_managers', 'document_managers');
+        $types = ['entity_managers', 'document_managers'];
         foreach ($config as $cacheType => $cacheData) {
             foreach ($types as $type) {
                 if (!isset($cacheData[$type])) {
@@ -53,10 +57,12 @@ class DoctrineSupportCompilerPass extends BaseCompilerPass
                 }
 
                 if (!isset($cacheData['instance'])) {
-                    throw new InvalidConfigurationException(sprintf(
-                        "There was no instance passed. Please specify a instance under the %s type",
-                        $cacheType
-                    ));
+                    throw new InvalidConfigurationException(
+                        sprintf(
+                            "There was no instance passed. Please specify a instance under the %s type",
+                            $cacheType
+                        )
+                    );
                 }
                 $cacheDefinitionName = sprintf('%s.instance.%s.bridge', $this->getAlias(), $cacheData['instance']);
 
@@ -74,5 +80,16 @@ class DoctrineSupportCompilerPass extends BaseCompilerPass
                 }
             }
         }
+    }
+
+    /**
+     * Checks to see if there are ORM's or ODM's
+     *
+     * @return bool
+     */
+    private function hasDoctrine()
+    {
+        return $this->container->hasAlias('doctrine.orm.entity_manager') ||
+        $this->container->hasAlias('doctrine_mongodb.document_manager');
     }
 }

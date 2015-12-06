@@ -41,7 +41,7 @@ abstract class BaseCompilerPass implements CompilerPassInterface
      */
     protected function getAlias()
     {
-        return 'aequasi_cache';
+        return 'cache';
     }
 
     /**

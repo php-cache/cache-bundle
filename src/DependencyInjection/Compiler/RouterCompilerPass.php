@@ -11,12 +11,9 @@
 
 namespace Cache\CacheBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- *
- *
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
 class RouterCompilerPass extends BaseCompilerPass
@@ -31,10 +28,17 @@ class RouterCompilerPass extends BaseCompilerPass
         if (!$router['enabled']) {
             return;
         }
-        $instance = $router['instance'];
 
-        $def = $this->container->findDefinition('router');
+        $def = clone $this->container->findDefinition('router');
+
+
         $def->setClass('Cache\CacheBundle\Routing\Router');
-        $def->addMethodCall('setCache', [new Reference(sprintf('aequasi_cache.instance.%s', $instance))]);
+        $def->addMethodCall('setCache', [new Reference(sprintf('aequasi_cache.instance.%s', $router['instance']))]);
+
+        $this->container->setDefinition('router.cache', $def);
+
+        if ($router['auto-register']) {
+            $this->container->setAlias('router', 'router.cache');
+        }
     }
 }
