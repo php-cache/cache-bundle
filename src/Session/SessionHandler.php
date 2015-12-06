@@ -11,7 +11,6 @@
 
 namespace Cache\CacheBundle\Session;
 
-use Doctrine\Common\Cache\Cache;
 use Psr\Cache\CacheItemPoolInterface;
 
 /**

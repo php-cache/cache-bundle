@@ -14,6 +14,7 @@ namespace Cache\CacheBundle\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
+ * @author Aaron Scherer <aequasi@gmail.com>
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
 class RouterCompilerPass extends BaseCompilerPass
@@ -23,7 +24,7 @@ class RouterCompilerPass extends BaseCompilerPass
      */
     protected function prepare()
     {
-        $router = $this->container->getParameter($this->getAlias() . '.router');
+        $router = $this->container->getParameter($this->getAlias().'.router');
 
         if (!$router['enabled']) {
             return;

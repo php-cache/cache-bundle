@@ -49,8 +49,7 @@ class Router extends BaseRouter
             return $this->matcher;
         }
 
-        $matcher = new CacheUrlMatcher($this->getRouteCollection(), $this->context);
-        $matcher->setCache($this->cache);
+        $matcher = new CacheUrlMatcher($this->cache, $this->ttl, $this->getRouteCollection(), $this->context);
 
         return $this->matcher = $matcher;
     }

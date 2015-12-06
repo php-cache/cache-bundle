@@ -11,9 +11,10 @@
 
 namespace Cache\CacheBundle\Routing\Matcher;
 
-use Aequasi\Cache\CachePool;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
+use Symfony\Component\Routing\RequestContext;
+use Symfony\Component\Routing\RouteCollection;
 
 /**
  * Class CacheUrlMatcher
@@ -22,12 +23,34 @@ use Symfony\Component\Routing\Matcher\UrlMatcher;
  */
 class CacheUrlMatcher extends UrlMatcher
 {
-    const CACHE_LIFETIME = 604800; // a week
-
     /**
      * @var CacheItemPoolInterface
      */
-    protected $cache;
+    protected $cachePool;
+
+    /**
+     * @type int
+     */
+    protected $ttl;
+
+    /**
+     * CacheUrlMatcher constructor.
+     *
+     * @param CacheItemPoolInterface $cachePool
+     * @param int                    $ttl
+     * @param RouteCollection        $routes
+     * @param RequestContext         $context
+     */
+    public function __construct(
+        CacheItemPoolInterface $cachePool,
+        $ttl,
+        RouteCollection $routes,
+        RequestContext $context
+    ) {
+        $this->cachePool = $cachePool;
+        $this->ttl       = $ttl;
+        parent::__construct($routes, $context);
+    }
 
     /**
      * @param string $pathInfo
@@ -38,33 +61,17 @@ class CacheUrlMatcher extends UrlMatcher
     {
         $host   = strtr($this->context->getHost(), '.', '_');
         $method = strtolower($this->context->getMethod());
-        $key    = 'route_' . $method . '_' . $host . '_' . $pathInfo;
+        $key    = 'route_'.$method.'_'.$host.'_'.$pathInfo;
 
-        if ($this->cache->hasItem($key)) {
-            return $this->cache->getItem($key)->get();
+        if ($this->cachePool->hasItem($key)) {
+            return $this->cachePool->getItem($key)->get();
         }
 
         $match = parent::match($pathInfo);
-        $item = $this->cache->getItem($key);
-            $item->set($match)
-                ->expiresAfter(self::CACHE_LIFETIME);
+        $item  = $this->cachePool->getItem($key);
+        $item->set($match)
+            ->expiresAfter($this->ttl);
 
         return $match;
-    }
-
-    /**
-     * @param CacheItemPoolInterface $cache
-     */
-    public function setCache(CacheItemPoolInterface $cache)
-    {
-        $this->cache = $cache;
-    }
-
-    /**
-     * @return CacheItemPoolInterface
-     */
-    public function getCache()
-    {
-        return $this->cache;
     }
 }
