@@ -11,12 +11,14 @@
 
 namespace Cache\CacheBundle\DependencyInjection\Compiler;
 
+use Cache\CacheBundle\Cache\LoggingCachePool;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Class DataCollectorCompilerPass
  *
  * @author Aaron Scherer <aequasi@gmail.com>
+ * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
 class DataCollectorCompilerPass extends BaseCompilerPass
 {
@@ -27,18 +29,19 @@ class DataCollectorCompilerPass extends BaseCompilerPass
     {
         $this->transformLoggableCachePools();
 
-        $instances = $this->container->getParameter($this->getAlias() . '.instance');
+        $collectorDefinition = $this->container->getDefinition('data_collector.cache');
 
-        $definition = $this->container->getDefinition('data_collector.cache');
-
-        foreach (array_keys($instances) as $name) {
-            $instance = new Reference(sprintf("%s.instance.%s", $this->getAlias(), $name));
-            $definition->addMethodCall('addInstance', array($name, $instance));
+        $serviceIds = $this->container->findTaggedServiceIds('cache.provider');
+        foreach (array_keys($serviceIds) as $id) {
+            $collectorDefinition->addMethodCall('addInstance', [$id, new Reference($id)]);
         }
 
-        $this->container->setDefinition('data_collector.cache', $definition);
+        $this->container->setDefinition('data_collector.cache', $collectorDefinition);
     }
 
+    /**
+     * Make all cache providers loggable.
+     */
     private function transformLoggableCachePools()
     {
         $serviceIds = $this->container->findTaggedServiceIds('cache.provider');

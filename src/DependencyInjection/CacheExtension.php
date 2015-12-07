@@ -40,8 +40,8 @@ class CacheExtension extends Extension
         }
 
         foreach (['router', 'session', 'doctrine'] as $section) {
-            if ($container[$section]['enabled']) {
-                $container->setParameter($this->getAlias().'.'.$section, $config[$section]);
+            if ($config[$section]['enabled']) {
+                $container->setParameter('cache.'.$section, $config[$section]);
             }
         }
 

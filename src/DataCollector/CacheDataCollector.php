@@ -29,7 +29,7 @@ class CacheDataCollector extends DataCollector
      *
      * @type string
      */
-    const TEMPLATE = 'CacheCacheBundle:Collector:cache.html.twig';
+    const TEMPLATE = 'CacheBundle:Collector:cache.html.twig';
 
     /**
      * @var LoggingCachePool[]
