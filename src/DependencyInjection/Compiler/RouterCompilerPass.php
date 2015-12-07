@@ -32,14 +32,14 @@ class RouterCompilerPass extends BaseCompilerPass
 
         $def = clone $this->container->findDefinition('router');
         $def->setClass('Cache\CacheBundle\Routing\Router');
-        $def->addMethodCall('setCache', [new Reference(sprintf('cache.instance.%s', $router['instance']))]);
+        $def->addMethodCall('setCache', [new Reference($router['service_id'])]);
         $def->addMethodCall('setTtl', [$router['ttl']]);
 
         $this->container->setDefinition('cache.router', $def);
         $this->container->setAlias('router.alias', 'cache.router');
 
         if ($router['auto-register']) {
-            $this->container->setAlias('router', 'router.cache');
+            $this->container->setAlias('router', 'cache.router');
         }
     }
 }

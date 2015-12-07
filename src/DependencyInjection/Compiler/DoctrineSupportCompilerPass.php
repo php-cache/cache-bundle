@@ -11,12 +11,16 @@
 
 namespace Cache\CacheBundle\DependencyInjection\Compiler;
 
+use Cache\Bridge\DoctrineCacheBridge;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Class DoctrineSupportCompilerPass
  *
  * @author Aaron Scherer <aequasi@gmail.com>
+ * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
 class DoctrineSupportCompilerPass extends BaseCompilerPass
 {
@@ -27,7 +31,7 @@ class DoctrineSupportCompilerPass extends BaseCompilerPass
     protected function prepare()
     {
         // If disabled, continue
-        if (!$this->container->hasParameter($this->getAlias().'.doctrine')) {
+        if (!$this->container->hasParameter('cache.doctrine')) {
             return;
         }
 
@@ -37,7 +41,7 @@ class DoctrineSupportCompilerPass extends BaseCompilerPass
             );
         }
 
-        $this->enableDoctrineSupport($this->container->getParameter($this->getAlias().'.doctrine'));
+        $this->enableDoctrineSupport($this->container->getParameter('cache.doctrine'));
     }
 
     /**
@@ -56,15 +60,10 @@ class DoctrineSupportCompilerPass extends BaseCompilerPass
                     continue;
                 }
 
-                if (!isset($cacheData['instance'])) {
-                    throw new InvalidConfigurationException(
-                        sprintf(
-                            "There was no instance passed. Please specify a instance under the %s type",
-                            $cacheType
-                        )
-                    );
-                }
-                $cacheDefinitionName = sprintf('%s.instance.%s.bridge', $this->getAlias(), $cacheData['instance']);
+                $bridgeServiceId = sprintf('cache.provider.doctrine.%s.bridge', $cacheType);
+                $bridgeDef = $this->container->register($bridgeServiceId, DoctrineCacheBridge::class);
+                $bridgeDef->addArgument(0, new Reference($cacheData['service_id']))
+                    ->setPublic(false);
 
                 foreach ($cacheData[$type] as $manager) {
                     $doctrineDefinitionName =
@@ -76,7 +75,7 @@ class DoctrineSupportCompilerPass extends BaseCompilerPass
                         );
 
                     // Replace the doctrine entity manager cache with our bridge
-                    $this->container->setAlias($doctrineDefinitionName, $cacheDefinitionName);
+                    $this->container->setAlias($doctrineDefinitionName, $bridgeServiceId);
                 }
             }
         }

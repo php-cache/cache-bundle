@@ -23,8 +23,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class Router extends BaseRouter
 {
-    const CACHE_LIFETIME = 604800; // a week
-
     /**
      * @var ContainerInterface
      */
@@ -92,8 +90,20 @@ class Router extends BaseRouter
     /**
      * @return int
      */
-    public function getTtl()
+    protected function getTtl()
     {
         return $this->ttl;
+    }
+
+    /**
+     * @param int $ttl
+     *
+     * @return Router
+     */
+    public function setTtl($ttl)
+    {
+        $this->ttl = $ttl;
+
+        return $this;
     }
 }

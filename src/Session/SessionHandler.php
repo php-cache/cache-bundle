@@ -101,9 +101,7 @@ class SessionHandler implements \SessionHandlerInterface
      */
     public function destroy($sessionId)
     {
-        $item = $this->cache->getItem($this->prefix . $sessionId);
-
-        return $this->cache->deleteItem($item);
+        return $this->cache->deleteItem($this->prefix . $sessionId);
     }
 
     /**

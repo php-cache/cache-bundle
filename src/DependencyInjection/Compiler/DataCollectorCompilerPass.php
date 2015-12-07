@@ -11,12 +11,14 @@
 
 namespace Cache\CacheBundle\DependencyInjection\Compiler;
 
+use Cache\CacheBundle\Cache\LoggingCachePool;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Class DataCollectorCompilerPass
  *
  * @author Aaron Scherer <aequasi@gmail.com>
+ * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
 class DataCollectorCompilerPass extends BaseCompilerPass
 {
@@ -25,23 +27,9 @@ class DataCollectorCompilerPass extends BaseCompilerPass
      */
     protected function prepare()
     {
-        $this->transformLoggableCachePools();
-
-        $instances = $this->container->getParameter($this->getAlias() . '.instance');
-
-        $definition = $this->container->getDefinition('data_collector.cache');
-
-        foreach (array_keys($instances) as $name) {
-            $instance = new Reference(sprintf("%s.instance.%s", $this->getAlias(), $name));
-            $definition->addMethodCall('addInstance', array($name, $instance));
-        }
-
-        $this->container->setDefinition('data_collector.cache', $definition);
-    }
-
-    private function transformLoggableCachePools()
-    {
+        $collectorDefinition = $this->container->getDefinition('data_collector.cache');
         $serviceIds = $this->container->findTaggedServiceIds('cache.provider');
+
         foreach (array_keys($serviceIds) as $id) {
 
             // Duplicating definition to $originalServiceId.logged
@@ -53,6 +41,7 @@ class DataCollectorCompilerPass extends BaseCompilerPass
 
             // Overwrite the original service id with the new LoggingCachePool instance
             $this->container->setAlias($id, $id.'.logger');
+            $collectorDefinition->addMethodCall('addInstance', [$id, new Reference($id.'.logger')]);
         }
     }
 }

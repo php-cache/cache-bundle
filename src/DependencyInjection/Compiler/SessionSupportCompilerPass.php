@@ -11,6 +11,7 @@
 
 namespace Cache\CacheBundle\DependencyInjection\Compiler;
 
+use Cache\CacheBundle\Session\SessionHandler;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
@@ -49,35 +50,17 @@ class SessionSupportCompilerPass extends BaseCompilerPass
      */
     private function enableSessionSupport(array $config)
     {
-        if (empty($config['instance'])) {
-            throw new InvalidConfigurationException("Instance must be passed under the `session` config.");
-        }
-
-        $instance  = $config['instance'];
-        $instances = $this->container->getParameter($this->getAlias().'.instance');
-
-        if (!isset($instances[$instance])) {
-            throw new InvalidConfigurationException(
-                sprintf(
-                    "Failed to hook into the session. The instance \"%s\" doesn't exist!",
-                    $instance
-                )
-            );
-        }
-
         // calculate options
         $sessionOptions = $this->container->getParameter('session.storage.options');
         if (isset($sessionOptions['cookie_lifetime']) && !isset($config['cookie_lifetime'])) {
             $config['cookie_lifetime'] = $sessionOptions['cookie_lifetime'];
         }
         // load the session handler
-        $definition =
-            new Definition($this->container->getParameter(sprintf('%s.session.handler.class', $this->getAlias())));
-        $definition->addArgument(new Reference(sprintf('%s.instance.%s.bridge', $this->getAlias(), $instance)))
+        $definition = new Definition(SessionHandler::class);
+        $definition->addArgument(new Reference($config['service_id']))
             ->addArgument($config);
 
-        $this->container->setDefinition(sprintf('%s.session_handler', $this->getAlias()), $definition);
-        $this->container->setAlias('cache.session_handler', sprintf('%s.session_handler', $this->getAlias()));
+        $this->container->setDefinition('cache.session_handler', $definition);
 
         $this->container->setAlias('session.handler', 'cache.session_handler');
     }
