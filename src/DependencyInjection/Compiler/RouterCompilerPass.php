@@ -24,11 +24,11 @@ class RouterCompilerPass extends BaseCompilerPass
      */
     protected function prepare()
     {
-        $router = $this->container->getParameter($this->getAlias().'.router');
-
-        if (!$router['enabled']) {
+        if (!$this->container->hasParameter('cache.router')) {
             return;
         }
+
+        $router = $this->container->getParameter('cache.router');
 
         $def = clone $this->container->findDefinition('router');
         $def->setClass('Cache\CacheBundle\Routing\Router');
