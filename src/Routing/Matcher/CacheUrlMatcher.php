@@ -63,14 +63,15 @@ class CacheUrlMatcher extends UrlMatcher
         $method = strtolower($this->context->getMethod());
         $key    = 'route_'.$method.'_'.$host.'_'.$pathInfo;
 
-        if ($this->cachePool->hasItem($key)) {
-            return $this->cachePool->getItem($key)->get();
+        $cacheItem = $this->cachePool->getItem($key);
+        if ($cacheItem->isHit()) {
+            return $cacheItem->get();
         }
 
         $match = parent::match($pathInfo);
-        $item  = $this->cachePool->getItem($key);
-        $item->set($match)
+        $cacheItem->set($match)
             ->expiresAfter($this->ttl);
+        $this->cachePool->save($cacheItem);
 
         return $match;
     }

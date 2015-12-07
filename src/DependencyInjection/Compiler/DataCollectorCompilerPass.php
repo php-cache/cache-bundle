@@ -27,24 +27,9 @@ class DataCollectorCompilerPass extends BaseCompilerPass
      */
     protected function prepare()
     {
-        $this->transformLoggableCachePools();
-
         $collectorDefinition = $this->container->getDefinition('data_collector.cache');
-
         $serviceIds = $this->container->findTaggedServiceIds('cache.provider');
-        foreach (array_keys($serviceIds) as $id) {
-            $collectorDefinition->addMethodCall('addInstance', [$id, new Reference($id)]);
-        }
 
-        $this->container->setDefinition('data_collector.cache', $collectorDefinition);
-    }
-
-    /**
-     * Make all cache providers loggable.
-     */
-    private function transformLoggableCachePools()
-    {
-        $serviceIds = $this->container->findTaggedServiceIds('cache.provider');
         foreach (array_keys($serviceIds) as $id) {
 
             // Duplicating definition to $originalServiceId.logged
@@ -56,6 +41,7 @@ class DataCollectorCompilerPass extends BaseCompilerPass
 
             // Overwrite the original service id with the new LoggingCachePool instance
             $this->container->setAlias($id, $id.'.logger');
+            $collectorDefinition->addMethodCall('addInstance', [$id, new Reference($id.'.logger')]);
         }
     }
 }
