@@ -34,7 +34,7 @@
         }
     ],
     "suggest":      {
-        "php-cache/doctrine-adapter-bundle": "A bundle to register PSR-6 complient services based on Doctrine cache"
+        "cache/doctrine-adapter-bundle": "A bundle to register PSR-6 complient services based on Doctrine cache"
     },
     "autoload":     {
         "psr-4": {
