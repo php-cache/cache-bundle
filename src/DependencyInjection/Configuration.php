@@ -42,7 +42,7 @@ class Configuration implements ConfigurationInterface
     }
 
     /**
-     * Configure the "aequasi_cache.session" section
+     * Configure the "cache.session" section
      *
      * @return ArrayNodeDefinition
      */
@@ -69,7 +69,7 @@ class Configuration implements ConfigurationInterface
     }
 
     /**
-     * Configure the "aequasi_cache.doctrine" section
+     * Configure the "cache.doctrine" section
      *
      * @return ArrayNodeDefinition
      */
@@ -127,7 +127,7 @@ class Configuration implements ConfigurationInterface
     }
 
     /**
-     * Configure the "aequasi_cache.router" section
+     * Configure the "cache.router" section
      *
      * @return ArrayNodeDefinition
      */

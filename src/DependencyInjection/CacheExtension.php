@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 /**
- * Class AequasiCacheExtension
+ * Class CacheExtension
  *
  * @author Aaron Scherer <aequasi@gmail.com>
  */

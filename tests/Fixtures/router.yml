@@ -1,7 +1,4 @@
-aequasi_cache:
-    instances:
-        default:
-            type: array
+cache:
     router:
         enabled: true
-        instance: default
+        service_id: default

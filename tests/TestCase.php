@@ -11,7 +11,7 @@
 
 namespace Cache\CacheBundle\Tests;
 
-use Cache\CacheBundle\DependencyInjection\AequasiCacheExtension;
+use Cache\CacheBundle\DependencyInjection\CacheExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
@@ -64,7 +64,7 @@ class TestCase extends \PHPUnit_Framework_TestCase
     protected function createContainerFromFile($file, $data = array())
     {
         $container = $this->createContainer($data);
-        $container->registerExtension(new AequasiCacheExtension());
+        $container->registerExtension(new CacheExtension());
         $this->loadFromFile($container, $file);
 
         $container->getCompilerPassConfig()

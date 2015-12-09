@@ -1,4 +1,0 @@
-aequasi_cache:
-    instances:
-        default:
-            type: array
