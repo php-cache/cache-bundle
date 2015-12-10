@@ -54,6 +54,7 @@ class RouterListener
         }
 
         $request->attributes->add($item->get());
+        $request->attributes->set('_cache_hit', true);
     }
 
     /**
@@ -70,11 +71,14 @@ class RouterListener
             return;
         }
 
-        $item = $this->getCacheItem($request);
-        if ($item->isHit()) {
+        if ($request->attributes->has('_cache_hit')) {
+            $request->attributes->remove('_cache_hit');
+            // object is in cache all ready
             return;
         }
 
+        // Save to the cache
+        $item = $this->getCacheItem($request);
         $item->set($request->attributes->all());
         $this->cache->save($item);
     }
