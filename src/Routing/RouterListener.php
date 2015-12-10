@@ -88,9 +88,32 @@ class RouterListener
      */
     private function createCacheKey(Request $request)
     {
-        $key = 'route_'.$request->getMethod().'_'.$request->getHost().'_'.$request->getPathInfo();
+        $key = sprintf('route:%s:%s:%s',$request->getMethod(),$request->getHost(),$request->getPathInfo());
+
+        // This might be optional
+        $key.=':'.$this->implodeRecursive('|', $request->query->all());
 
         return $key;
+    }
+
+    /**
+     * @param $separator
+     * @param array $array
+     *
+     * @return string
+     */
+    private function implodeRecursive($separator, array $array)
+    {
+        $output = '';
+        foreach ($array as $key=>$value) {
+            if (is_array($value)) {
+                $output.=sprintf('%s%s[%s]', $separator, $key, $this->implodeRecursive($separator, $value));
+            } else {
+                $output.=$separator.$value;
+            }
+        }
+
+        return ltrim($output, $separator);
     }
 
     /**
