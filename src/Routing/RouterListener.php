@@ -73,7 +73,7 @@ class RouterListener
 
         if ($request->attributes->has('_cache_hit')) {
             $request->attributes->remove('_cache_hit');
-            // object is in cache all ready
+            // object is in cache already
             return;
         }
 
