@@ -91,7 +91,7 @@ class RouterListener
         $key = sprintf('route:%s:%s:%s',$request->getMethod(),$request->getHost(),$request->getPathInfo());
 
         // This might be optional
-        $key.=':'.$this->implodeRecursive('|', $request->query->all());
+        //$key.=':'.$this->implodeRecursive('|', $request->query->all());
 
         return $key;
     }
