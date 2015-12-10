@@ -1,0 +1,12 @@
+services:
+  data_collector.cache:
+    class: Cache\CacheBundle\DataCollector\CacheDataCollector
+    tags:
+      - { tag: data_collectorr, template: 'CacheBundle:Collector:cache.html.twig', id: 'cache' }
+
+  cache.router_listener:
+    class: Cache\CacheBundle\Routing\RouterListener
+    arguments: [~, %cache.router.ttl%]
+    tags:
+      - { tag: kernel.event_listener, event: kernel.request, method: onBeforeRouting, priority: 33 }
+      - { tag: kernel.event_listener, event: kernel.request, method: onAfterRouting, priority: 31 }
