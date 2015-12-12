@@ -11,6 +11,7 @@
 
 namespace Cache\CacheBundle\Command;
 
+use Cache\Taggable\TaggablePoolInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -18,13 +19,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 
 /**
- * Class CacheFlushCommand
+ * Class CacheFlushCommand.
  *
  * @author Aaron Scherer <aequasi@gmail.com>
  */
 class CacheFlushCommand extends ContainerAwareCommand
 {
-
     /**
      * {@inheritdoc}
      */
@@ -32,7 +32,7 @@ class CacheFlushCommand extends ContainerAwareCommand
     {
         $this->setName('cache:flush');
         $this->setDescription('Flushes the given cache');
-        $this->addArgument('instance', InputArgument::REQUIRED, 'Which instance do you want to clean?');
+        $this->addArgument('type', InputArgument::REQUIRED, 'Which type of cache do you want to clear?');
     }
 
     /**
@@ -40,10 +40,36 @@ class CacheFlushCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $serviceName = sprintf('cache.instance.%s', $input->getArgument('instance'));
+        $validTypes = ['session', 'routing', 'doctrine', 'all'];
+        $type = $input->getArgument('type');
+        if (!in_array($type, $validTypes)) {
+            $output->writeln(sprintf('Type "%s" does not exist. Valid type are: %s', $type, implode(',', $validTypes)));
+        }
+
+        if ($type === 'all') {
+            foreach (['session', 'routing', 'doctrine'] as $type) {
+                $this->clearCacheForType($type);
+            }
+        } else {
+            $this->clearCacheForType($type);
+        }
+    }
+
+    /**
+     * Clear the cache for a type.
+     *
+     * @param string $type
+     */
+    private function clearCacheForType($type)
+    {
+        $serviceId = $this->getContainer()->getParameter(sprintf('cache.%s%.service_id', $type));
 
         /** @var CacheItemPoolInterface $service */
-        $service = $this->getContainer()->get($serviceName);
-        $service->clear();
+        $service = $this->getContainer()->get($serviceId);
+        if ($service instanceof TaggablePoolInterface) {
+            $service->clear([$type]);
+        } else {
+            $service->clear();
+        }
     }
 }

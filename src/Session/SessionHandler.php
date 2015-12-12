@@ -11,10 +11,11 @@
 
 namespace Cache\CacheBundle\Session;
 
+use Cache\Taggable\TaggablePoolInterface;
 use Psr\Cache\CacheItemPoolInterface;
 
 /**
- * Class SessionHandler
+ * Class SessionHandler.
  *
  * @author Aaron Scherer <aequasi@gmail.com>
  */
@@ -26,7 +27,7 @@ class SessionHandler implements \SessionHandlerInterface
     private $cache;
 
     /**
-     * @var integer Time to live in seconds
+     * @var int Time to live in seconds
      */
     private $ttl;
 
@@ -43,7 +44,7 @@ class SessionHandler implements \SessionHandlerInterface
      *  * expiretime: The time to live in seconds
      *
      * @param CacheItemPoolInterface $cache   A Cache instance
-     * @param array $options An associative array of cache options
+     * @param array                  $options An associative array of cache options
      *
      * @throws \InvalidArgumentException When unsupported options are passed
      */
@@ -51,12 +52,12 @@ class SessionHandler implements \SessionHandlerInterface
     {
         $this->cache = $cache;
 
-        $this->ttl    = isset($options['ttl']) ? (int) $options['ttl'] : 86400;
+        $this->ttl = isset($options['ttl']) ? (int) $options['ttl'] : 86400;
         $this->prefix = isset($options['prefix']) ? $options['prefix'] : 'sf2ses_';
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function open($savePath, $sessionName)
     {
@@ -64,7 +65,7 @@ class SessionHandler implements \SessionHandlerInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function close()
     {
@@ -72,11 +73,11 @@ class SessionHandler implements \SessionHandlerInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function read($sessionId)
     {
-        $item = $this->cache->getItem($this->prefix.$sessionId);
+        $item = $this->getCacheItem($sessionId);
         if ($item->isHit()) {
             return $item->get();
         }
@@ -85,11 +86,11 @@ class SessionHandler implements \SessionHandlerInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function write($sessionId, $data)
     {
-        $item = $this->cache->getItem($this->prefix . $sessionId);
+        $item = $this->getCacheItem($sessionId);
         $item->set($data)
             ->expiresAfter($this->ttl);
 
@@ -97,19 +98,37 @@ class SessionHandler implements \SessionHandlerInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function destroy($sessionId)
     {
-        return $this->cache->deleteItem($this->prefix . $sessionId);
+        if ($this->cache instanceof TaggablePoolInterface) {
+            return $this->cache->deleteItem($this->prefix.$sessionId, ['session']);
+        }
+
+        return $this->cache->deleteItem($this->prefix.$sessionId);
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function gc($lifetime)
     {
         // not required here because cache will auto expire the records anyhow.
         return true;
+    }
+
+    /**
+     * @param $sessionId
+     *
+     * @return \Psr\Cache\CacheItemInterface
+     */
+    private function getCacheItem($sessionId)
+    {
+        if ($this->cache instanceof TaggablePoolInterface) {
+            return $this->cache->getItem($this->prefix.$sessionId, ['session']);
+        }
+
+        return $this->cache->getItem($this->prefix.$sessionId);
     }
 }
