@@ -19,13 +19,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 
 /**
- * Class CacheFlushCommand
+ * Class CacheFlushCommand.
  *
  * @author Aaron Scherer <aequasi@gmail.com>
  */
 class CacheFlushCommand extends ContainerAwareCommand
 {
-
     /**
      * {@inheritdoc}
      */
@@ -41,12 +40,28 @@ class CacheFlushCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $validTypes = ['session', 'routing', 'doctrine'];
+        $validTypes = ['session', 'routing', 'doctrine', 'all'];
         $type = $input->getArgument('type');
         if (!in_array($type, $validTypes)) {
             $output->writeln(sprintf('Type "%s" does not exist. Valid type are: %s', $type, implode(',', $validTypes)));
         }
 
+        if ($type === 'all') {
+            foreach (['session', 'routing', 'doctrine'] as $type) {
+                $this->clearCacheForType($type);
+            }
+        } else {
+            $this->clearCacheForType($type);
+        }
+    }
+
+    /**
+     * Clear the cache for a type.
+     *
+     * @param string $type
+     */
+    private function clearCacheForType($type)
+    {
         $serviceId = $this->getContainer()->getParameter(sprintf('cache.%s%.service_id', $type));
 
         /** @var CacheItemPoolInterface $service */
