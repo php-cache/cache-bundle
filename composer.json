@@ -2,7 +2,13 @@
     "name":         "cache/cache-bundle",
     "type":         "library",
     "description":  "Symfony 2 bundle providing PSR-6 compliant cache services for the user. Many other features.",
-    "keywords":     ["cache", "psr6", "doctrine", "router", "session"],
+    "keywords":     [
+        "cache",
+        "psr6",
+        "doctrine",
+        "router",
+        "session"
+    ],
     "homepage":     "https://github.com/php-cache/cache-bundle",
     "license":      "MIT",
     "authors":      [
@@ -20,21 +26,15 @@
     "require":      {
         "php":                      "^5.5|^7",
         "symfony/framework-bundle": "^2.7|^3.0",
-        "psr/cache-implementation": "~1.0"
+        "psr/cache-implementation": "~1.0",
+        "psr/cache":                "1.0.x-dev"
     },
     "require-dev":  {
         "phpunit/phpunit":      "^5.1|^4.0",
-        "cache/doctrine-cache": "dev-master",
-        "psr/cache":            "dev-master"
+        "cache/doctrine-cache": "^0.1"
     },
-    "repositories": [
-        {
-            "type": "git",
-            "url":  "https://github.com/php-fig/cache.git"
-        }
-    ],
     "suggest":      {
-        "php-cache/doctrine-adapter-bundle": "A bundle to register PSR-6 complient services based on Doctrine cache"
+        "php-cache/doctrine-adapter-bundle": "A bundle to register PSR-6 compliant services based on Doctrine cache"
     },
     "autoload":     {
         "psr-4": {
