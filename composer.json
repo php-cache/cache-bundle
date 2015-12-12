@@ -24,9 +24,10 @@
         }
     ],
     "require":      {
-        "php":                      "^5.5|^7",
-        "symfony/framework-bundle": "^2.6|^3.0",
-        "psr/cache-implementation": "~1.0"
+        "php":                         "^5.5|^7",
+        "symfony/framework-bundle":    "^2.6|^3.0",
+        "cache/psr-6-doctrine-bridge": "^0.1",
+        "psr/cache-implementation":    "~1.0"
     },
     "require-dev":  {
         "phpunit/phpunit":        "^5.1|^4.0",
