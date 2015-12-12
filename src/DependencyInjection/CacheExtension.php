@@ -11,16 +11,17 @@
 
 namespace Cache\CacheBundle\DependencyInjection;
 
-use Cache\CacheBundle\Cache\LoggingCachePool;
-use Cache\CacheBundle\DataCollector\CacheDataCollector;
+use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\DependencyInjection\Loader;
+
 
 /**
- * Class AequasiCacheExtension
  *
  * @author Aaron Scherer <aequasi@gmail.com>
+ * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
 class CacheExtension extends Extension
 {
@@ -34,10 +35,8 @@ class CacheExtension extends Extension
     {
         $config = $this->processConfiguration(new Configuration(), $configs);
 
-        if ($container->getParameter('kernel.debug')) {
-            $container->register('data_collector.cache', CacheDataCollector::class)
-                ->addTag('data_collector', ['template' => CacheDataCollector::TEMPLATE, 'id' => 'cache']);
-        }
+        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader->load('services.yml');
 
         foreach (['router', 'session', 'doctrine'] as $section) {
             if ($config[$section]['enabled']) {
@@ -45,6 +44,15 @@ class CacheExtension extends Extension
             }
         }
 
+        if ($config['router']['enabled']) {
+            $container->getDefinition('cache.router_listener')->replaceArgument(0, new Reference($config['router']['service_id']));
+        } else {
+            $container->removeDefinition('cache.router_listener');
+        }
+
+        if (!$container->getParameter('kernel.debug')) {
+            $container->removeDefinition('data_collector.cache');
+        }
     }
 
     public function getAlias()
