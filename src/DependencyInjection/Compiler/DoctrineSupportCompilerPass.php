@@ -43,7 +43,7 @@ class DoctrineSupportCompilerPass extends BaseCompilerPass
 
         if (!class_exists('Cache\Bridge\DoctrineCacheBridge')) {
             throw new \Exception(
-                'You need the DoctrineBridge to be able to cache queries, results and metadata. Please run "composer.phar require cache/psr-6-doctrine-bridge" to install the missing dependency.'
+                'You need the DoctrineBridge to be able to cache queries, results and metadata. Please run "composer require cache/psr-6-doctrine-bridge" to install the missing dependency.'
             );
         }
 
