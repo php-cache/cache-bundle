@@ -40,19 +40,24 @@ class CacheFlushCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $validTypes = ['session', 'routing', 'doctrine', 'all'];
+        $validTypes = ['session', 'routing', 'doctrine'];
         $type = $input->getArgument('type');
-        if (!in_array($type, $validTypes)) {
-            $output->writeln(sprintf('Type "%s" does not exist. Valid type are: %s', $type, implode(',', $validTypes)));
-        }
-
         if ($type === 'all') {
-            foreach (['session', 'routing', 'doctrine'] as $type) {
+            foreach ($validTypes as $type) {
                 $this->clearCacheForType($type);
             }
-        } else {
-            $this->clearCacheForType($type);
+
+            return;
         }
+
+        // If not "all", verify that $type is valid
+        if (!in_array($type, $validTypes)) {
+            $output->writeln(sprintf('Type "%s" does not exist. Valid type are: %s', $type, implode(',', $validTypes)));
+
+            return;
+        }
+
+        $this->clearCacheForType($type);
     }
 
     /**
