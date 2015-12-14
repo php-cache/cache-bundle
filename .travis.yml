@@ -15,10 +15,15 @@ matrix:
 
 sudo: false
 
+cache:
+    directories:
+        - vendor
+        - $HOME/.composer/cache
+
 before_script:
     - composer self-update
     - composer require symfony/symfony:${SYMFONY_VERSION} --no-update
-    - composer install --dev --prefer-source --no-interaction
+    - composer install --dev --prefer-dist --no-interaction
 
 script:
     - php vendor/bin/phpunit
