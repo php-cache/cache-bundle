@@ -66,13 +66,14 @@ class DoctrineSupportCompilerPass extends BaseCompilerPass
                     continue;
                 }
 
+                // Doctrine can't talk to a PSR-6 cache, so we need a bridge
                 $bridgeServiceId = sprintf('cache.provider.doctrine.%s.bridge', $cacheType);
                 $bridgeDef = $this->container->register($bridgeServiceId, DoctrineCacheBridge::class);
                 $bridgeDef->addArgument(0, new Reference($cacheData['service_id']))
                     ->setPublic(false);
 
                 foreach ($cacheData[$type] as $manager) {
-                    $doctrineDefinitionName =
+                    $doctrineDefinitionId =
                         sprintf(
                             "doctrine.%s.%s_%s_cache",
                             ($type == 'entity_managers' ? 'orm' : 'odm'),
@@ -81,7 +82,7 @@ class DoctrineSupportCompilerPass extends BaseCompilerPass
                         );
 
                     // Replace the doctrine entity manager cache with our bridge
-                    $this->container->setAlias($doctrineDefinitionName, $bridgeServiceId);
+                    $this->container->setAlias($doctrineDefinitionId, $bridgeServiceId);
                 }
             }
         }
