@@ -16,7 +16,7 @@ use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 /**
- * Class Configuration
+ * Class Configuration.
  *
  * @author Aaron Scherer <aequasi@gmail.com>
  */
@@ -42,7 +42,7 @@ class Configuration implements ConfigurationInterface
     }
 
     /**
-     * Configure the "cache.session" section
+     * Configure the "cache.session" section.
      *
      * @return ArrayNodeDefinition
      */
@@ -59,17 +59,16 @@ class Configuration implements ConfigurationInterface
                 ->end()
                 ->scalarNode('service_id')->isRequired()->end()
                 ->scalarNode('prefix')
-                    ->defaultValue("session_")
+                    ->defaultValue('session_')
                 ->end()
                 ->scalarNode('ttl')->end()
-            ->end()
-        ;
+            ->end();
 
         return $node;
     }
 
     /**
-     * Configure the "cache.doctrine" section
+     * Configure the "cache.doctrine" section.
      *
      * @return ArrayNodeDefinition
      */
@@ -85,10 +84,9 @@ class Configuration implements ConfigurationInterface
                     ->defaultFalse()
                     ->isRequired()
                 ->end()
-            ->end()
-        ;
+            ->end();
 
-        $types = array('metadata', 'result', 'query');
+        $types = ['metadata', 'result', 'query'];
         foreach ($types as $type) {
             $node->children()
                     ->arrayNode($type)
@@ -96,7 +94,7 @@ class Configuration implements ConfigurationInterface
                         ->children()
                             ->scalarNode('service_id')->isRequired()->end()
                             ->arrayNode('entity_managers')
-                                ->defaultValue(array())
+                                ->defaultValue([])
                                 ->beforeNormalization()
                                     ->ifString()
                                     ->then(
@@ -108,7 +106,7 @@ class Configuration implements ConfigurationInterface
                                     ->prototype('scalar')->end()
                                 ->end()
                             ->arrayNode('document_managers')
-                                ->defaultValue(array())
+                                ->defaultValue([])
                                 ->beforeNormalization()
                                     ->ifString()
                                     ->then(
@@ -127,7 +125,7 @@ class Configuration implements ConfigurationInterface
     }
 
     /**
-     * Configure the "cache.router" section
+     * Configure the "cache.router" section.
      *
      * @return ArrayNodeDefinition
      */

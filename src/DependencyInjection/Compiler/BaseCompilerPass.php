@@ -15,19 +15,19 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
- * Class BaseCompilerPass
+ * Class BaseCompilerPass.
  *
  * @author Aaron Scherer <aequasi@gmail.com>
  */
 abstract class BaseCompilerPass implements CompilerPassInterface
 {
     /**
-     * @var ContainerBuilder
+     * @type ContainerBuilder
      */
     protected $container;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function process(ContainerBuilder $container)
     {
