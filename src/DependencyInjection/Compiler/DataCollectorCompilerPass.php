@@ -15,7 +15,7 @@ use Cache\CacheBundle\Cache\LoggingCachePool;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Class DataCollectorCompilerPass
+ * Class DataCollectorCompilerPass.
  *
  * @author Aaron Scherer <aequasi@gmail.com>
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
@@ -23,12 +23,12 @@ use Symfony\Component\DependencyInjection\Reference;
 class DataCollectorCompilerPass extends BaseCompilerPass
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     protected function prepare()
     {
         $collectorDefinition = $this->container->getDefinition('data_collector.cache');
-        $serviceIds = $this->container->findTaggedServiceIds('cache.provider');
+        $serviceIds          = $this->container->findTaggedServiceIds('cache.provider');
 
         foreach (array_keys($serviceIds) as $id) {
 

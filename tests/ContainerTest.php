@@ -12,7 +12,7 @@
 namespace Cache\CacheBundle\Tests;
 
 /**
- * Class ContainerTest
+ * Class ContainerTest.
  *
  * @author Aaron Scherer <aequasi@gmail.com>
  */
