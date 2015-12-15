@@ -12,33 +12,32 @@
 namespace Cache\CacheBundle\DataCollector;
 
 use Cache\CacheBundle\Cache\LoggingCachePool;
-use Cache\CacheBundle\Service\CacheService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 
 /**
- * Class CacheDataCollector
+ * Class CacheDataCollector.
  *
  * @author Aaron Scherer <aequasi@gmail.com>
  */
 class CacheDataCollector extends DataCollector
 {
     /**
-     * Template name
+     * Template name.
      *
      * @type string
      */
     const TEMPLATE = 'CacheBundle:Collector:cache.html.twig';
 
     /**
-     * @var LoggingCachePool[]
+     * @type LoggingCachePool[]
      */
     private $instances = [];
 
     /**
-     * @param                               $name
-     * @param LoggingCachePool              $instance
+     * @param                  $name
+     * @param LoggingCachePool $instance
      */
     public function addInstance($name, LoggingCachePool $instance)
     {
@@ -59,7 +58,7 @@ class CacheDataCollector extends DataCollector
         $empty      = ['calls' => [], 'config' => [], 'options' => [], 'statistics' => []];
         $this->data = ['instances' => $empty, 'total' => $empty];
         foreach ($this->instances as $name => $instance) {
-            $calls = $instance->getCalls();
+            $calls                                   = $instance->getCalls();
             $this->data['instances']['calls'][$name] = $calls;
         }
         $this->data['instances']['statistics'] = $this->calculateStatistics();
@@ -79,7 +78,7 @@ class CacheDataCollector extends DataCollector
     }
 
     /**
-     * Method returns amount of logged Cache reads: "get" calls
+     * Method returns amount of logged Cache reads: "get" calls.
      *
      * @return array
      */
@@ -89,7 +88,7 @@ class CacheDataCollector extends DataCollector
     }
 
     /**
-     * Method returns the statistic totals
+     * Method returns the statistic totals.
      *
      * @return array
      */
@@ -99,7 +98,7 @@ class CacheDataCollector extends DataCollector
     }
 
     /**
-     * Method returns all logged Cache call objects
+     * Method returns all logged Cache call objects.
      *
      * @return mixed
      */
@@ -122,24 +121,24 @@ class CacheDataCollector extends DataCollector
                 'hits'    => 0,
                 'misses'  => 0,
                 'writes'  => 0,
-                'deletes' => 0
+                'deletes' => 0,
             ];
             foreach ($calls as $call) {
                 $statistics[$name]['calls'] += 1;
                 $statistics[$name]['time'] += $call->time;
-                if ($call->name == 'fetch') {
+                if ($call->name === 'fetch') {
                     $statistics[$name]['reads'] += 1;
                     if ($call->result !== false) {
                         $statistics[$name]['hits'] += 1;
                     } else {
                         $statistics[$name]['misses'] += 1;
                     }
-                } elseif ($call->name == 'contains' && $call->result === false) {
+                } elseif ($call->name === 'contains' && $call->result === false) {
                     $statistics[$name]['reads'] += 1;
                     $statistics[$name]['misses'] += 1;
-                } elseif ($call->name == 'save') {
+                } elseif ($call->name === 'save') {
                     $statistics[$name]['writes'] += 1;
-                } elseif ($call->name == 'delete') {
+                } elseif ($call->name === 'delete') {
                     $statistics[$name]['deletes'] += 1;
                 }
             }

@@ -1,13 +1,20 @@
 <?php
 
+/*
+ * This file is part of php-cache\cache-bundle package.
+ *
+ * (c) 2015-2015 Aaron Scherer <aequasi@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace Cache\CacheBundle\Routing;
 
 use Cache\Taggable\TaggablePoolInterface;
 use Psr\Cache\CacheItemPoolInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
@@ -15,12 +22,12 @@ use Symfony\Component\HttpKernel\KernelEvents;
 class RouterListener
 {
     /**
-     * @var CacheItemPoolInterface
+     * @type CacheItemPoolInterface
      */
     private $cache;
 
     /**
-     * @var int
+     * @type int
      */
     private $ttl;
 
@@ -92,7 +99,7 @@ class RouterListener
      */
     private function createCacheKey(Request $request)
     {
-        $key = sprintf('route:%s:%s:%s',$request->getMethod(),$request->getHost(),$request->getPathInfo());
+        $key = sprintf('route:%s:%s:%s', $request->getMethod(), $request->getHost(), $request->getPathInfo());
 
         // This might be optional
         //$key.=':'.$this->implodeRecursive('|', $request->query->all());
@@ -109,11 +116,11 @@ class RouterListener
     private function implodeRecursive($separator, array $array)
     {
         $output = '';
-        foreach ($array as $key=>$value) {
+        foreach ($array as $key => $value) {
             if (is_array($value)) {
-                $output.=sprintf('%s%s[%s]', $separator, $key, $this->implodeRecursive($separator, $value));
+                $output .= sprintf('%s%s[%s]', $separator, $key, $this->implodeRecursive($separator, $value));
             } else {
-                $output.=$separator.$value;
+                $output .= $separator.$value;
             }
         }
 

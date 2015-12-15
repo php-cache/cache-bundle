@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Class SessionSupportCompilerPass
+ * Class SessionSupportCompilerPass.
  *
  * @author Aaron Scherer <aequasi@gmail.com>
  */
@@ -35,14 +35,14 @@ class SessionSupportCompilerPass extends BaseCompilerPass
 
         // If there is no active session support, throw
         if (!$this->container->hasAlias('session.storage')) {
-            throw new \Exception("Session cache support cannot be enabled if there is no session.storage service");
+            throw new \Exception('Session cache support cannot be enabled if there is no session.storage service');
         }
 
         $this->enableSessionSupport($this->container->getParameter($this->getAlias().'.session'));
     }
 
     /**
-     * Enables session support for memcached
+     * Enables session support for memcached.
      *
      * @param array $config Configuration for bundle
      *

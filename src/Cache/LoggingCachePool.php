@@ -13,7 +13,6 @@ namespace Cache\CacheBundle\Cache;
 
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
-use Psr\Cache\InvalidArgumentException;
 
 /**
  * @author Aaron Scherer <aequasi@gmail.com>
@@ -21,7 +20,7 @@ use Psr\Cache\InvalidArgumentException;
 class LoggingCachePool implements CacheItemPoolInterface
 {
     /**
-     * @var array $calls
+     * @type array
      */
     private $calls = [];
 
@@ -91,7 +90,7 @@ class LoggingCachePool implements CacheItemPoolInterface
         $result = call_user_func_array([$this->cachePool, $name], $arguments);
         $time   = microtime(true) - $start;
 
-        $object = (object)compact('name', 'arguments', 'start', 'time', 'result');
+        $object = (object) compact('name', 'arguments', 'start', 'time', 'result');
 
         return $object;
     }

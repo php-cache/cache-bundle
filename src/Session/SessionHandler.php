@@ -22,17 +22,17 @@ use Psr\Cache\CacheItemPoolInterface;
 class SessionHandler implements \SessionHandlerInterface
 {
     /**
-     * @var CacheItemPoolInterface Cache driver.
+     * @type CacheItemPoolInterface Cache driver.
      */
     private $cache;
 
     /**
-     * @var int Time to live in seconds
+     * @type int Time to live in seconds
      */
     private $ttl;
 
     /**
-     * @var string Key prefix for shared environments.
+     * @type string Key prefix for shared environments.
      */
     private $prefix;
 
@@ -48,11 +48,11 @@ class SessionHandler implements \SessionHandlerInterface
      *
      * @throws \InvalidArgumentException When unsupported options are passed
      */
-    public function __construct(CacheItemPoolInterface $cache, array $options = array())
+    public function __construct(CacheItemPoolInterface $cache, array $options = [])
     {
         $this->cache = $cache;
 
-        $this->ttl = isset($options['ttl']) ? (int) $options['ttl'] : 86400;
+        $this->ttl    = isset($options['ttl']) ? (int) $options['ttl'] : 86400;
         $this->prefix = isset($options['prefix']) ? $options['prefix'] : 'sf2ses_';
     }
 

@@ -11,19 +11,19 @@
 
 namespace Cache\CacheBundle;
 
-use Symfony\Component\HttpKernel\Bundle\Bundle;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Cache\CacheBundle\DependencyInjection\Compiler;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
- * Class AequasiCacheBundle
+ * Class AequasiCacheBundle.
  *
  * @author Aaron Scherer <aequasi@gmail.com>
  */
 class CacheBundle extends Bundle
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function build(ContainerBuilder $container)
     {
