@@ -17,7 +17,6 @@ sudo: false
 
 cache:
     directories:
-        - vendor
         - $HOME/.composer/cache
 
 before_script:
