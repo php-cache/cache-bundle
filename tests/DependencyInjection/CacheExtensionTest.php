@@ -12,17 +12,14 @@
 namespace Cache\CacheBundle\Tests\DependencyInjection;
 
 use Cache\CacheBundle\Tests\TestCase;
-use Aequasi\Cache\DoctrineCacheBridge;
-use Psr\Cache\CacheItemPoolInterface;
 
 /**
- * Class CacheExtensionTest
+ * Class CacheExtensionTest.
  *
  * @author Aaron Scherer <aequasi@gmail.com>
  */
 class CacheExtensionTest extends TestCase
 {
-
     /**
      *
      */

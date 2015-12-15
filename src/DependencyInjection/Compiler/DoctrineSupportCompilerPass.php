@@ -13,11 +13,10 @@ namespace Cache\CacheBundle\DependencyInjection\Compiler;
 
 use Cache\Bridge\DoctrineCacheBridge;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Class DoctrineSupportCompilerPass
+ * Class DoctrineSupportCompilerPass.
  *
  * @author Aaron Scherer <aequasi@gmail.com>
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
@@ -25,8 +24,9 @@ use Symfony\Component\DependencyInjection\Reference;
 class DoctrineSupportCompilerPass extends BaseCompilerPass
 {
     /**
-     * @return void
      * @throws \Exception
+     *
+     * @return void
      */
     protected function prepare()
     {
@@ -37,7 +37,7 @@ class DoctrineSupportCompilerPass extends BaseCompilerPass
 
         if (!$this->hasDoctrine()) {
             throw new \Exception(
-                "Not able to find any doctrine caches to implement. Ensure you have Doctrine ORM or ODM"
+                'Not able to find any doctrine caches to implement. Ensure you have Doctrine ORM or ODM'
             );
         }
 
@@ -68,15 +68,15 @@ class DoctrineSupportCompilerPass extends BaseCompilerPass
 
                 // Doctrine can't talk to a PSR-6 cache, so we need a bridge
                 $bridgeServiceId = sprintf('cache.provider.doctrine.%s.bridge', $cacheType);
-                $bridgeDef = $this->container->register($bridgeServiceId, DoctrineCacheBridge::class);
+                $bridgeDef       = $this->container->register($bridgeServiceId, DoctrineCacheBridge::class);
                 $bridgeDef->addArgument(0, new Reference($cacheData['service_id']))
                     ->setPublic(false);
 
                 foreach ($cacheData[$type] as $manager) {
                     $doctrineDefinitionId =
                         sprintf(
-                            "doctrine.%s.%s_%s_cache",
-                            ($type == 'entity_managers' ? 'orm' : 'odm'),
+                            'doctrine.%s.%s_%s_cache',
+                            ($type === 'entity_managers' ? 'orm' : 'odm'),
                             $manager,
                             $cacheType
                         );
@@ -89,7 +89,7 @@ class DoctrineSupportCompilerPass extends BaseCompilerPass
     }
 
     /**
-     * Checks to see if there are ORM's or ODM's
+     * Checks to see if there are ORM's or ODM's.
      *
      * @return bool
      */

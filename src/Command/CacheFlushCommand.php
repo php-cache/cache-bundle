@@ -14,9 +14,9 @@ namespace Cache\CacheBundle\Command;
 use Cache\Taggable\TaggablePoolInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Input\InputArgument;
 
 /**
  * Class CacheFlushCommand.
@@ -41,7 +41,7 @@ class CacheFlushCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $validTypes = ['session', 'routing', 'doctrine'];
-        $type = $input->getArgument('type');
+        $type       = $input->getArgument('type');
         if ($type === 'all') {
             foreach ($validTypes as $type) {
                 $this->clearCacheForType($type);
@@ -69,7 +69,7 @@ class CacheFlushCommand extends ContainerAwareCommand
     {
         $serviceId = $this->getContainer()->getParameter(sprintf('cache.%s%.service_id', $type));
 
-        /** @var CacheItemPoolInterface $service */
+        /** @type CacheItemPoolInterface $service */
         $service = $this->getContainer()->get($serviceId);
         if ($service instanceof TaggablePoolInterface) {
             $service->clear([$type]);

@@ -12,27 +12,26 @@
 namespace Cache\CacheBundle\Tests;
 
 use Cache\CacheBundle\DependencyInjection\CacheExtension;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
-use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 /**
- * Class TestCase
+ * Class TestCase.
  *
  * @author Aaron Scherer <aequasi@gmail.com>
  */
 class TestCase extends \PHPUnit_Framework_TestCase
 {
-
     /**
      * @param ContainerBuilder $container
      * @param string           $file
      */
     protected function loadFromFile(ContainerBuilder $container, $file)
     {
-        $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/Fixtures'));
-        $loader->load($file . '.yml');
+        $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/Fixtures'));
+        $loader->load($file.'.yml');
     }
 
     /**
@@ -40,17 +39,17 @@ class TestCase extends \PHPUnit_Framework_TestCase
      *
      * @return ContainerBuilder
      */
-    protected function createContainer(array $data = array())
+    protected function createContainer(array $data = [])
     {
         return new ContainerBuilder(new ParameterBag(array_merge(
-            array(
-                'kernel.bundles'     => array('FrameworkBundle' => 'Symfony\\Bundle\\FrameworkBundle\\FrameworkBundle'),
+            [
+                'kernel.bundles'     => ['FrameworkBundle' => 'Symfony\\Bundle\\FrameworkBundle\\FrameworkBundle'],
                 'kernel.cache_dir'   => __DIR__,
                 'kernel.debug'       => false,
                 'kernel.environment' => 'test',
                 'kernel.name'        => 'kernel',
                 'kernel.root_dir'    => __DIR__,
-            ),
+            ],
             $data
         )));
     }
@@ -61,16 +60,16 @@ class TestCase extends \PHPUnit_Framework_TestCase
      *
      * @return ContainerBuilder
      */
-    protected function createContainerFromFile($file, $data = array())
+    protected function createContainerFromFile($file, $data = [])
     {
         $container = $this->createContainer($data);
         $container->registerExtension(new CacheExtension());
         $this->loadFromFile($container, $file);
 
         $container->getCompilerPassConfig()
-            ->setOptimizationPasses(array());
+            ->setOptimizationPasses([]);
         $container->getCompilerPassConfig()
-            ->setRemovingPasses(array());
+            ->setRemovingPasses([]);
         $container->compile();
 
         return $container;

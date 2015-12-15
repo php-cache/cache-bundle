@@ -13,20 +13,18 @@ namespace Cache\CacheBundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
-use Symfony\Component\DependencyInjection\Loader;
-
 
 /**
- *
  * @author Aaron Scherer <aequasi@gmail.com>
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
 class CacheExtension extends Extension
 {
     /**
-     * Loads the configs for Cache and puts data into the container
+     * Loads the configs for Cache and puts data into the container.
      *
      * @param array            $configs   Array of configs
      * @param ContainerBuilder $container Container Object
