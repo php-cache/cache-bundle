@@ -43,7 +43,9 @@ class CacheExtension extends Extension
         }
 
         if ($config['router']['enabled']) {
-            $container->getDefinition('cache.router_listener')->replaceArgument(0, new Reference($config['router']['service_id']));
+            $container->getDefinition('cache.router_listener')
+                ->replaceArgument(0, new Reference($config['router']['service_id']))
+                ->replaceArgument(1, $config['router']['ttl']);
         } else {
             $container->removeDefinition('cache.router_listener');
         }
