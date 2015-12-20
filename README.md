@@ -1,5 +1,5 @@
 # PHP-Cache cache-bundle 
-[![Build Status](https://travis-ci.org/php-cache/cache-bundle.png?branch=master)](https://travis-ci.org/php-cache/cache-bundle)
+[![Build Status](https://travis-ci.org/php-cache/cache-bundle.png?branch=master)](https://travis-ci.org/php-cache/cache-bundle) [![SensioLabsInsight](https://insight.sensiolabs.com/projects/ea12a1b3-09c9-4f0a-9a2c-63d72b47db5a/mini.png)](https://insight.sensiolabs.com/projects/ea12a1b3-09c9-4f0a-9a2c-63d72b47db5a)
 
 #### Cache Bundle for Symfony 2.6 and above
 
