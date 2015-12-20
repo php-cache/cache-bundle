@@ -32,15 +32,12 @@ class DataCollectorCompilerPass extends BaseCompilerPass
 
         foreach (array_keys($serviceIds) as $id) {
 
-            // Duplicating definition to $originalServiceId.logged
-            $this->container->setDefinition($id.'.logged', $this->container->findDefinition($id));
-
             // Creating a LoggingCachePool instance, and passing it the new definition from above
             $def = $this->container->register($id.'.logger', LoggingCachePool::class);
-            $def->addArgument(new Reference($id.'.logged'));
+            $def->addArgument(new Reference($id.'.logger.inner'))
+                ->setDecoratedService($id, null, 10);
 
-            // Overwrite the original service id with the new LoggingCachePool instance
-            $this->container->setAlias($id, $id.'.logger');
+            // Tell the collector to add the new logger
             $collectorDefinition->addMethodCall('addInstance', [$id, new Reference($id.'.logger')]);
         }
     }

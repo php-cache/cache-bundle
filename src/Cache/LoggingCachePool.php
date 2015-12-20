@@ -11,13 +11,14 @@
 
 namespace Cache\CacheBundle\Cache;
 
+use Cache\Taggable\TaggablePoolInterface;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 
 /**
  * @author Aaron Scherer <aequasi@gmail.com>
  */
-class LoggingCachePool implements CacheItemPoolInterface
+class LoggingCachePool implements CacheItemPoolInterface, TaggablePoolInterface
 {
     /**
      * @type array
@@ -39,45 +40,6 @@ class LoggingCachePool implements CacheItemPoolInterface
         $this->cachePool = $cachePool;
     }
 
-    public function getItem($key)
-    {
-        $call         = $this->timeCall(__FUNCTION__, [$key]);
-        $result       = $call->result;
-        $call->result = sprintf('<DATA:%s>', gettype($result));
-
-        $this->calls[] = $call;
-
-        return $result;
-    }
-
-    public function hasItem($key)
-    {
-        $call          = $this->timeCall(__FUNCTION__, [$key]);
-        $this->calls[] = $call;
-
-        return $call->result;
-    }
-
-    public function deleteItem($key)
-    {
-        $call          = $this->timeCall(__FUNCTION__, [$key]);
-        $this->calls[] = $call;
-
-        return $call->result;
-    }
-
-    public function save(CacheItemInterface $item)
-    {
-        $itemClone = clone $item;
-        $itemClone->set(sprintf('<DATA:%s', gettype($item->get())));
-
-        $call            = $this->timeCall(__FUNCTION__, [$item]);
-        $call->arguments = ['<CacheItem>', $itemClone];
-        $this->calls[]   = $call;
-
-        return $call->result;
-    }
-
     /**
      * @param string $name
      * @param array  $arguments
@@ -95,9 +57,53 @@ class LoggingCachePool implements CacheItemPoolInterface
         return $object;
     }
 
-    public function getItems(array $keys = [])
+    public function getItem($key, array $tags = [])
     {
-        $call         = $this->timeCall(__FUNCTION__, [$keys]);
+        $call         = $this->timeCall(__FUNCTION__, [$key, $tags]);
+        $result       = $call->result;
+
+        if ($result->isHit()) {
+            $call->result = sprintf('<DATA:%s>', gettype($result->get()));
+        } else {
+            $call->result = false;
+        }
+
+        $this->calls[] = $call;
+
+        return $result;
+    }
+
+    public function hasItem($key, array $tags = [])
+    {
+        $call          = $this->timeCall(__FUNCTION__, [$key, $tags]);
+        $this->calls[] = $call;
+
+        return $call->result;
+    }
+
+    public function deleteItem($key, array $tags = [])
+    {
+        $call          = $this->timeCall(__FUNCTION__, [$key, $tags]);
+        $this->calls[] = $call;
+
+        return $call->result;
+    }
+
+    public function save(CacheItemInterface $item)
+    {
+        $itemClone = clone $item;
+        $itemClone->set(sprintf('<DATA:%s', gettype($item->get())));
+
+        $call            = $this->timeCall(__FUNCTION__, [$item]);
+        $call->arguments = ['<CacheItem>', $itemClone];
+        $this->calls[]   = $call;
+
+        return $call->result;
+    }
+
+    public function getItems(array $keys = [], array $tags = [])
+    {
+        $call         = $this->timeCall(__FUNCTION__, [$keys, $tags]);
         $result       = $call->result;
         $call->result = sprintf('<DATA:%s>', gettype($result));
 
@@ -106,17 +112,17 @@ class LoggingCachePool implements CacheItemPoolInterface
         return $result;
     }
 
-    public function clear()
+    public function clear(array $tags = [])
     {
-        $call          = $this->timeCall(__FUNCTION__);
+        $call          = $this->timeCall(__FUNCTION__, [$tags]);
         $this->calls[] = $call;
 
         return $call->result;
     }
 
-    public function deleteItems(array $keys)
+    public function deleteItems(array $keys, array $tags = [])
     {
-        $call          = $this->timeCall(__FUNCTION__, [$keys]);
+        $call          = $this->timeCall(__FUNCTION__, [$keys, $tags]);
         $this->calls[] = $call;
 
         return $call->result;

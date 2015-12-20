@@ -58,9 +58,9 @@ class CacheDataCollector extends DataCollector
         $empty      = ['calls' => [], 'config' => [], 'options' => [], 'statistics' => []];
         $this->data = ['instances' => $empty, 'total' => $empty];
         foreach ($this->instances as $name => $instance) {
-            $calls                                   = $instance->getCalls();
-            $this->data['instances']['calls'][$name] = $calls;
+            $this->data['instances']['calls'][$name] = $instance->getCalls();
         }
+
         $this->data['instances']['statistics'] = $this->calculateStatistics();
         $this->data['total']['statistics']     = $this->calculateTotalStatistics();
     }
@@ -126,19 +126,21 @@ class CacheDataCollector extends DataCollector
             foreach ($calls as $call) {
                 $statistics[$name]['calls'] += 1;
                 $statistics[$name]['time'] += $call->time;
-                if ($call->name === 'fetch') {
+                if ($call->name === 'getItem') {
                     $statistics[$name]['reads'] += 1;
                     if ($call->result !== false) {
                         $statistics[$name]['hits'] += 1;
                     } else {
                         $statistics[$name]['misses'] += 1;
                     }
-                } elseif ($call->name === 'contains' && $call->result === false) {
+                } elseif ($call->name === 'hasItem') {
                     $statistics[$name]['reads'] += 1;
-                    $statistics[$name]['misses'] += 1;
+                    if ($call->result === false) {
+                        $statistics[$name]['misses'] += 1;
+                    }
                 } elseif ($call->name === 'save') {
                     $statistics[$name]['writes'] += 1;
-                } elseif ($call->name === 'delete') {
+                } elseif ($call->name === 'deleteItem') {
                     $statistics[$name]['deletes'] += 1;
                 }
             }
