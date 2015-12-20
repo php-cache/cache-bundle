@@ -115,6 +115,7 @@ cache:
   router:
     enabled: true
     service_id: cache.provider.acme_redis_cache
+    ttl: 86400
 ```
 
 If you change any of your routes, you will need to clear the cache. If you use a cache implementation that supports 
