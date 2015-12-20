@@ -27,7 +27,7 @@ class DataCollectorCompilerPass extends BaseCompilerPass
      */
     protected function prepare()
     {
-        $collectorDefinition = $this->container->getDefinition('data_collector.cache');
+        $collectorDefinition = $this->container->getDefinition('cache.data_collector');
         $serviceIds          = $this->container->findTaggedServiceIds('cache.provider');
 
         foreach (array_keys($serviceIds) as $id) {

@@ -34,8 +34,8 @@ class CacheExtension extends Extension
         $config = $this->processConfiguration(new Configuration(), $configs);
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
-        $loader->load('services.yml');
 
+        // Make sure config values are in the parameters
         foreach (['router', 'session', 'doctrine'] as $section) {
             if ($config[$section]['enabled']) {
                 $container->setParameter('cache.'.$section, $config[$section]);
@@ -43,15 +43,15 @@ class CacheExtension extends Extension
         }
 
         if ($config['router']['enabled']) {
-            $container->getDefinition('cache.router_listener')
+            $loader->load('router.yml');
+            $container->getDefinition('cache.router')
+                ->setDecoratedService('router', null, 10)
                 ->replaceArgument(0, new Reference($config['router']['service_id']))
-                ->replaceArgument(1, $config['router']['ttl']);
-        } else {
-            $container->removeDefinition('cache.router_listener');
+                ->replaceArgument(2, $config['router']['ttl']);
         }
 
-        if (!$container->getParameter('kernel.debug')) {
-            $container->removeDefinition('data_collector.cache');
+        if ($container->getParameter('kernel.debug')) {
+            $loader->load('data-collector.yml');
         }
     }
 
