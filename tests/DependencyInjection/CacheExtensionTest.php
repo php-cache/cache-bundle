@@ -27,19 +27,11 @@ class CacheExtensionTest extends TestCase
     {
         $container = $this->createContainerFromFile('router');
 
-        $config = $container->getParameter($this->getAlias().'.router');
+        $config = $container->getParameter('cache.router');
 
         $this->assertTrue(isset($config['enabled']));
 
         $this->assertTrue($config['enabled']);
         $this->assertEquals($config['service_id'], 'default');
-    }
-
-    /**
-     * @return string
-     */
-    private function getAlias()
-    {
-        return 'cache';
     }
 }
