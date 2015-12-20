@@ -84,6 +84,9 @@ class Configuration implements ConfigurationInterface
                     ->defaultFalse()
                     ->isRequired()
                 ->end()
+                ->booleanNode('use_tagging')
+                    ->defaultTrue()
+                ->end()
             ->end();
 
         $types = ['metadata', 'result', 'query'];
