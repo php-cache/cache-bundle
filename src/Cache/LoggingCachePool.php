@@ -61,11 +61,13 @@ class LoggingCachePool implements CacheItemPoolInterface, TaggablePoolInterface
     {
         $call         = $this->timeCall(__FUNCTION__, [$key, $tags]);
         $result       = $call->result;
+        $call->isHit  = $result->isHit();
 
-        if ($result->isHit()) {
-            $call->result = sprintf('<DATA:%s>', gettype($result->get()));
+        // Display the result in a good way depending on the data type
+        if ($call->isHit) {
+            $call->result = $this->getValueRepresentation($result->get());
         } else {
-            $call->result = false;
+            $call->result = null;
         }
 
         $this->calls[] = $call;
@@ -91,11 +93,11 @@ class LoggingCachePool implements CacheItemPoolInterface, TaggablePoolInterface
 
     public function save(CacheItemInterface $item)
     {
-        $itemClone = clone $item;
-        $itemClone->set(sprintf('<DATA:%s', gettype($item->get())));
+        $key   = $item->getKey();
+        $value = $this->getValueRepresentation($item->get());
 
         $call            = $this->timeCall(__FUNCTION__, [$item]);
-        $call->arguments = ['<CacheItem>', $itemClone];
+        $call->arguments = ['<CacheItem>', $key, $value];
         $this->calls[]   = $call;
 
         return $call->result;
@@ -154,5 +156,28 @@ class LoggingCachePool implements CacheItemPoolInterface, TaggablePoolInterface
     public function getCalls()
     {
         return $this->calls;
+    }
+
+    /**
+     * Get a string to represent the value.
+     *
+     * @param mixed $value
+     *
+     * @return string
+     */
+    private function getValueRepresentation($value)
+    {
+        $type = gettype($value);
+        if (in_array($type, ['boolean', 'integer', 'double', 'string', 'NULL'])) {
+            $rep = $value;
+        } elseif ($type === 'array') {
+            $rep = json_encode($value);
+        } elseif ($type === 'object') {
+            $rep = get_class($value);
+        } else {
+            $rep = sprintf('<DATA:%s>', $type);
+        }
+
+        return $rep;
     }
 }

@@ -9,6 +9,15 @@
 
 {% extends 'WebProfilerBundle:Profiler:layout.html.twig' %}
 
+{% block head %}
+    {{ parent() }}
+    <style>
+        .color-red {
+            color:red;
+        }
+    </style>
+{% endblock head %}
+
 {% block toolbar %}
     {% set icon %}
     <img width="20" height="28" alt="Cache"
@@ -91,8 +100,12 @@
                     <li class="{{ i is odd ? 'odd' : 'even' }}">
                         <div>
                             <strong>Name</strong>: {{ call.name }}<br />
-                            <strong>Arguments</strong>: {{ call.arguments|json_encode() }}<br />
-                            <strong>Results</strong>: {{ call.result|json_encode() }}<br />
+                            <strong>Arguments</strong>: {{ call.arguments|json_encode|truncate(140) }}<br />
+                            <strong>Results</strong>: {% if call.result == false %}
+                                <span class="color-red">Miss</span>
+                            {% else %}
+                                {{ call.result|truncate(140) }}
+                            {% endif %}<br />
                         </div>
                         <small>
                             <strong>Time</strong>: {{ '%0.2f'|format(call.time * 1000) }} ms
