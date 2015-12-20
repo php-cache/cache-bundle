@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of php-cache\cache-bundle package.
+ *
+ * (c) 2015-2015 Aaron Scherer <aequasi@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace Cache\CacheBundle\Cache;
 
 use Cache\Taggable\TaggablePoolInterface;
@@ -15,7 +24,7 @@ use Psr\Cache\CacheItemPoolInterface;
 class DoctrineTaggingCachePool implements CacheItemPoolInterface
 {
     /**
-     * @var CacheItemPoolInterface|TaggablePoolInterface
+     * @type CacheItemPoolInterface|TaggablePoolInterface
      */
     private $cache;
 
@@ -38,7 +47,7 @@ class DoctrineTaggingCachePool implements CacheItemPoolInterface
     /**
      * @{@inheritdoc}
      */
-    public function getItems(array $keys = array())
+    public function getItems(array $keys = [])
     {
         return $this->cache->getItems($keys, ['doctrine']);
     }

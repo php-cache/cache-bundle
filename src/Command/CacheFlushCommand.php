@@ -83,13 +83,13 @@ class CacheFlushCommand extends ContainerAwareCommand
     }
 
     /**
-     * @param $type
-     * @param $serviceId
+     * @param string $type
+     * @param string $serviceId
      */
     private function doClearCache($type, $serviceId)
     {
         /** @type CacheItemPoolInterface $service */
-        $service = $this->getContainer()->get($config['service_id']);
+        $service = $this->getContainer()->get($serviceId);
         if ($service instanceof TaggablePoolInterface) {
             $service->clear([$type]);
         } else {

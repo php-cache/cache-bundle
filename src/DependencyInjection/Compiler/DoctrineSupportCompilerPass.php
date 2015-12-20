@@ -24,8 +24,6 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class DoctrineSupportCompilerPass extends BaseCompilerPass
 {
-
-
     /**
      * @throws \Exception
      *
@@ -96,8 +94,8 @@ class DoctrineSupportCompilerPass extends BaseCompilerPass
      * If we support tagging we use the DoctrineTaggingCachePool.
      *
      * @param string $bridgeServiceId
-     * @param array $cacheData
-     * @param bool $tagging
+     * @param array  $cacheData
+     * @param bool   $tagging
      *
      * @return string
      */
@@ -108,7 +106,7 @@ class DoctrineSupportCompilerPass extends BaseCompilerPass
         }
 
         $taggingServiceId = $bridgeServiceId.'.tagging';
-        $taggingDef= $this->container->register($taggingServiceId, DoctrineTaggingCachePool::class);
+        $taggingDef       = $this->container->register($taggingServiceId, DoctrineTaggingCachePool::class);
         $taggingDef->addArgument(new Reference($cacheData['service_id']))
             ->setPublic(false);
 
