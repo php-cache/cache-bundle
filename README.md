@@ -129,12 +129,14 @@ If you want to clear the cache you can run the following commands.
 
 ```sh
 php app/console cache:flush session
-php app/console cache:flush routing
+php app/console cache:flush router
 php app/console cache:flush doctrine
 
-echo "Or you could run: "
+echo "Or you could run:"
 php app/console cache:flush all
 ```
+
+*Caution: If you are using a implementation that does not support tagging you will clear all with any of the above commands.*
 
 ### Need Help?
 
