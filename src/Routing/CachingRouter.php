@@ -164,7 +164,7 @@ class CachingRouter implements RouterInterface
     private function getCacheItemFromKey($key, $tag)
     {
         if ($this->cache instanceof TaggablePoolInterface) {
-            $item = $this->cache->getItem($key, ['routing', $tag]);
+            $item = $this->cache->getItem($key, ['router', $tag]);
         } else {
             $item = $this->cache->getItem($key);
         }

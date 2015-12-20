@@ -40,7 +40,7 @@ class CacheFlushCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $validTypes = ['session', 'routing', 'doctrine'];
+        $validTypes = ['session', 'router', 'doctrine'];
         $type       = $input->getArgument('type');
         if ($type === 'all') {
             foreach ($validTypes as $type) {
@@ -67,10 +67,14 @@ class CacheFlushCommand extends ContainerAwareCommand
      */
     private function clearCacheForType($type)
     {
-        $serviceId = $this->getContainer()->getParameter(sprintf('cache.%s%.service_id', $type));
+        if (!$this->getContainer()->hasParameter(sprintf('cache.%s', $type))) {
+            return;
+        }
+
+        $config = $this->getContainer()->getParameter(sprintf('cache.%s', $type));
 
         /** @type CacheItemPoolInterface $service */
-        $service = $this->getContainer()->get($serviceId);
+        $service = $this->getContainer()->get($config['service_id']);
         if ($service instanceof TaggablePoolInterface) {
             $service->clear([$type]);
         } else {
