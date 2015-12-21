@@ -12,7 +12,6 @@
 namespace Cache\CacheBundle\Command;
 
 use Cache\Taggable\TaggablePoolInterface;
-use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -88,7 +87,7 @@ class CacheFlushCommand extends ContainerAwareCommand
      */
     private function doClearCache($type, $serviceId)
     {
-        /** @type CacheItemPoolInterface $service */
+        /** @type \Psr\Cache\CacheItemPoolInterface $service */
         $service = $this->getContainer()->get($serviceId);
         if ($service instanceof TaggablePoolInterface) {
             $service->clear([$type]);
