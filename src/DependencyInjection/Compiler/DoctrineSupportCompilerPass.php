@@ -12,7 +12,7 @@
 namespace Cache\CacheBundle\DependencyInjection\Compiler;
 
 use Cache\Bridge\DoctrineCacheBridge;
-use Cache\CacheBundle\Cache\DoctrineTaggingCachePool;
+use Cache\CacheBundle\Cache\FixedTaggingCachePool;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -106,8 +106,9 @@ class DoctrineSupportCompilerPass extends BaseCompilerPass
         }
 
         $taggingServiceId = $bridgeServiceId.'.tagging';
-        $taggingDef       = $this->container->register($taggingServiceId, DoctrineTaggingCachePool::class);
+        $taggingDef       = $this->container->register($taggingServiceId, FixedTaggingCachePool::class);
         $taggingDef->addArgument(new Reference($cacheData['service_id']))
+            ->addArgument(['doctrine'])
             ->setPublic(false);
 
         return $taggingServiceId;

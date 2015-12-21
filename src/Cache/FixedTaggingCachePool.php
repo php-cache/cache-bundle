@@ -21,7 +21,7 @@ use Psr\Cache\CacheItemPoolInterface;
  *
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-class DoctrineTaggingCachePool implements CacheItemPoolInterface
+class FixedTaggingCachePool implements CacheItemPoolInterface
 {
     /**
      * @type CacheItemPoolInterface|TaggablePoolInterface
@@ -29,63 +29,70 @@ class DoctrineTaggingCachePool implements CacheItemPoolInterface
     private $cache;
 
     /**
-     * @param TaggablePoolInterface $cache
+     * @type array
      */
-    public function __construct(TaggablePoolInterface $cache)
+    private $tags;
+
+    /**
+     * @param TaggablePoolInterface $cache
+     * @param array                 $tags
+     */
+    public function __construct(TaggablePoolInterface $cache, array $tags)
     {
         $this->cache = $cache;
+        $this->tags  = $tags;
     }
 
     /**
-     * @{@inheritdoc}
+     * {@inheritdoc}
      */
     public function getItem($key)
     {
-        return $this->cache->getItem($key, ['doctrine']);
+        return $this->cache->getItem($key, $this->tags);
     }
 
     /**
-     * @{@inheritdoc}
+     * {@inheritdoc}
      */
     public function getItems(array $keys = [])
     {
-        return $this->cache->getItems($keys, ['doctrine']);
+        return $this->cache->getItems($keys, $this->tags);
     }
 
     /**
-     * @{@inheritdoc}
+     * {@inheritdoc}
      */
     public function hasItem($key)
     {
-        return $this->cache->hasItem($key, ['doctrine']);
+        return $this->cache->hasItem($key, $this->tags);
     }
 
     /**
-     * @{@inheritdoc}
+     * {@inheritdoc}
      */
     public function clear()
     {
-        return $this->cache->clear(['doctrine']);
+        return $this->cache->clear($this->tags);
     }
 
     /**
-     * @{@inheritdoc}
+     * {@inheritdoc}
      */
     public function deleteItem($key)
     {
-        return $this->cache->deleteItem($key, ['doctrine']);
+        return $this->cache->deleteItem($key, $this->tags);
     }
 
     /**
-     * @{@inheritdoc}
+     * {@inheritdoc}
      */
     public function deleteItems(array $keys)
     {
-        return $this->cache->deleteItems($keys, ['doctrine']);
+        return $this->cache->deleteItems($keys, $this->tags);
     }
 
     /**
-     * @{@inheritdoc}
+     * {@inheritdoc}
      */
     public function save(CacheItemInterface $item)
     {
@@ -93,7 +100,7 @@ class DoctrineTaggingCachePool implements CacheItemPoolInterface
     }
 
     /**
-     * @{@inheritdoc}
+     * {@inheritdoc}
      */
     public function saveDeferred(CacheItemInterface $item)
     {
@@ -101,7 +108,7 @@ class DoctrineTaggingCachePool implements CacheItemPoolInterface
     }
 
     /**
-     * @{@inheritdoc}
+     * {@inheritdoc}
      */
     public function commit()
     {
