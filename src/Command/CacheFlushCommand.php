@@ -73,8 +73,23 @@ class CacheFlushCommand extends ContainerAwareCommand
 
         $config = $this->getContainer()->getParameter(sprintf('cache.%s', $type));
 
+        if ($type === 'doctrine') {
+            $this->doClearCache($type, $config['metadata']['service_id']);
+            $this->doClearCache($type, $config['result']['service_id']);
+            $this->doClearCache($type, $config['query']['service_id']);
+        } else {
+            $this->doClearCache($type, $config['service_id']);
+        }
+    }
+
+    /**
+     * @param string $type
+     * @param string $serviceId
+     */
+    private function doClearCache($type, $serviceId)
+    {
         /** @type CacheItemPoolInterface $service */
-        $service = $this->getContainer()->get($config['service_id']);
+        $service = $this->getContainer()->get($serviceId);
         if ($service instanceof TaggablePoolInterface) {
             $service->clear([$type]);
         } else {
