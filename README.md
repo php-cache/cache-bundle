@@ -119,8 +119,12 @@ cache:
 ```
 
 If you change any of your routes, you will need to clear the cache. If you use a cache implementation that supports 
-tagging (implements [TaggablePoolTrait](https://github.com/php-cache/taggable-cache/blob/master/src/TaggablePoolInterface.php))
+tagging (implements [TaggablePoolInterface](https://github.com/php-cache/taggable-cache/blob/master/src/TaggablePoolInterface.php)) 
 you can clear the cache tagged with `routing`.
+
+The routing cache will make the route lookup more performant when your application have many routes, especially many 
+dynamic routes. If you just have a few routes your performance will actually be worse enabling this. 
+Use [Blackfire](https://blackfire.io/) to profile your application to see if you should enable routing cache or not. 
 
 
 ### Clearing the cache
