@@ -26,3 +26,6 @@ before_script:
 
 script:
     - php vendor/bin/phpunit
+
+after_success:
+    - codecov
