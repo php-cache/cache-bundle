@@ -26,13 +26,12 @@
     "require":      {
         "php":                         "^5.5|^7",
         "symfony/framework-bundle":    "^2.6|^3.0",
-        "cache/taggable-cache":        "^0.1",
-        "psr/cache-implementation":    "~1.0"
+        "cache/taggable-cache":        "^0.2"
     },
     "require-dev":  {
         "phpunit/phpunit":             "^5.1|^4.0",
         "cache/psr-6-doctrine-bridge": "^2.0",
-        "cache/doctrine-adapter":      "^0.1"
+        "cache/doctrine-adapter":      "^0.3"
     },
     "suggest":      {
         "cache/doctrine-adapter-bundle": "A bundle to register PSR-6 compliant services based on Doctrine cache",
