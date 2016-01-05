@@ -29,6 +29,7 @@ class CacheBundle extends Bundle
     {
         parent::build($container);
 
+        $container->addCompilerPass(new Compiler\CacheTaggingPass());
         $container->addCompilerPass(new Compiler\SessionSupportCompilerPass());
         $container->addCompilerPass(new Compiler\DoctrineSupportCompilerPass());
 

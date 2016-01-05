@@ -53,8 +53,32 @@ class CacheExtension extends Extension
         if ($container->getParameter('kernel.debug')) {
             $loader->load('data-collector.yml');
         }
+
+        $serviceIds = array();
+        $this->findServiceIds($config, $serviceIds);
+        $container->setParameter('cache.provider.serviceIds', $serviceIds);
     }
 
+    /**
+     * Find service ids that we configured.
+     *
+     * @param array $config
+     * @param array $serviceIds
+     */
+    protected function findServiceIds(array $config, array &$serviceIds)
+    {
+        foreach ($config as $name=>$value) {
+            if (is_array($value)) {
+                $this->findServiceIds($value, $serviceIds);
+            } elseif ($name === 'service_id') {
+                $serviceIds[] = $value;
+            }
+        }
+    }
+
+    /**
+     * @return string
+     */
     public function getAlias()
     {
         return 'cache';
