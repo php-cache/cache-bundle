@@ -3,7 +3,7 @@
 /*
  * This file is part of php-cache\cache-bundle package.
  *
- * (c) 2015-2015 Aaron Scherer <aequasi@gmail.com>
+ * (c) 2015-2015 Aaron Scherer <aequasi@gmail.com>, Tobias Nyholm <tobias.nyholm@gmail.com>
  *
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
@@ -56,21 +56,21 @@ EOD
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if (false ===$type = $this->verifyArguments($input, $output)) {
+        if (false === $type = $this->verifyArguments($input, $output)) {
             return 0;
         }
 
         $builtInTypes = ['session', 'router', 'doctrine'];
         if (in_array($type, $builtInTypes)) {
-            return $this->clearCacheForBuiltInType($type)?0:1;
+            return $this->clearCacheForBuiltInType($type) ? 0 : 1;
         }
 
         if ($type === 'symfony') {
-            return $this->clearSymfonyCache($output)?0:1;
+            return $this->clearSymfonyCache($output) ? 0 : 1;
         }
 
         if ($type === 'provider') {
-            return $this->clearCacheForProvider($input->getArgument('service'))?0:1;
+            return $this->clearCacheForProvider($input->getArgument('service')) ? 0 : 1;
         }
 
         if ($type === 'all') {
@@ -80,7 +80,7 @@ EOD
             }
             $result = $result && $this->clearSymfonyCache($output);
 
-            return $result?0:1;
+            return $result ? 0 : 1;
         }
     }
 
@@ -129,8 +129,7 @@ EOD
     }
 
     /**
-     *
-     * @param InputInterface $input
+     * @param InputInterface  $input
      * @param OutputInterface $output
      *
      * @return string|bool type or false if invalid arguements
@@ -140,7 +139,7 @@ EOD
         $type = $input->getArgument('type');
         if ($type === null) {
             // ask a question and default $type='all'
-            $helper = $this->getHelper('question');
+            $helper   = $this->getHelper('question');
             $question = new ConfirmationQuestion('Do you want to clear all cache? [N] ', false);
 
             if (!$helper->ask($input, $output, $question)) {
@@ -194,10 +193,10 @@ EOD
      */
     protected function clearSymfonyCache(OutputInterface $output)
     {
-        $command = $this->getApplication()->find('cache:clear');
-        $arguments = array(
+        $command   = $this->getApplication()->find('cache:clear');
+        $arguments = [
             'command' => 'cache:clear',
-        );
+        ];
 
         return $command->run(new ArrayInput($arguments), $output) === 0;
     }
