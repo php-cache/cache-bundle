@@ -36,7 +36,7 @@ class CacheExtension extends Extension
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
 
         // Make sure config values are in the parameters
-        foreach (['router', 'session', 'doctrine'] as $section) {
+        foreach (['router', 'session', 'doctrine', 'logging'] as $section) {
             if ($config[$section]['enabled']) {
                 $container->setParameter('cache.'.$section, $config[$section]);
             }
@@ -54,7 +54,7 @@ class CacheExtension extends Extension
             $loader->load('data-collector.yml');
         }
 
-        $serviceIds = array();
+        $serviceIds = [];
         $this->findServiceIds($config, $serviceIds);
         $container->setParameter('cache.provider.serviceIds', $serviceIds);
     }
@@ -67,7 +67,7 @@ class CacheExtension extends Extension
      */
     protected function findServiceIds(array $config, array &$serviceIds)
     {
-        foreach ($config as $name=>$value) {
+        foreach ($config as $name => $value) {
             if (is_array($value)) {
                 $this->findServiceIds($value, $serviceIds);
             } elseif ($name === 'service_id') {

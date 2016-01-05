@@ -36,6 +36,7 @@ class Configuration implements ConfigurationInterface
             ->append($this->addSessionSupportSection())
             ->append($this->addDoctrineSection())
             ->append($this->addRouterSection())
+            ->append($this->addLoggingSection())
             ->end();
 
         return $treeBuilder;
@@ -62,6 +63,27 @@ class Configuration implements ConfigurationInterface
                     ->defaultValue('session_')
                 ->end()
                 ->scalarNode('ttl')->end()
+            ->end();
+
+        return $node;
+    }
+
+    /**
+     * @return ArrayNodeDefinition
+     */
+    private function addLoggingSection()
+    {
+        $tree = new TreeBuilder();
+        $node = $tree->root('logging');
+
+        $node
+            ->addDefaultsIfNotSet()
+            ->children()
+                ->booleanNode('enabled')
+                    ->defaultFalse()
+                ->end()
+                ->scalarNode('logger')->defaultValue('logger')->end()
+                ->scalarNode('level')->defaultValue('info')->end()
             ->end();
 
         return $node;

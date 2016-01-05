@@ -11,10 +11,8 @@
 
 namespace Cache\CacheBundle\DependencyInjection\Compiler;
 
-use Cache\CacheBundle\Cache\LoggingCachePool;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Make sure to tag all cache provider used.
@@ -32,7 +30,6 @@ class CacheTaggingPass implements CompilerPassInterface
         $serviceIds = $container->getParameter('cache.provider.serviceIds');
 
         foreach ($serviceIds as $id) {
-
             $def = $container->findDefinition($id);
             if (!$def->hasTag('cache.provider')) {
                 $def->addTag('cache.provider');
