@@ -11,173 +11,92 @@
 
 namespace Cache\CacheBundle\Cache;
 
-use Cache\Taggable\TaggablePoolInterface;
-use Psr\Cache\CacheItemInterface;
-use Psr\Cache\CacheItemPoolInterface;
+use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 
 /**
- * @author Aaron Scherer <aequasi@gmail.com>
+ * Logg all calls to the cache.
+ *
+ * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-class LoggingCachePool implements CacheItemPoolInterface, TaggablePoolInterface
+class LoggingCachePool extends RecordingCachePool
 {
     /**
-     * @type array
+     * @type Logger
      */
-    private $calls = [];
+    private $logger;
 
     /**
-     * @type CacheItemPoolInterface
+     * @type string
      */
-    private $cachePool;
+    private $name;
 
     /**
-     * LoggingCachePool constructor.
+     * @type string
+     */
+    private $level = 'info';
+
+    /**
+     * @param LoggerInterface $logger
      *
-     * @param CacheItemPoolInterface $cachePool
+     * @return LoggingCachePool
      */
-    public function __construct(CacheItemPoolInterface $cachePool)
+    public function setLogger($logger)
     {
-        $this->cachePool = $cachePool;
+        $this->logger = $logger;
+
+        return $this;
     }
 
     /**
      * @param string $name
-     * @param array  $arguments
      *
-     * @return object
+     * @return LoggingCachePool
      */
-    private function timeCall($name, array $arguments = null)
+    public function setName($name)
     {
-        $start  = microtime(true);
-        $result = call_user_func_array([$this->cachePool, $name], $arguments);
-        $time   = microtime(true) - $start;
+        $this->name = $name;
 
-        $object = (object) compact('name', 'arguments', 'start', 'time', 'result');
-
-        return $object;
-    }
-
-    public function getItem($key, array $tags = [])
-    {
-        $call         = $this->timeCall(__FUNCTION__, [$key, $tags]);
-        $result       = $call->result;
-        $call->isHit  = $result->isHit();
-
-        // Display the result in a good way depending on the data type
-        if ($call->isHit) {
-            $call->result = $this->getValueRepresentation($result->get());
-        } else {
-            $call->result = null;
-        }
-
-        $this->calls[] = $call;
-
-        return $result;
-    }
-
-    public function hasItem($key, array $tags = [])
-    {
-        $call          = $this->timeCall(__FUNCTION__, [$key, $tags]);
-        $this->calls[] = $call;
-
-        return $call->result;
-    }
-
-    public function deleteItem($key, array $tags = [])
-    {
-        $call          = $this->timeCall(__FUNCTION__, [$key, $tags]);
-        $this->calls[] = $call;
-
-        return $call->result;
-    }
-
-    public function save(CacheItemInterface $item)
-    {
-        $key   = $item->getKey();
-        $value = $this->getValueRepresentation($item->get());
-
-        $call            = $this->timeCall(__FUNCTION__, [$item]);
-        $call->arguments = ['<CacheItem>', $key, $value];
-        $this->calls[]   = $call;
-
-        return $call->result;
-    }
-
-    public function getItems(array $keys = [], array $tags = [])
-    {
-        $call         = $this->timeCall(__FUNCTION__, [$keys, $tags]);
-        $result       = $call->result;
-        $call->result = sprintf('<DATA:%s>', gettype($result));
-
-        $this->calls[] = $call;
-
-        return $result;
-    }
-
-    public function clear(array $tags = [])
-    {
-        $call          = $this->timeCall(__FUNCTION__, [$tags]);
-        $this->calls[] = $call;
-
-        return $call->result;
-    }
-
-    public function deleteItems(array $keys, array $tags = [])
-    {
-        $call          = $this->timeCall(__FUNCTION__, [$keys, $tags]);
-        $this->calls[] = $call;
-
-        return $call->result;
-    }
-
-    public function saveDeferred(CacheItemInterface $item)
-    {
-        $itemClone = clone $item;
-        $itemClone->set(sprintf('<DATA:%s', gettype($item->get())));
-
-        $call            = $this->timeCall(__FUNCTION__, [$item]);
-        $call->arguments = ['<CacheItem>', $itemClone];
-        $this->calls[]   = $call;
-
-        return $call->result;
-    }
-
-    public function commit()
-    {
-        $call          = $this->timeCall(__FUNCTION__);
-        $this->calls[] = $call;
-
-        return $call->result;
+        return $this;
     }
 
     /**
-     * @return array
+     * @param string $level
+     *
+     * @return LoggingCachePool
      */
-    public function getCalls()
+    public function setLevel($level)
     {
-        return $this->calls;
+        $this->level = $level;
+
+        return $this;
     }
 
     /**
-     * Get a string to represent the value.
-     *
-     * @param mixed $value
-     *
-     * @return string
+     * @param $call
      */
-    private function getValueRepresentation($value)
+    protected function addCall($call)
     {
-        $type = gettype($value);
-        if (in_array($type, ['boolean', 'integer', 'double', 'string', 'NULL'])) {
-            $rep = $value;
-        } elseif ($type === 'array') {
-            $rep = json_encode($value);
-        } elseif ($type === 'object') {
-            $rep = get_class($value);
-        } else {
-            $rep = sprintf('<DATA:%s>', $type);
-        }
+        $data = [
+            'name'      => $this->name,
+            'method'    => $call->name,
+            'arguments' => json_encode($call->arguments),
+            'hit'       => isset($call->isHit) ? $call->isHit ? 'True' : 'False' : 'Invalid',
+            'time'      => round($call->time * 1000, 2),
+            'result'    => $call->result,
+        ];
 
-        return $rep;
+        $this->logger->log(
+            $this->level,
+            sprintf('[Cache] Provider: %s. Method: %s(%s). Hit: %s. Time: %sms. Result: %s',
+                $data['name'],
+                $data['method'],
+                $data['arguments'],
+                $data['hit'],
+                $data['time'],
+                $data['result']
+            ),
+            $data
+        );
     }
 }

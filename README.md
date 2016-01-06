@@ -127,6 +127,19 @@ dynamic routes. If you just have a few routes your performance will actually be 
 Use [Blackfire](https://blackfire.io/) to profile your application to see if you should enable routing cache or not. 
 
 
+#### Logging
+
+If you want to log all the interaction with the cache you may do so with the following configuration.
+
+```yml
+cache:
+  logging:
+    enabled: true
+    logger: 'logger' # Default service id to use for logging
+    level: 'info' # Default logging level
+```
+
+
 ### Clearing the cache
 
 If you want to clear the cache you can run the following commands.

@@ -11,7 +11,9 @@
 
 namespace Cache\CacheBundle\DependencyInjection\Compiler;
 
-use Cache\CacheBundle\Cache\LoggingCachePool;
+use Cache\CacheBundle\Cache\RecordingCachePool;
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -20,25 +22,25 @@ use Symfony\Component\DependencyInjection\Reference;
  * @author Aaron Scherer <aequasi@gmail.com>
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-class DataCollectorCompilerPass extends BaseCompilerPass
+class DataCollectorCompilerPass implements CompilerPassInterface
 {
     /**
      * {@inheritdoc}
      */
-    protected function prepare()
+    public function process(ContainerBuilder $container)
     {
-        $collectorDefinition = $this->container->getDefinition('cache.data_collector');
-        $serviceIds          = $this->container->findTaggedServiceIds('cache.provider');
+        $collectorDefinition = $container->getDefinition('cache.data_collector');
+        $serviceIds          = $container->findTaggedServiceIds('cache.provider');
 
         foreach (array_keys($serviceIds) as $id) {
 
             // Creating a LoggingCachePool instance, and passing it the new definition from above
-            $def = $this->container->register($id.'.logger', LoggingCachePool::class);
-            $def->addArgument(new Reference($id.'.logger.inner'))
+            $def = $container->register($id.'.recorder', RecordingCachePool::class);
+            $def->addArgument(new Reference($id.'.recorder.inner'))
                 ->setDecoratedService($id, null, 10);
 
             // Tell the collector to add the new logger
-            $collectorDefinition->addMethodCall('addInstance', [$id, new Reference($id.'.logger')]);
+            $collectorDefinition->addMethodCall('addInstance', [$id, new Reference($id.'.recorder')]);
         }
     }
 }

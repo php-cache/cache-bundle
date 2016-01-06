@@ -14,6 +14,8 @@ namespace Cache\CacheBundle\DependencyInjection\Compiler;
 use Cache\Bridge\DoctrineCacheBridge;
 use Cache\CacheBundle\Cache\FixedTaggingCachePool;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -22,15 +24,16 @@ use Symfony\Component\DependencyInjection\Reference;
  * @author Aaron Scherer <aequasi@gmail.com>
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-class DoctrineSupportCompilerPass extends BaseCompilerPass
+class DoctrineSupportCompilerPass implements CompilerPassInterface
 {
     /**
      * @throws \Exception
      *
      * @return void
      */
-    protected function prepare()
+    public function process(ContainerBuilder $container)
     {
+        $this->container = $container;
         // If disabled, continue
         if (!$this->container->hasParameter('cache.doctrine')) {
             return;

@@ -100,11 +100,11 @@
                     <li class="{{ i is odd ? 'odd' : 'even' }}">
                         <div>
                             <strong>Name</strong>: {{ call.name }}<br />
-                            <strong>Arguments</strong>: {{ call.arguments|json_encode|truncate(140) }}<br />
+                            <strong>Arguments</strong>: {{ call.arguments|json_encode[:140] }}<br />
                             <strong>Results</strong>: {% if call.result == false %}
                                 <span class="color-red">Miss</span>
                             {% else %}
-                                {{ call.result|truncate(140) }}
+                                {{ call.result[:140] }}
                             {% endif %}<br />
                         </div>
                         <small>

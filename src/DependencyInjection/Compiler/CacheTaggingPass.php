@@ -15,37 +15,25 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
- * Class BaseCompilerPass.
+ * Make sure to tag all cache provider used.
  *
- * @author Aaron Scherer <aequasi@gmail.com>
+ * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-abstract class BaseCompilerPass implements CompilerPassInterface
+class CacheTaggingPass implements CompilerPassInterface
 {
-    /**
-     * @type ContainerBuilder
-     */
-    protected $container;
-
     /**
      * {@inheritdoc}
      */
     public function process(ContainerBuilder $container)
     {
-        $this->container = $container;
+        // get service ids form parameters
+        $serviceIds = $container->getParameter('cache.provider.serviceIds');
 
-        $this->prepare();
+        foreach ($serviceIds as $id) {
+            $def = $container->findDefinition($id);
+            if (!$def->hasTag('cache.provider')) {
+                $def->addTag('cache.provider');
+            }
+        }
     }
-
-    /**
-     * @return string
-     */
-    protected function getAlias()
-    {
-        return 'cache';
-    }
-
-    /**
-     * @return mixed
-     */
-    abstract protected function prepare();
 }
