@@ -14,9 +14,9 @@ namespace Cache\CacheBundle\DependencyInjection;
 use Cache\Bridge\DoctrineCacheBridge;
 use Cache\CacheBundle\Bridge\SessionHandlerBridge;
 use Cache\CacheBundle\Bridge\SymfonyValidatorBridge;
-use Cache\CacheBundle\Factory\AnnotationFactory;
-use Cache\CacheBundle\Factory\SerializerFactory;
+use Cache\CacheBundle\Factory\DoctrineBridgeFactory;
 use Cache\CacheBundle\Factory\ValidationFactory;
+use Cache\CacheBundle\Routing\CachingRouter;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
@@ -48,20 +48,26 @@ class CacheExtension extends Extension
             }
         }
 
+        if ($config['doctrine']['enabled']) {
+            $this->verifyDoctrineBridgeExists('doctrine');
+        }
+
         if ($config['annotation']['enabled']) {
             $this->verifyDoctrineBridgeExists('annotation');
             $container->register('cache.service.annotation', DoctrineCacheBridge::class)
-                ->setFactory([AnnotationFactory::class, 'get'])
+                ->setFactory([DoctrineBridgeFactory::class, 'get'])
                 ->addArgument(new Reference($config['annotation']['service_id']))
-                ->addArgument($config['annotation']);
+                ->addArgument($config['annotation'])
+                ->addArgument('annotation');
         }
 
         if ($config['serializer']['enabled']) {
             $this->verifyDoctrineBridgeExists('serializer');
             $container->register('cache.service.serializer', DoctrineCacheBridge::class)
-                ->setFactory([SerializerFactory::class, 'get'])
+                ->setFactory([DoctrineBridgeFactory::class, 'get'])
                 ->addArgument(new Reference($config['serializer']['service_id']))
-                ->addArgument($config['serializer']);
+                ->addArgument($config['serializer'])
+                ->addArgument('serializer');
         }
 
         if ($config['validation']['enabled']) {
@@ -79,11 +85,11 @@ class CacheExtension extends Extension
         }
 
         if ($config['router']['enabled']) {
-            $loader->load('router.yml');
-            $container->getDefinition('cache.router')
+            $container->register('cache.service.router', CachingRouter::class)
                 ->setDecoratedService('router', null, 10)
-                ->replaceArgument(0, new Reference($config['router']['service_id']))
-                ->replaceArgument(2, $config['router']['ttl']);
+                ->addArgument(new Reference($config['router']['service_id']))
+                ->addArgument(new Reference('cache.service.router.inner'))
+                ->addArgument($config['router']['ttl']);
         }
 
         if ($container->getParameter('kernel.debug')) {
@@ -92,7 +98,7 @@ class CacheExtension extends Extension
 
         $serviceIds = [];
         $this->findServiceIds($config, $serviceIds);
-        $container->setParameter('cache.provider.serviceIds', $serviceIds);
+        $container->setParameter('cache.provider_service_ids', $serviceIds);
     }
 
     /**

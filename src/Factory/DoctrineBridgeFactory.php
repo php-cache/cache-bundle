@@ -18,18 +18,19 @@ use Psr\Cache\CacheItemPoolInterface;
 /**
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-class AnnotationFactory
+class DoctrineBridgeFactory
 {
     /**
      * @param CacheItemPoolInterface $pool
      * @param array                  $config
+     * @param array                  $tags
      *
      * @return DoctrineCacheBridge
      */
-    public static function get(CacheItemPoolInterface $pool, $config)
+    public static function get(CacheItemPoolInterface $pool, $config, array $tags)
     {
         if ($config['use_tagging']) {
-            $pool = new FixedTaggingCachePool($pool, ['annotation']);
+            $pool = new FixedTaggingCachePool($pool, $tags);
         }
 
         return new DoctrineCacheBridge($pool);

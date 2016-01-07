@@ -16,7 +16,7 @@ use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 
 /**
- * This class is a decorator for a TaggablePoolInterface. It tags everything with 'doctrine'.
+ * This class is a decorator for a TaggablePoolInterface. It tags everything with predefined tags.
  * Use this class with the DoctrineBridge.
  *
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>

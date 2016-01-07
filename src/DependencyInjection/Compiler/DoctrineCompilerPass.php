@@ -11,8 +11,8 @@
 
 namespace Cache\CacheBundle\DependencyInjection\Compiler;
 
-use Cache\Bridge\DoctrineCacheBridge;
 use Cache\CacheBundle\Cache\FixedTaggingCachePool;
+use Cache\CacheBundle\Factory\DoctrineBridgeFactory;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -24,7 +24,7 @@ use Symfony\Component\DependencyInjection\Reference;
  * @author Aaron Scherer <aequasi@gmail.com>
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-class DoctrineSupportCompilerPass implements CompilerPassInterface
+class DoctrineCompilerPass implements CompilerPassInterface
 {
     /**
      * @type ContainerBuilder
@@ -51,12 +51,6 @@ class DoctrineSupportCompilerPass implements CompilerPassInterface
             );
         }
 
-        if (!class_exists('Cache\Bridge\DoctrineCacheBridge')) {
-            throw new \Exception(
-                'You need the DoctrineBridge to be able to cache queries, results and metadata. Please run "composer require cache/psr-6-doctrine-bridge" to install the missing dependency.'
-            );
-        }
-
         $this->enableDoctrineSupport($this->container->getParameter('cache.doctrine'));
     }
 
@@ -70,19 +64,23 @@ class DoctrineSupportCompilerPass implements CompilerPassInterface
     protected function enableDoctrineSupport(array $config)
     {
         $types = ['entity_managers', 'document_managers'];
-        foreach ($config as $cacheType => $cacheData) {
+        // For each ['metadata' => [], 'result' => [], 'query' => []]
+        foreach ($config as $cacheType => $typeConfig) {
             foreach ($types as $type) {
-                if (!isset($cacheData[$type])) {
+                if (!isset($typeConfig[$type])) {
                     continue;
                 }
 
                 // Doctrine can't talk to a PSR-6 cache, so we need a bridge
-                $bridgeServiceId = sprintf('cache.provider.doctrine.%s.bridge', $cacheType);
-                $bridgeDef       = $this->container->register($bridgeServiceId, DoctrineCacheBridge::class);
-                $bridgeDef->addArgument(new Reference($this->getPoolReferenceForBridge($bridgeServiceId, $cacheData, $config['use_tagging'])))
-                    ->setPublic(false);
+                $bridgeServiceId = sprintf('cache.service.doctrine.%s.%s.bridge', $cacheType, $type);
+                $this->container->register($bridgeServiceId, FixedTaggingCachePool::class)
+                    ->setPublic(false)
+                    ->setFactory([DoctrineBridgeFactory::class, 'get'])
+                    ->addArgument(new Reference($typeConfig['service_id']))
+                    ->addArgument($typeConfig)
+                    ->addArgument(['doctrine', $cacheType]);
 
-                foreach ($cacheData[$type] as $manager) {
+                foreach ($typeConfig[$type] as $manager) {
                     $doctrineDefinitionId =
                         sprintf(
                             'doctrine.%s.%s_%s_cache',
@@ -96,31 +94,6 @@ class DoctrineSupportCompilerPass implements CompilerPassInterface
                 }
             }
         }
-    }
-
-    /**
-     * Get a reference string for the PSR-6 cache implementation service to use with doctrine.
-     * If we support tagging we use the DoctrineTaggingCachePool.
-     *
-     * @param string $bridgeServiceId
-     * @param array  $cacheData
-     * @param bool   $tagging
-     *
-     * @return string
-     */
-    public function getPoolReferenceForBridge($bridgeServiceId, $cacheData, $tagging)
-    {
-        if (!$tagging) {
-            return $cacheData['service_id'];
-        }
-
-        $taggingServiceId = $bridgeServiceId.'.tagging';
-        $taggingDef       = $this->container->register($taggingServiceId, FixedTaggingCachePool::class);
-        $taggingDef->addArgument(new Reference($cacheData['service_id']))
-            ->addArgument(['doctrine'])
-            ->setPublic(false);
-
-        return $taggingServiceId;
     }
 
     /**
