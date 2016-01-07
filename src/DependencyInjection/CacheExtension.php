@@ -14,8 +14,7 @@ namespace Cache\CacheBundle\DependencyInjection;
 use Cache\Bridge\DoctrineCacheBridge;
 use Cache\CacheBundle\Bridge\SessionHandlerBridge;
 use Cache\CacheBundle\Bridge\SymfonyValidatorBridge;
-use Cache\CacheBundle\Factory\AnnotationFactory;
-use Cache\CacheBundle\Factory\SerializerFactory;
+use Cache\CacheBundle\Factory\DoctrineBridgeFactory;
 use Cache\CacheBundle\Factory\ValidationFactory;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -51,17 +50,19 @@ class CacheExtension extends Extension
         if ($config['annotation']['enabled']) {
             $this->verifyDoctrineBridgeExists('annotation');
             $container->register('cache.service.annotation', DoctrineCacheBridge::class)
-                ->setFactory([AnnotationFactory::class, 'get'])
+                ->setFactory([DoctrineBridgeFactory::class, 'get'])
                 ->addArgument(new Reference($config['annotation']['service_id']))
-                ->addArgument($config['annotation']);
+                ->addArgument($config['annotation'])
+                ->addArgument('annotation');
         }
 
         if ($config['serializer']['enabled']) {
             $this->verifyDoctrineBridgeExists('serializer');
             $container->register('cache.service.serializer', DoctrineCacheBridge::class)
-                ->setFactory([SerializerFactory::class, 'get'])
+                ->setFactory([DoctrineBridgeFactory::class, 'get'])
                 ->addArgument(new Reference($config['serializer']['service_id']))
-                ->addArgument($config['serializer']);
+                ->addArgument($config['serializer'])
+                ->addArgument('serializer');
         }
 
         if ($config['validation']['enabled']) {
