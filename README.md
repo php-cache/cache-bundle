@@ -141,38 +141,47 @@ cache:
 
 #### Annotation
 
-To use a PSR-6 cache for your annotations, use the following confguration. This will overwrite the value at 
-`framwork.annotations.cache`
+To use a PSR-6 cache for your annotations, use the following confguration.
 
 ```yml
 cache:
   annotation:
     enabled: true
     service_id: cache.provider.acme_apc_cache
+    
+framwork:
+  annotations:
+    cache: cache.service.annotation
 ```
 
 #### Serialization
 
-To use a PSR-6 cache for the serialzer, use the following confguration. This will overwrite the value at 
-`framwork.serializer.cache`
+To use a PSR-6 cache for the serialzer, use the following confguration. 
 
 ```yml
 cache:
   serializer:
     enabled: true
     service_id: cache.provider.acme_apc_cache
+    
+framwork:
+  serializer:
+    cache: cache.service.serializer
 ```
 
 #### Validation
 
-To use a PSR-6 cache for the validation, use the following confguration. This will overwrite the value at 
-`framwork.validation.cache`
+To use a PSR-6 cache for the validation, use the following confguration. 
 
 ```yml
 cache:
   validation:
     enabled: true
     service_id: cache.provider.acme_apc_cache
+
+framwork:
+  validation:
+    cache: cache.service.validation
 ```
 
 

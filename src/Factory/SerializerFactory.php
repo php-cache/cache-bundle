@@ -22,7 +22,7 @@ class SerializerFactory
     public static function get(CacheItemPoolInterface $pool, $config)
     {
         if ($config['use_tagging']) {
-            $pool = new FixedTaggingCachePool($pool, 'serializer');
+            $pool = new FixedTaggingCachePool($pool, ['serializer']);
         }
 
         return new DoctrineCacheBridge($pool);

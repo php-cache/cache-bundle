@@ -22,7 +22,7 @@ class AnnotationFactory
     public static function get(CacheItemPoolInterface $pool, $config)
     {
         if ($config['use_tagging']) {
-            $pool = new FixedTaggingCachePool($pool, 'annotation');
+            $pool = new FixedTaggingCachePool($pool, ['annotation']);
         }
 
         return new DoctrineCacheBridge($pool);

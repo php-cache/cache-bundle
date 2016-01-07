@@ -23,7 +23,7 @@ class ValidationFactory
     public static function get(CacheItemPoolInterface $pool, $config)
     {
         if ($config['use_tagging']) {
-            $pool = new FixedTaggingCachePool($pool, 'validation');
+            $pool = new FixedTaggingCachePool($pool, ['validation']);
         }
 
         return new SymfonyValidatorBridge($pool);

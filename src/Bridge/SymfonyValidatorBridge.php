@@ -33,7 +33,7 @@ class SymfonyValidatorBridge implements CacheInterface
      */
     public function has($class)
     {
-        return $this->pool->hasItem($class);
+        return $this->pool->hasItem($this->normalizeKey($class));
     }
 
     /**
@@ -41,7 +41,7 @@ class SymfonyValidatorBridge implements CacheInterface
      */
     public function read($class)
     {
-        $item = $this->pool->getItem($class);
+        $item = $this->pool->getItem($this->normalizeKey($class));
 
         if (!$item->isHit()) {
             return false;
@@ -55,8 +55,18 @@ class SymfonyValidatorBridge implements CacheInterface
      */
     public function write(ClassMetadata $metadata)
     {
-        $item = $this->pool->getItem($metadata->getClassName());
+        $item = $this->pool->getItem($this->normalizeKey($metadata->getClassName()));
         $item->set($metadata);
         $this->pool->save($item);
+    }
+
+    /**
+     * @param string $key
+     *
+     * @return string
+     */
+    private function normalizeKey($key)
+    {
+        return preg_replace('|[\\\/]|', '.', $key);
     }
 }
