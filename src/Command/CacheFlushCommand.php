@@ -26,7 +26,7 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
  */
 class CacheFlushCommand extends ContainerAwareCommand
 {
-    const VALID_TYPES = ['all', 'session', 'router', 'doctrine', 'symfony', 'provider'];
+    const VALID_TYPES = ['all', 'annotation', 'session', 'serializer', 'router', 'doctrine', 'symfony', 'validation', 'provider'];
 
     /**
      * {@inheritdoc}
@@ -41,11 +41,14 @@ class CacheFlushCommand extends ContainerAwareCommand
 
 Types and their description
 all                       Clear all types of caches
+annotation                Clear annotation cache
 doctrine                  Clear doctrine cache for query, result and metadata
 privider cache.acme       Clear all the cache for the provider with service id "cache.acme"
 router                    Clear router cache
+serializer                Clear serializer cache
 session                   Clear session cache. All your logged in users will be logged out.
 symfony                   Clear Symfony cache. This is the same as cache:clear
+validation                Clear validation cache
 
 EOD
     );
@@ -60,7 +63,7 @@ EOD
             return 0;
         }
 
-        $builtInTypes = ['session', 'router', 'doctrine'];
+        $builtInTypes = ['annotation', 'doctrine', 'serializer', 'session', 'router', 'validation'];
         if (in_array($type, $builtInTypes)) {
             return $this->clearCacheForBuiltInType($type) ? 0 : 1;
         }
