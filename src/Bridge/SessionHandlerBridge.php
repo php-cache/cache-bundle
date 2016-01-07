@@ -11,7 +11,6 @@
 
 namespace Cache\CacheBundle\Bridge;
 
-use Cache\Taggable\TaggablePoolInterface;
 use Psr\Cache\CacheItemPoolInterface;
 
 /**
@@ -102,10 +101,6 @@ class SessionHandlerBridge implements \SessionHandlerInterface
      */
     public function destroy($sessionId)
     {
-        if ($this->cache instanceof TaggablePoolInterface) {
-            return $this->cache->deleteItem($this->prefix.$sessionId);
-        }
-
         return $this->cache->deleteItem($this->prefix.$sessionId);
     }
 
@@ -125,10 +120,6 @@ class SessionHandlerBridge implements \SessionHandlerInterface
      */
     private function getCacheItem($sessionId)
     {
-        if ($this->cache instanceof TaggablePoolInterface) {
-            return $this->cache->getItem($this->prefix.$sessionId);
-        }
-
         return $this->cache->getItem($this->prefix.$sessionId);
     }
 }

@@ -38,6 +38,6 @@ class SessionSupportCompilerPass implements CompilerPassInterface
             throw new \Exception('Session cache support cannot be enabled if there is no session.storage service');
         }
 
-        $container->setAlias('session.handler', 'cache.servcice.session');
+        $container->setAlias('session.handler', 'cache.service.session');
     }
 }
