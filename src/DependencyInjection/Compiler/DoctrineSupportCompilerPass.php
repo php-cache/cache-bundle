@@ -27,6 +27,11 @@ use Symfony\Component\DependencyInjection\Reference;
 class DoctrineSupportCompilerPass implements CompilerPassInterface
 {
     /**
+     * @type ContainerBuilder
+     */
+    private $container;
+
+    /**
      * @throws \Exception
      *
      * @return void
@@ -34,6 +39,7 @@ class DoctrineSupportCompilerPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         $this->container = $container;
+
         // If disabled, continue
         if (!$this->container->hasParameter('cache.doctrine')) {
             return;

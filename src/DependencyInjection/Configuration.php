@@ -36,6 +36,8 @@ class Configuration implements ConfigurationInterface
             ->append($this->addSessionSupportSection())
             ->append($this->addDoctrineSection())
             ->append($this->addRouterSection())
+            ->append($this->addAnnotationSection())
+            ->append($this->addSerializerSection())
             ->append($this->addLoggingSection())
             ->end();
 
@@ -63,6 +65,52 @@ class Configuration implements ConfigurationInterface
                     ->defaultValue('session_')
                 ->end()
                 ->scalarNode('ttl')->end()
+            ->end();
+
+        return $node;
+    }
+
+    /**
+     * Configure the "cache.serializer" section.
+     *
+     * @return ArrayNodeDefinition
+     */
+    private function addSerializerSection()
+    {
+        $tree = new TreeBuilder();
+        $node = $tree->root('serializer');
+
+        $node
+            ->addDefaultsIfNotSet()
+            ->children()
+                ->booleanNode('enabled')
+                    ->defaultFalse()
+                ->end()
+                ->scalarNode('service_id')->isRequired()->end()
+                ->booleanNode('use_tagging')->defaultTrue()->end()
+            ->end();
+
+        return $node;
+    }
+
+    /**
+     * Configure the "cache.annotation" section.
+     *
+     * @return ArrayNodeDefinition
+     */
+    private function addAnnotationSection()
+    {
+        $tree = new TreeBuilder();
+        $node = $tree->root('annotation');
+
+        $node
+            ->addDefaultsIfNotSet()
+            ->children()
+                ->booleanNode('enabled')
+                    ->defaultFalse()
+                ->end()
+                ->scalarNode('service_id')->isRequired()->end()
+                ->booleanNode('use_tagging')->defaultTrue()->end()
             ->end();
 
         return $node;

@@ -139,6 +139,30 @@ cache:
     level: 'info' # Default logging level
 ```
 
+#### Annotation
+
+To use a PSR-6 cache for your annotations, use the following confguration. This will overwrite the value at 
+`framwork.annotations.cache`
+
+```yml
+cache:
+  annotation:
+    enabled: true
+    service_id: cache.provider.acme_apc_cache
+```
+
+#### Serialization
+
+To use a PSR-6 cache for the serialzer, use the following confguration. This will overwrite the value at 
+`framwork.serializer.cache`
+
+```yml
+cache:
+  serializer:
+    enabled: true
+    service_id: cache.provider.acme_apc_cache
+```
+
 
 ### Clearing the cache
 
