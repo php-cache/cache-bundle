@@ -9,7 +9,7 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Cache\CacheBundle\Session;
+namespace Cache\CacheBundle\Bridge;
 
 use Cache\Taggable\TaggablePoolInterface;
 use Psr\Cache\CacheItemPoolInterface;
@@ -19,7 +19,7 @@ use Psr\Cache\CacheItemPoolInterface;
  *
  * @author Aaron Scherer <aequasi@gmail.com>
  */
-class SessionHandler implements \SessionHandlerInterface
+class SessionHandlerBridge implements \SessionHandlerInterface
 {
     /**
      * @type CacheItemPoolInterface Cache driver.
@@ -103,7 +103,7 @@ class SessionHandler implements \SessionHandlerInterface
     public function destroy($sessionId)
     {
         if ($this->cache instanceof TaggablePoolInterface) {
-            return $this->cache->deleteItem($this->prefix.$sessionId, ['session']);
+            return $this->cache->deleteItem($this->prefix.$sessionId);
         }
 
         return $this->cache->deleteItem($this->prefix.$sessionId);
@@ -126,7 +126,7 @@ class SessionHandler implements \SessionHandlerInterface
     private function getCacheItem($sessionId)
     {
         if ($this->cache instanceof TaggablePoolInterface) {
-            return $this->cache->getItem($this->prefix.$sessionId, ['session']);
+            return $this->cache->getItem($this->prefix.$sessionId);
         }
 
         return $this->cache->getItem($this->prefix.$sessionId);

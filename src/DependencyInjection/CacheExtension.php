@@ -12,6 +12,7 @@
 namespace Cache\CacheBundle\DependencyInjection;
 
 use Cache\Bridge\DoctrineCacheBridge;
+use Cache\CacheBundle\Bridge\SessionHandlerBridge;
 use Cache\CacheBundle\Bridge\SymfonyValidatorBridge;
 use Cache\CacheBundle\Factory\AnnotationFactory;
 use Cache\CacheBundle\Factory\SerializerFactory;
@@ -68,6 +69,13 @@ class CacheExtension extends Extension
                 ->setFactory([ValidationFactory::class, 'get'])
                 ->addArgument(new Reference($config['validation']['service_id']))
                 ->addArgument($config['validation']);
+        }
+
+        if ($config['session']['enabled']) {
+            $container->register('cache.service.session', SymfonyValidatorBridge::class)
+                ->setFactory([SessionHandlerBridge::class, 'get'])
+                ->addArgument(new Reference($config['session']['service_id']))
+                ->addArgument($config['session']);
         }
 
         if ($config['router']['enabled']) {
