@@ -11,6 +11,11 @@
 
 namespace Cache\CacheBundle\DependencyInjection;
 
+use Cache\Bridge\DoctrineCacheBridge;
+use Cache\CacheBundle\Bridge\SymfonyValidatorBridge;
+use Cache\CacheBundle\Factory\AnnotationFactory;
+use Cache\CacheBundle\Factory\SerializerFactory;
+use Cache\CacheBundle\Factory\ValidationFactory;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
@@ -36,10 +41,33 @@ class CacheExtension extends Extension
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
 
         // Make sure config values are in the parameters
-        foreach (['router', 'session', 'doctrine', 'logging'] as $section) {
+        foreach (['router', 'session', 'doctrine', 'logging', 'annotation', 'serializer', 'validation'] as $section) {
             if ($config[$section]['enabled']) {
                 $container->setParameter('cache.'.$section, $config[$section]);
             }
+        }
+
+        if ($config['annotation']['enabled']) {
+            $this->verifyDoctrineBridgeExists('annotation');
+            $container->register('cache.service.annotation', DoctrineCacheBridge::class)
+                ->setFactory([AnnotationFactory::class, 'get'])
+                ->addArgument(new Reference($config['annotation']['service_id']))
+                ->addArgument($config['annotation']);
+        }
+
+        if ($config['serializer']['enabled']) {
+            $this->verifyDoctrineBridgeExists('serializer');
+            $container->register('cache.service.serializer', DoctrineCacheBridge::class)
+                ->setFactory([SerializerFactory::class, 'get'])
+                ->addArgument(new Reference($config['serializer']['service_id']))
+                ->addArgument($config['serializer']);
+        }
+
+        if ($config['validation']['enabled']) {
+            $container->register('cache.service.validation', SymfonyValidatorBridge::class)
+                ->setFactory([ValidationFactory::class, 'get'])
+                ->addArgument(new Reference($config['validation']['service_id']))
+                ->addArgument($config['validation']);
         }
 
         if ($config['router']['enabled']) {
@@ -73,6 +101,23 @@ class CacheExtension extends Extension
             } elseif ($name === 'service_id') {
                 $serviceIds[] = $value;
             }
+        }
+    }
+
+    /**
+     * Make sure the DoctrineBridge is installed.
+     *
+     * @param string $name
+     *
+     * @throws \Exception
+     */
+    private function verifyDoctrineBridgeExists($name)
+    {
+        if (!class_exists('Cache\Bridge\DoctrineCacheBridge')) {
+            throw new \Exception(sprintf(
+                'You need the DoctrineBridge to be able to use "%s". Please run "composer require cache/psr-6-doctrine-bridge" to install the missing dependency.',
+                $name
+            ));
         }
     }
 

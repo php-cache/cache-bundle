@@ -36,6 +36,9 @@ class Configuration implements ConfigurationInterface
             ->append($this->addSessionSupportSection())
             ->append($this->addDoctrineSection())
             ->append($this->addRouterSection())
+            ->append($this->addAnnotationSection())
+            ->append($this->addSerializerSection())
+            ->append($this->addValidationSection())
             ->append($this->addLoggingSection())
             ->end();
 
@@ -53,16 +56,77 @@ class Configuration implements ConfigurationInterface
         $node = $tree->root('session');
 
         $node
+            ->canBeEnabled()
             ->addDefaultsIfNotSet()
             ->children()
-                ->booleanNode('enabled')
-                    ->defaultFalse()
-                ->end()
                 ->scalarNode('service_id')->isRequired()->end()
                 ->scalarNode('prefix')
                     ->defaultValue('session_')
                 ->end()
                 ->scalarNode('ttl')->end()
+            ->end();
+
+        return $node;
+    }
+
+    /**
+     * Configure the "cache.serializer" section.
+     *
+     * @return ArrayNodeDefinition
+     */
+    private function addSerializerSection()
+    {
+        $tree = new TreeBuilder();
+        $node = $tree->root('serializer');
+
+        $node
+            ->canBeEnabled()
+            ->addDefaultsIfNotSet()
+            ->children()
+            ->scalarNode('service_id')->isRequired()->end()
+                ->booleanNode('use_tagging')->defaultTrue()->end()
+            ->end();
+
+        return $node;
+    }
+
+    /**
+     * Configure the "cache.serializer" section.
+     *
+     * @return ArrayNodeDefinition
+     */
+    private function addValidationSection()
+    {
+        $tree = new TreeBuilder();
+        $node = $tree->root('validation');
+
+        $node
+            ->canBeEnabled()
+            ->addDefaultsIfNotSet()
+            ->children()
+                ->scalarNode('service_id')->isRequired()->end()
+                ->booleanNode('use_tagging')->defaultTrue()->end()
+            ->end();
+
+        return $node;
+    }
+
+    /**
+     * Configure the "cache.annotation" section.
+     *
+     * @return ArrayNodeDefinition
+     */
+    private function addAnnotationSection()
+    {
+        $tree = new TreeBuilder();
+        $node = $tree->root('annotation');
+
+        $node
+            ->canBeEnabled()
+            ->addDefaultsIfNotSet()
+            ->children()
+                ->scalarNode('service_id')->isRequired()->end()
+                ->booleanNode('use_tagging')->defaultTrue()->end()
             ->end();
 
         return $node;
@@ -77,11 +141,9 @@ class Configuration implements ConfigurationInterface
         $node = $tree->root('logging');
 
         $node
+            ->canBeEnabled()
             ->addDefaultsIfNotSet()
             ->children()
-                ->booleanNode('enabled')
-                    ->defaultFalse()
-                ->end()
                 ->scalarNode('logger')->defaultValue('logger')->end()
                 ->scalarNode('level')->defaultValue('info')->end()
             ->end();
@@ -100,12 +162,9 @@ class Configuration implements ConfigurationInterface
         $node = $tree->root('doctrine');
 
         $node
+            ->canBeEnabled()
             ->addDefaultsIfNotSet()
             ->children()
-                ->booleanNode('enabled')
-                    ->defaultFalse()
-                    ->isRequired()
-                ->end()
                 ->booleanNode('use_tagging')
                     ->defaultTrue()
                 ->end()
@@ -159,11 +218,10 @@ class Configuration implements ConfigurationInterface
         $tree = new TreeBuilder();
         $node = $tree->root('router');
 
-        $node->addDefaultsIfNotSet()
+        $node
+            ->canBeEnabled()
+            ->addDefaultsIfNotSet()
             ->children()
-                ->booleanNode('enabled')
-                    ->defaultFalse()
-                ->end()
                 ->integerNode('ttl')
                     ->defaultValue(604800)
                 ->end()
