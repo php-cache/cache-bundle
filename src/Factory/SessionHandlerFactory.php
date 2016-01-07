@@ -13,7 +13,6 @@ namespace Cache\CacheBundle\Factory;
 
 use Cache\Bridge\DoctrineCacheBridge;
 use Cache\CacheBundle\Bridge\SessionHandlerBridge;
-use Cache\CacheBundle\Bridge\SymfonyValidatorBridge;
 use Cache\CacheBundle\Cache\FixedTaggingCachePool;
 use Psr\Cache\CacheItemPoolInterface;
 
