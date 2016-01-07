@@ -12,6 +12,7 @@
 namespace Cache\CacheBundle\DependencyInjection;
 
 use Cache\Bridge\DoctrineCacheBridge;
+use Cache\CacheBundle\Bridge\SymfonyValidatorBridge;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
@@ -60,7 +61,7 @@ class CacheExtension extends Extension
         }
 
         if ($config['validation']['enabled']) {
-            $container->register('cache.service.validation', DoctrineCacheBridge::class)
+            $container->register('cache.service.validation', SymfonyValidatorBridge::class)
                 ->setFactory('Cache\CacheBundle\Factory\ValidationFactory::get')
                 ->addArgument(new Reference($config['validation']['service_id']))
                 ->addArgument($config['validation']);
