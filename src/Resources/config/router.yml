@@ -1,7 +1,0 @@
-services:
-
-  cache.router:
-    class: Cache\CacheBundle\Routing\CachingRouter
-    arguments: [~, "@cache.router.inner", ~]
-
-

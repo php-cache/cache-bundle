@@ -27,7 +27,7 @@ class CacheTaggingPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         // get service ids form parameters
-        $serviceIds = $container->getParameter('cache.provider.serviceIds');
+        $serviceIds = $container->getParameter('cache.provider_service_ids');
 
         foreach ($serviceIds as $id) {
             $def = $container->findDefinition($id);

@@ -11,7 +11,6 @@
 
 namespace Cache\CacheBundle\DependencyInjection\Compiler;
 
-use Cache\Bridge\DoctrineCacheBridge;
 use Cache\CacheBundle\Cache\FixedTaggingCachePool;
 use Cache\CacheBundle\Factory\DoctrineBridgeFactory;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
@@ -25,7 +24,7 @@ use Symfony\Component\DependencyInjection\Reference;
  * @author Aaron Scherer <aequasi@gmail.com>
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-class DoctrineSupportCompilerPass implements CompilerPassInterface
+class DoctrineCompilerPass implements CompilerPassInterface
 {
     /**
      * @type ContainerBuilder
@@ -49,12 +48,6 @@ class DoctrineSupportCompilerPass implements CompilerPassInterface
         if (!$this->hasDoctrine()) {
             throw new \Exception(
                 'Not able to find any doctrine caches to implement. Ensure you have Doctrine ORM or ODM'
-            );
-        }
-
-        if (!class_exists('Cache\Bridge\DoctrineCacheBridge')) {
-            throw new \Exception(
-                'You need the DoctrineBridge to be able to cache queries, results and metadata. Please run "composer require cache/psr-6-doctrine-bridge" to install the missing dependency.'
             );
         }
 
