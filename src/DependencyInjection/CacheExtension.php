@@ -67,7 +67,6 @@ class CacheExtension extends Extension
                 ->addArgument($config['validation']);
         }
 
-
         if ($config['router']['enabled']) {
             $loader->load('router.yml');
             $container->getDefinition('cache.router')
@@ -103,9 +102,10 @@ class CacheExtension extends Extension
     }
 
     /**
-     * Make sure the DoctrineBridge is installed
+     * Make sure the DoctrineBridge is installed.
      *
      * @param string $name
+     *
      * @throws \Exception
      */
     private function verifyDoctrineBridgeExists($name)
