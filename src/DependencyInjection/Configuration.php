@@ -56,11 +56,9 @@ class Configuration implements ConfigurationInterface
         $node = $tree->root('session');
 
         $node
+            ->canBeEnabled()
             ->addDefaultsIfNotSet()
             ->children()
-                ->booleanNode('enabled')
-                    ->defaultFalse()
-                ->end()
                 ->scalarNode('service_id')->isRequired()->end()
                 ->scalarNode('prefix')
                     ->defaultValue('session_')
@@ -82,12 +80,10 @@ class Configuration implements ConfigurationInterface
         $node = $tree->root('serializer');
 
         $node
+            ->canBeEnabled()
             ->addDefaultsIfNotSet()
             ->children()
-                ->booleanNode('enabled')
-                    ->defaultFalse()
-                ->end()
-                ->scalarNode('service_id')->isRequired()->end()
+            ->scalarNode('service_id')->isRequired()->end()
                 ->booleanNode('use_tagging')->defaultTrue()->end()
             ->end();
 
@@ -105,11 +101,9 @@ class Configuration implements ConfigurationInterface
         $node = $tree->root('validation');
 
         $node
+            ->canBeEnabled()
             ->addDefaultsIfNotSet()
             ->children()
-                ->booleanNode('enabled')
-                    ->defaultFalse()
-                ->end()
                 ->scalarNode('service_id')->isRequired()->end()
                 ->booleanNode('use_tagging')->defaultTrue()->end()
             ->end();
@@ -128,11 +122,9 @@ class Configuration implements ConfigurationInterface
         $node = $tree->root('annotation');
 
         $node
+            ->canBeEnabled()
             ->addDefaultsIfNotSet()
             ->children()
-                ->booleanNode('enabled')
-                    ->defaultFalse()
-                ->end()
                 ->scalarNode('service_id')->isRequired()->end()
                 ->booleanNode('use_tagging')->defaultTrue()->end()
             ->end();
@@ -149,11 +141,9 @@ class Configuration implements ConfigurationInterface
         $node = $tree->root('logging');
 
         $node
+            ->canBeEnabled()
             ->addDefaultsIfNotSet()
             ->children()
-                ->booleanNode('enabled')
-                    ->defaultFalse()
-                ->end()
                 ->scalarNode('logger')->defaultValue('logger')->end()
                 ->scalarNode('level')->defaultValue('info')->end()
             ->end();
@@ -172,12 +162,9 @@ class Configuration implements ConfigurationInterface
         $node = $tree->root('doctrine');
 
         $node
+            ->canBeEnabled()
             ->addDefaultsIfNotSet()
             ->children()
-                ->booleanNode('enabled')
-                    ->defaultFalse()
-                    ->isRequired()
-                ->end()
                 ->booleanNode('use_tagging')
                     ->defaultTrue()
                 ->end()
@@ -231,11 +218,10 @@ class Configuration implements ConfigurationInterface
         $tree = new TreeBuilder();
         $node = $tree->root('router');
 
-        $node->addDefaultsIfNotSet()
+        $node
+            ->canBeEnabled()
+            ->addDefaultsIfNotSet()
             ->children()
-                ->booleanNode('enabled')
-                    ->defaultFalse()
-                ->end()
                 ->integerNode('ttl')
                     ->defaultValue(604800)
                 ->end()
