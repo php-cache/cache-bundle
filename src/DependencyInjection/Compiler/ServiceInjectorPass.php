@@ -27,6 +27,7 @@ class ServiceInjectorPass implements CompilerPassInterface
     {
         $this->injectAnnotationService($container);
         $this->injectSerializerService($container);
+        $this->injectValidationService($container);
     }
 
     /**
@@ -60,5 +61,20 @@ class ServiceInjectorPass implements CompilerPassInterface
 
         $container->getDefinition('serializer.mapping.class_metadata_factory')
             ->replaceArgument(1, new Reference('cache.service.serializer'));
+    }
+    /**
+     * @param ContainerBuilder $container
+     *
+     * @throws \Exception
+     */
+    private function injectValidationService(ContainerBuilder $container)
+    {
+        // If disabled, continue
+        if (!$container->hasParameter('cache.validation')) {
+            return;
+        }
+
+        $container->getDefinition('validator.builder')
+            ->addMethodCall('setMetadataCache', [new Reference('cache.service.serializer')]);
     }
 }

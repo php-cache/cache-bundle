@@ -37,7 +37,7 @@ class CacheExtension extends Extension
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
 
         // Make sure config values are in the parameters
-        foreach (['router', 'session', 'doctrine', 'logging', 'annotation', 'serializer'] as $section) {
+        foreach (['router', 'session', 'doctrine', 'logging', 'annotation', 'serializer', 'validation'] as $section) {
             if ($config[$section]['enabled']) {
                 $container->setParameter('cache.'.$section, $config[$section]);
             }
@@ -57,6 +57,13 @@ class CacheExtension extends Extension
                 ->setFactory('Cache\CacheBundle\Factory\SerializerFactory::get')
                 ->addArgument(new Reference($config['serializer']['service_id']))
                 ->addArgument($config['serializer']);
+        }
+
+        if ($config['validation']['enabled']) {
+            $container->register('cache.service.validation', DoctrineCacheBridge::class)
+                ->setFactory('Cache\CacheBundle\Factory\ValidationFactory::get')
+                ->addArgument(new Reference($config['validation']['service_id']))
+                ->addArgument($config['validation']);
         }
 
 

@@ -38,6 +38,7 @@ class Configuration implements ConfigurationInterface
             ->append($this->addRouterSection())
             ->append($this->addAnnotationSection())
             ->append($this->addSerializerSection())
+            ->append($this->addValidationSection())
             ->append($this->addLoggingSection())
             ->end();
 
@@ -79,6 +80,29 @@ class Configuration implements ConfigurationInterface
     {
         $tree = new TreeBuilder();
         $node = $tree->root('serializer');
+
+        $node
+            ->addDefaultsIfNotSet()
+            ->children()
+                ->booleanNode('enabled')
+                    ->defaultFalse()
+                ->end()
+                ->scalarNode('service_id')->isRequired()->end()
+                ->booleanNode('use_tagging')->defaultTrue()->end()
+            ->end();
+
+        return $node;
+    }
+
+    /**
+     * Configure the "cache.serializer" section.
+     *
+     * @return ArrayNodeDefinition
+     */
+    private function addValidationSection()
+    {
+        $tree = new TreeBuilder();
+        $node = $tree->root('validation');
 
         $node
             ->addDefaultsIfNotSet()

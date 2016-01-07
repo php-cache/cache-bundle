@@ -163,6 +163,18 @@ cache:
     service_id: cache.provider.acme_apc_cache
 ```
 
+#### Validation
+
+To use a PSR-6 cache for the validation, use the following confguration. This will overwrite the value at 
+`framwork.validation.cache`
+
+```yml
+cache:
+  validation:
+    enabled: true
+    service_id: cache.provider.acme_apc_cache
+```
+
 
 ### Clearing the cache
 
