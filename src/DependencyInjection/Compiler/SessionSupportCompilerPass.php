@@ -11,12 +11,8 @@
 
 namespace Cache\CacheBundle\DependencyInjection\Compiler;
 
-use Cache\CacheBundle\Session\SessionHandler;
-use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Class SessionSupportCompilerPass.
@@ -25,11 +21,6 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class SessionSupportCompilerPass implements CompilerPassInterface
 {
-    /**
-     * @type ContainerBuilder
-     */
-    protected $container;
-
     /**
      * @param ContainerBuilder $container
      *
@@ -47,30 +38,6 @@ class SessionSupportCompilerPass implements CompilerPassInterface
             throw new \Exception('Session cache support cannot be enabled if there is no session.storage service');
         }
 
-        $this->enableSessionSupport($container, $container->getParameter('cache.session'));
-    }
-
-    /**
-     * Enables session support for memcached.
-     *
-     * @param array $config Configuration for bundle
-     *
-     * @throws InvalidConfigurationException
-     */
-    private function enableSessionSupport(ContainerBuilder $container, array $config)
-    {
-        // calculate options
-        $sessionOptions = $container->getParameter('session.storage.options');
-        if (isset($sessionOptions['cookie_lifetime']) && !isset($config['cookie_lifetime'])) {
-            $config['cookie_lifetime'] = $sessionOptions['cookie_lifetime'];
-        }
-        // load the session handler
-        $definition = new Definition(SessionHandler::class);
-        $definition->addArgument(new Reference($config['service_id']))
-            ->addArgument($config);
-
-        $container->setDefinition('cache.session_handler', $definition);
-
-        $container->setAlias('session.handler', 'cache.session_handler');
+        $container->setAlias('session.handler', 'cache.service.session');
     }
 }

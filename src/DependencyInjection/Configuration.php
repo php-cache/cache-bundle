@@ -60,9 +60,7 @@ class Configuration implements ConfigurationInterface
             ->addDefaultsIfNotSet()
             ->children()
                 ->scalarNode('service_id')->isRequired()->end()
-                ->scalarNode('prefix')
-                    ->defaultValue('session_')
-                ->end()
+                ->scalarNode('prefix')->defaultValue('session_')->end()
                 ->scalarNode('ttl')->end()
             ->end();
 
