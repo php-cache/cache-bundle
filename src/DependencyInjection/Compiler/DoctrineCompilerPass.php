@@ -11,7 +11,7 @@
 
 namespace Cache\CacheBundle\DependencyInjection\Compiler;
 
-use Cache\CacheBundle\Cache\FixedTaggingCachePool;
+use Cache\Bridge\DoctrineCacheBridge;
 use Cache\CacheBundle\Factory\DoctrineBridgeFactory;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -73,7 +73,7 @@ class DoctrineCompilerPass implements CompilerPassInterface
 
                 // Doctrine can't talk to a PSR-6 cache, so we need a bridge
                 $bridgeServiceId = sprintf('cache.service.doctrine.%s.%s.bridge', $cacheType, $type);
-                $this->container->register($bridgeServiceId, FixedTaggingCachePool::class)
+                $this->container->register($bridgeServiceId, DoctrineCacheBridge::class)
                     ->setPublic(false)
                     ->setFactory([DoctrineBridgeFactory::class, 'get'])
                     ->addArgument(new Reference($typeConfig['service_id']))
