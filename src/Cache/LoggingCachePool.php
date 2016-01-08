@@ -11,7 +11,6 @@
 
 namespace Cache\CacheBundle\Cache;
 
-use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -22,7 +21,7 @@ use Psr\Log\LoggerInterface;
 class LoggingCachePool extends RecordingCachePool
 {
     /**
-     * @type Logger
+     * @type LoggerInterface
      */
     private $logger;
 

@@ -89,7 +89,7 @@ class CacheExtension extends Extension
                 ->setDecoratedService('router', null, 10)
                 ->addArgument(new Reference($config['router']['service_id']))
                 ->addArgument(new Reference('cache.service.router.inner'))
-                ->addArgument($config['router']['ttl']);
+                ->addArgument($config['router']);
         }
 
         if ($container->getParameter('kernel.debug')) {

@@ -39,12 +39,12 @@ class CachingRouter implements RouterInterface
     /**
      * @param CacheItemPoolInterface $cache
      * @param RouterInterface        $router
-     * @param $ttl
+     * @param array                  $config
      */
-    public function __construct(CacheItemPoolInterface $cache, RouterInterface $router, $ttl)
+    public function __construct(CacheItemPoolInterface $cache, RouterInterface $router, array $config)
     {
         $this->cache  = $cache;
-        $this->ttl    = $ttl;
+        $this->ttl    = $config['ttl'];
         $this->router = $router;
     }
 

@@ -196,6 +196,9 @@ php app/console cache:flush doctrine
 
 echo "Or you could run:"
 php app/console cache:flush all
+
+echo "Run the following command to see all your options:"
+php app/console cache:flush help
 ```
 
 *Caution: If you are using a implementation that does not support tagging you will clear all with any of the above commands.*
