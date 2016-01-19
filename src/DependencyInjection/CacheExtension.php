@@ -15,6 +15,7 @@ use Cache\Bridge\DoctrineCacheBridge;
 use Cache\CacheBundle\Bridge\SessionHandlerBridge;
 use Cache\CacheBundle\Bridge\SymfonyValidatorBridge;
 use Cache\CacheBundle\Factory\DoctrineBridgeFactory;
+use Cache\CacheBundle\Factory\SessionHandlerFactory;
 use Cache\CacheBundle\Factory\ValidationFactory;
 use Cache\CacheBundle\Routing\CachingRouter;
 use Symfony\Component\Config\FileLocator;
@@ -78,8 +79,8 @@ class CacheExtension extends Extension
         }
 
         if ($config['session']['enabled']) {
-            $container->register('cache.service.session', SymfonyValidatorBridge::class)
-                ->setFactory([SessionHandlerBridge::class, 'get'])
+            $container->register('cache.service.session', SessionHandlerBridge::class)
+                ->setFactory([SessionHandlerFactory::class, 'get'])
                 ->addArgument(new Reference($config['session']['service_id']))
                 ->addArgument($config['session']);
         }
