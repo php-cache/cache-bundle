@@ -35,7 +35,7 @@
         "cache/array-adapter":         "@stable"
     },
     "suggest":      {
-        "cache/doctrine-adapter-bundle": "A bundle to register PSR-6 compliant services based on Doctrine cache",
+        "cache/adapter-bundle": "To register PSR-6 compliant cache implementations as services.",
         "cache/psr-6-doctrine-bridge": "To be able to use Doctrine query, result and metadata cache."
     },
     "autoload":     {
