@@ -113,6 +113,7 @@ class CacheExtension extends Extension
      *
      * @param ContainerBuilder $container
      * @param $config
+     *
      * @throws \Exception
      */
     private function registerServices(ContainerBuilder $container, $config)
