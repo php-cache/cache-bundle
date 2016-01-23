@@ -12,12 +12,12 @@
 namespace Cache\CacheBundle\DependencyInjection;
 
 use Cache\Bridge\DoctrineCacheBridge;
-use Cache\CacheBundle\Bridge\SessionHandlerBridge;
 use Cache\CacheBundle\Bridge\SymfonyValidatorBridge;
 use Cache\CacheBundle\Factory\DoctrineBridgeFactory;
 use Cache\CacheBundle\Factory\SessionHandlerFactory;
 use Cache\CacheBundle\Factory\ValidationFactory;
 use Cache\CacheBundle\Routing\CachingRouter;
+use Cache\SessionHandler\Psr6SessionHandler;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
@@ -79,7 +79,7 @@ class CacheExtension extends Extension
         }
 
         if ($config['session']['enabled']) {
-            $container->register('cache.service.session', SessionHandlerBridge::class)
+            $container->register('cache.service.session', Psr6SessionHandler::class)
                 ->setFactory([SessionHandlerFactory::class, 'get'])
                 ->addArgument(new Reference($config['session']['service_id']))
                 ->addArgument($config['session']);
