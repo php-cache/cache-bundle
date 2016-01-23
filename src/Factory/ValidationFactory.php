@@ -11,7 +11,6 @@
 
 namespace Cache\CacheBundle\Factory;
 
-use Cache\Bridge\DoctrineCacheBridge;
 use Cache\CacheBundle\Bridge\SymfonyValidatorBridge;
 use Cache\CacheBundle\Cache\FixedTaggingCachePool;
 use Psr\Cache\CacheItemPoolInterface;
@@ -25,7 +24,7 @@ class ValidationFactory
      * @param CacheItemPoolInterface $pool
      * @param array                  $config
      *
-     * @return DoctrineCacheBridge
+     * @return SymfonyValidatorBridge
      */
     public static function get(CacheItemPoolInterface $pool, $config)
     {

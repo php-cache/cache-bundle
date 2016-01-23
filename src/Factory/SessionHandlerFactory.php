@@ -11,9 +11,8 @@
 
 namespace Cache\CacheBundle\Factory;
 
-use Cache\Bridge\DoctrineCacheBridge;
-use Cache\CacheBundle\Bridge\SessionHandlerBridge;
 use Cache\CacheBundle\Cache\FixedTaggingCachePool;
+use Cache\SessionHandler\Psr6SessionHandler;
 use Psr\Cache\CacheItemPoolInterface;
 
 /**
@@ -25,7 +24,7 @@ class SessionHandlerFactory
      * @param CacheItemPoolInterface $pool
      * @param array                  $config
      *
-     * @return DoctrineCacheBridge
+     * @return Psr6SessionHandler
      */
     public static function get(CacheItemPoolInterface $pool, $config)
     {
@@ -33,6 +32,6 @@ class SessionHandlerFactory
             $pool = new FixedTaggingCachePool($pool, ['session']);
         }
 
-        return new SessionHandlerBridge($pool, $config);
+        return new Psr6SessionHandler($pool, $config);
     }
 }
