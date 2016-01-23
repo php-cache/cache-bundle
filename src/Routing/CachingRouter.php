@@ -125,7 +125,7 @@ class CachingRouter implements RouterInterface
     {
         /** @type RequestContext $c */
         $c   = $this->getContext();
-        $key = sprintf('%s__%s__%s__%s', $c->getMethod(), $c->getHost(), $pathinfo, $c->getQueryString());
+        $key = sprintf('%s__%s__%s__%s', $c->getHost(), str_replace('/', '.', $pathinfo), $c->getMethod(), $c->getQueryString());
 
         return $this->getCacheItemFromKey($key, 'match');
     }
@@ -141,8 +141,8 @@ class CachingRouter implements RouterInterface
      */
     private function getCacheItemGenerate($name, array $parameters, $referenceType)
     {
-        sort($parameters);
-        $key = sprintf('%s.%s.%s', $name, $referenceType ? 'true' : 'false', json_encode($parameters));
+        asort($parameters);
+        $key = sprintf('%s.%s.%s', $name, $referenceType ? 'true' : 'false', http_build_query($parameters));
 
         return $this->getCacheItemFromKey($key, 'generate');
     }

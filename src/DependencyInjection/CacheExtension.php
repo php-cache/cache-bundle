@@ -53,6 +53,71 @@ class CacheExtension extends Extension
             $this->verifyDoctrineBridgeExists('doctrine');
         }
 
+        $this->registerServices($container, $config);
+
+        // Add toolbar and data collector if we are debuging
+        if ($container->getParameter('kernel.debug')) {
+            $loader->load('data-collector.yml');
+        }
+
+        // Get a list of the psr-6 services we are using.
+        $serviceIds = [];
+        $this->findServiceIds($config, $serviceIds);
+        $container->setParameter('cache.provider_service_ids', $serviceIds);
+    }
+
+    /**
+     * Find service ids that we configured. These services should be tagged so we can use them in the debug toolbar.
+     *
+     * @param array $config
+     * @param array $serviceIds
+     */
+    protected function findServiceIds(array $config, array &$serviceIds)
+    {
+        foreach ($config as $name => $value) {
+            if (is_array($value)) {
+                $this->findServiceIds($value, $serviceIds);
+            } elseif ($name === 'service_id') {
+                $serviceIds[] = $value;
+            }
+        }
+    }
+
+    /**
+     * Make sure the DoctrineBridge is installed.
+     *
+     * @param string $name
+     *
+     * @throws \Exception
+     */
+    private function verifyDoctrineBridgeExists($name)
+    {
+        if (!class_exists('Cache\Bridge\DoctrineCacheBridge')) {
+            throw new \Exception(sprintf(
+                'You need the DoctrineBridge to be able to use "%s". Please run "composer require cache/psr-6-doctrine-bridge" to install the missing dependency.',
+                $name
+            ));
+        }
+    }
+
+    /**
+     * @return string
+     */
+    public function getAlias()
+    {
+        return 'cache';
+    }
+
+    /**
+     * Register services. All service ids will start witn "cache.service.".
+     *
+     * @param ContainerBuilder $container
+     * @param $config
+     *
+     * @throws \Exception
+     */
+    private function registerServices(ContainerBuilder $container, $config)
+    {
         if ($config['annotation']['enabled']) {
             $this->verifyDoctrineBridgeExists('annotation');
             $container->register('cache.service.annotation', DoctrineCacheBridge::class)
@@ -92,55 +157,5 @@ class CacheExtension extends Extension
                 ->addArgument(new Reference('cache.service.router.inner'))
                 ->addArgument($config['router']);
         }
-
-        if ($container->getParameter('kernel.debug')) {
-            $loader->load('data-collector.yml');
-        }
-
-        $serviceIds = [];
-        $this->findServiceIds($config, $serviceIds);
-        $container->setParameter('cache.provider_service_ids', $serviceIds);
-    }
-
-    /**
-     * Find service ids that we configured.
-     *
-     * @param array $config
-     * @param array $serviceIds
-     */
-    protected function findServiceIds(array $config, array &$serviceIds)
-    {
-        foreach ($config as $name => $value) {
-            if (is_array($value)) {
-                $this->findServiceIds($value, $serviceIds);
-            } elseif ($name === 'service_id') {
-                $serviceIds[] = $value;
-            }
-        }
-    }
-
-    /**
-     * Make sure the DoctrineBridge is installed.
-     *
-     * @param string $name
-     *
-     * @throws \Exception
-     */
-    private function verifyDoctrineBridgeExists($name)
-    {
-        if (!class_exists('Cache\Bridge\DoctrineCacheBridge')) {
-            throw new \Exception(sprintf(
-                'You need the DoctrineBridge to be able to use "%s". Please run "composer require cache/psr-6-doctrine-bridge" to install the missing dependency.',
-                $name
-            ));
-        }
-    }
-
-    /**
-     * @return string
-     */
-    public function getAlias()
-    {
-        return 'cache';
     }
 }
