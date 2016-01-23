@@ -15,7 +15,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
- * Make sure to tag all cache provider used.
+ * Make sure to tag all cache services we can find.
  *
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */

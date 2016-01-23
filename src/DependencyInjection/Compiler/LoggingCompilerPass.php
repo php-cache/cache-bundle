@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Decorate our cache.provider with a logger.
+ * Decorate our cache.providers with a logger.
  *
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */

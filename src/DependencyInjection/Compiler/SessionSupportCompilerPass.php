@@ -15,7 +15,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
- * Class SessionSupportCompilerPass.
+ * Enable the session support by rewriting the "session.handler" alias.
  *
  * @author Aaron Scherer <aequasi@gmail.com>
  */
