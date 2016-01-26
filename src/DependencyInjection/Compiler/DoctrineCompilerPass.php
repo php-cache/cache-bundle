@@ -71,6 +71,9 @@ class DoctrineCompilerPass implements CompilerPassInterface
                     continue;
                 }
 
+                // Copy the tagging setting to the $typeConfig
+                $typeConfig['use_tagging'] = $config['use_tagging'];
+
                 // Doctrine can't talk to a PSR-6 cache, so we need a bridge
                 $bridgeServiceId = sprintf('cache.service.doctrine.%s.%s.bridge', $cacheType, $type);
                 $this->container->register($bridgeServiceId, DoctrineCacheBridge::class)
