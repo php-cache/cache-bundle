@@ -37,7 +37,7 @@ class CacheFlushCommand extends ContainerAwareCommand
         $this->setDescription('Flushes the given cache');
         $this->addArgument('type', InputArgument::OPTIONAL, sprintf('Which type of cache do you want to clear? Valid types are: %s', implode(', ', self::VALID_TYPES)));
         $this->addArgument('service', InputArgument::OPTIONAL, 'If using type "provider" you must give a service id for the cache you want to clear.');
-        $this->setHelp(<<<EOD
+        $this->setHelp(<<<'EOD'
 
 Types and their description
 all                       Clear all types of caches
