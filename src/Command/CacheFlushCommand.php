@@ -26,8 +26,6 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
  */
 class CacheFlushCommand extends ContainerAwareCommand
 {
-    const VALID_TYPES = ['all', 'annotation', 'session', 'serializer', 'router', 'doctrine', 'symfony', 'validation', 'provider'];
-
     /**
      * {@inheritdoc}
      */
@@ -35,7 +33,7 @@ class CacheFlushCommand extends ContainerAwareCommand
     {
         $this->setName('cache:flush');
         $this->setDescription('Flushes the given cache');
-        $this->addArgument('type', InputArgument::OPTIONAL, sprintf('Which type of cache do you want to clear? Valid types are: %s', implode(', ', self::VALID_TYPES)));
+        $this->addArgument('type', InputArgument::OPTIONAL, sprintf('Which type of cache do you want to clear? Valid types are: %s', implode(', ', $this->getValidTypes())));
         $this->addArgument('service', InputArgument::OPTIONAL, 'If using type "provider" you must give a service id for the cache you want to clear.');
         $this->setHelp(<<<'EOD'
 
@@ -139,7 +137,8 @@ EOD
      */
     protected function verifyArguments(InputInterface $input, OutputInterface $output)
     {
-        $type = $input->getArgument('type');
+        $type       = $input->getArgument('type');
+        $validTypes = $this->getValidTypes();
         if ($type === null) {
             // ask a question and default $type='all'
             $helper   = $this->getHelper('question');
@@ -152,12 +151,12 @@ EOD
             $type = 'all';
         }
 
-        if (!in_array($type, self::VALID_TYPES)) {
+        if (!in_array($type, $validTypes)) {
             $output->writeln(
                 sprintf(
                     '<error>Type "%s" does not exist. Valid type are: %s.</error>',
                     $type,
-                    implode(', ', self::VALID_TYPES)
+                    implode(', ', $validTypes)
                 )
             );
 
@@ -202,5 +201,15 @@ EOD
         ];
 
         return $command->run(new ArrayInput($arguments), $output) === 0;
+    }
+
+    /**
+     * List of valid cache identifiers.
+     *
+     * @return string[]
+     */
+    private function getValidTypes()
+    {
+        return ['all', 'annotation', 'session', 'serializer', 'router', 'doctrine', 'symfony', 'validation', 'provider'];
     }
 }
