@@ -124,7 +124,7 @@ class CacheExtension extends Extension
                 ->setFactory([DoctrineBridgeFactory::class, 'get'])
                 ->addArgument(new Reference($config['annotation']['service_id']))
                 ->addArgument($config['annotation'])
-                ->addArgument('annotation');
+                ->addArgument(['annotation']);
         }
 
         if ($config['serializer']['enabled']) {
@@ -133,7 +133,7 @@ class CacheExtension extends Extension
                 ->setFactory([DoctrineBridgeFactory::class, 'get'])
                 ->addArgument(new Reference($config['serializer']['service_id']))
                 ->addArgument($config['serializer'])
-                ->addArgument('serializer');
+                ->addArgument(['serializer']);
         }
 
         if ($config['validation']['enabled']) {
