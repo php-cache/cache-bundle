@@ -18,9 +18,6 @@ namespace Cache\CacheBundle\Tests;
  */
 class ContainerTest extends TestCase
 {
-    /**
-     *
-     */
     public function testContainer()
     {
         //$container = $this->createContainer();

@@ -20,9 +20,6 @@ use Cache\CacheBundle\Tests\TestCase;
  */
 class CacheExtensionTest extends TestCase
 {
-    /**
-     *
-     */
     public function testRouterBuilder()
     {
         $container = $this->createContainerFromFile('router');
