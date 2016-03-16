@@ -11,7 +11,7 @@
 
 namespace Cache\CacheBundle\Routing;
 
-use Cache\Taggable\TaggablePoolInterface;
+use Cache\Taggable\TaggableItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouterInterface;
@@ -163,10 +163,10 @@ class CachingRouter implements RouterInterface
      */
     private function getCacheItemFromKey($key, $tag)
     {
-        if ($this->cache instanceof TaggablePoolInterface) {
-            $item = $this->cache->getItem($key, ['router', $tag]);
-        } else {
-            $item = $this->cache->getItem($key);
+        $item = $this->cache->getItem($key);
+
+        if ($item instanceof TaggableItemInterface) {
+            $item->setTags(['router', $tag]);
         }
 
         return $item;

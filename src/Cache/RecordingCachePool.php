@@ -67,11 +67,11 @@ class RecordingCachePool implements CacheItemPoolInterface, TaggablePoolInterfac
         return $object;
     }
 
-    public function getItem($key, array $tags = [])
+    public function getItem($key)
     {
-        $call         = $this->timeCall(__FUNCTION__, [$key, $tags]);
-        $result       = $call->result;
-        $call->isHit  = $result->isHit();
+        $call        = $this->timeCall(__FUNCTION__, [$key]);
+        $result      = $call->result;
+        $call->isHit = $result->isHit();
 
         // Display the result in a good way depending on the data type
         if ($call->isHit) {
@@ -85,17 +85,17 @@ class RecordingCachePool implements CacheItemPoolInterface, TaggablePoolInterfac
         return $result;
     }
 
-    public function hasItem($key, array $tags = [])
+    public function hasItem($key)
     {
-        $call          = $this->timeCall(__FUNCTION__, [$key, $tags]);
+        $call = $this->timeCall(__FUNCTION__, [$key]);
         $this->addCall($call);
 
         return $call->result;
     }
 
-    public function deleteItem($key, array $tags = [])
+    public function deleteItem($key)
     {
-        $call          = $this->timeCall(__FUNCTION__, [$key, $tags]);
+        $call = $this->timeCall(__FUNCTION__, [$key]);
         $this->addCall($call);
 
         return $call->result;
@@ -125,9 +125,9 @@ class RecordingCachePool implements CacheItemPoolInterface, TaggablePoolInterfac
         return $call->result;
     }
 
-    public function getItems(array $keys = [], array $tags = [])
+    public function getItems(array $keys = [])
     {
-        $call         = $this->timeCall(__FUNCTION__, [$keys, $tags]);
+        $call         = $this->timeCall(__FUNCTION__, [$keys]);
         $result       = $call->result;
         $call->result = sprintf('<DATA:%s>', gettype($result));
         $this->addCall($call);
@@ -135,17 +135,25 @@ class RecordingCachePool implements CacheItemPoolInterface, TaggablePoolInterfac
         return $result;
     }
 
-    public function clear(array $tags = [])
+    public function clear()
     {
-        $call          = $this->timeCall(__FUNCTION__, [$tags]);
+        $call = $this->timeCall(__FUNCTION__, []);
         $this->addCall($call);
 
         return $call->result;
     }
 
-    public function deleteItems(array $keys, array $tags = [])
+    public function clearTags(array $tags)
     {
-        $call          = $this->timeCall(__FUNCTION__, [$keys, $tags]);
+        $call = $this->timeCall(__FUNCTION__, [$tags]);
+        $this->addCall($call);
+
+        return $call->result;
+    }
+
+    public function deleteItems(array $keys)
+    {
+        $call = $this->timeCall(__FUNCTION__, [$keys]);
         $this->addCall($call);
 
         return $call->result;
@@ -153,7 +161,7 @@ class RecordingCachePool implements CacheItemPoolInterface, TaggablePoolInterfac
 
     public function commit()
     {
-        $call          = $this->timeCall(__FUNCTION__);
+        $call = $this->timeCall(__FUNCTION__);
         $this->addCall($call);
 
         return $call->result;

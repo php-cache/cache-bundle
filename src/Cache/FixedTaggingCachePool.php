@@ -11,6 +11,7 @@
 
 namespace Cache\CacheBundle\Cache;
 
+use Cache\Taggable\TaggableItemInterface;
 use Cache\Taggable\TaggablePoolInterface;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
@@ -48,7 +49,7 @@ class FixedTaggingCachePool implements CacheItemPoolInterface
      */
     public function getItem($key)
     {
-        return $this->cache->getItem($key, $this->tags);
+        return $this->cache->getItem($key);
     }
 
     /**
@@ -56,7 +57,7 @@ class FixedTaggingCachePool implements CacheItemPoolInterface
      */
     public function getItems(array $keys = [])
     {
-        return $this->cache->getItems($keys, $this->tags);
+        return $this->cache->getItems($keys);
     }
 
     /**
@@ -64,7 +65,7 @@ class FixedTaggingCachePool implements CacheItemPoolInterface
      */
     public function hasItem($key)
     {
-        return $this->cache->hasItem($key, $this->tags);
+        return $this->cache->hasItem($key);
     }
 
     /**
@@ -72,7 +73,7 @@ class FixedTaggingCachePool implements CacheItemPoolInterface
      */
     public function clear()
     {
-        return $this->cache->clear($this->tags);
+        return $this->cache->clear();
     }
 
     /**
@@ -80,7 +81,7 @@ class FixedTaggingCachePool implements CacheItemPoolInterface
      */
     public function deleteItem($key)
     {
-        return $this->cache->deleteItem($key, $this->tags);
+        return $this->cache->deleteItem($key);
     }
 
     /**
@@ -88,7 +89,7 @@ class FixedTaggingCachePool implements CacheItemPoolInterface
      */
     public function deleteItems(array $keys)
     {
-        return $this->cache->deleteItems($keys, $this->tags);
+        return $this->cache->deleteItems($keys);
     }
 
     /**
@@ -96,6 +97,7 @@ class FixedTaggingCachePool implements CacheItemPoolInterface
      */
     public function save(CacheItemInterface $item)
     {
+        $this->addTags($item);
         return $this->cache->save($item);
     }
 
@@ -104,7 +106,18 @@ class FixedTaggingCachePool implements CacheItemPoolInterface
      */
     public function saveDeferred(CacheItemInterface $item)
     {
+        $this->addTags($item);
         return $this->cache->saveDeferred($item);
+    }
+
+    /**
+     * @param TaggableItemInterface $item
+     */
+    private function addTags(TaggableItemInterface $item)
+    {
+        foreach ($this->tags as $tag) {
+            $item->addTag($tag);
+        }
     }
 
     /**
