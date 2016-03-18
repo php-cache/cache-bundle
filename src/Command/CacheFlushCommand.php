@@ -123,7 +123,7 @@ EOD
         /** @type \Psr\Cache\CacheItemPoolInterface $service */
         $service = $this->getContainer()->get($serviceId);
         if ($service instanceof TaggablePoolInterface) {
-            return $service->clear([$type]);
+            return $service->clearTags([$type]);
         } else {
             return $service->clear();
         }
