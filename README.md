@@ -28,3 +28,7 @@ $bundles(
 ```
 
 Read the documentation at [www.php-cache.com/symfony/cache-bundle](http://www.php-cache.com/en/latest/symfony/cache-bundle/).
+
+### Contribute
+
+Contributions are very welcome! Send a pull request or report any issues you find on the [issue tracker](http://issues.php-cache.com).
