@@ -13,6 +13,7 @@ namespace Cache\CacheBundle\Factory;
 
 use Cache\CacheBundle\Cache\FixedTaggingCachePool;
 use Cache\SessionHandler\Psr6SessionHandler;
+use Cache\Taggable\TaggablePSR6PoolAdapter;
 use Psr\Cache\CacheItemPoolInterface;
 
 /**
@@ -29,7 +30,7 @@ class SessionHandlerFactory
     public static function get(CacheItemPoolInterface $pool, $config)
     {
         if ($config['use_tagging']) {
-            $pool = new FixedTaggingCachePool($pool, ['session']);
+            $pool = new FixedTaggingCachePool(TaggablePSR6PoolAdapter::makeTaggable($pool), ['session']);
         }
 
         return new Psr6SessionHandler($pool, $config);
