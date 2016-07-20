@@ -56,7 +56,7 @@ class RecordingCachePool implements CacheItemPoolInterface, TaggablePoolInterfac
      *
      * @return object
      */
-    private function timeCall($name, array $arguments = null)
+    private function timeCall($name, array $arguments = [])
     {
         $start  = microtime(true);
         $result = call_user_func_array([$this->cachePool, $name], $arguments);
