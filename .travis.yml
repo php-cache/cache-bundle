@@ -13,9 +13,13 @@ env:
     - TEST_COMMAND="php vendor/bin/phpunit"
     - COVERAGE=false
   matrix:
-  - SYMFONY_VERSION=2.7.*
-  - SYMFONY_VERSION=2.8.*
-  - SYMFONY_VERSION=3.0.*
+    - SYMFONY_VERSION=2.7.*
+    - SYMFONY_VERSION=2.8.*
+    - SYMFONY_VERSION=3.0.*
+
+branches:
+  except:
+    - /^analysis-.*$/
 
 matrix:
   fast_finish: true

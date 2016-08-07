@@ -1,17 +1,17 @@
 {
-    "name":         "cache/cache-bundle",
-    "type":         "library",
-    "description":  "Symfony 2 bundle providing integration between PSR-6 compliant cache services and the framework. It supports cache for sessions, routing and Doctrine",
-    "keywords":     [
+    "name": "cache/cache-bundle",
+    "type": "library",
+    "description": "Symfony 2 bundle providing integration between PSR-6 compliant cache services and the framework. It supports cache for sessions, routing and Doctrine",
+    "keywords": [
         "cache",
         "psr6",
         "doctrine",
         "router",
         "session"
     ],
-    "homepage":     "http://www.php-cache.com/en/latest/",
-    "license":      "MIT",
-    "authors":      [
+    "homepage": "http://www.php-cache.com/en/latest/",
+    "license": "MIT",
+    "authors": [
         {
             "name":     "Aaron Scherer",
             "email":    "aequasi@gmail.com",
@@ -23,22 +23,23 @@
             "homepage": "https://github.com/nyholm"
         }
     ],
-    "require":      {
-        "php":                         "^5.5|^7.0",
-        "symfony/framework-bundle":    "^2.7|^3.0",
-        "cache/taggable-cache":        "^0.4",
-        "cache/session-handler":       "^0.1"
+    "require": {
+        "php": "^5.5 || ^7.0",
+        "symfony/framework-bundle": "^2.7 || ^3.0",
+        "cache/taggable-cache": "^0.4",
+        "cache/session-handler": "^0.1"
     },
     "require-dev":  {
-        "phpunit/phpunit":             "^5.1|^4.0",
+        "phpunit/phpunit": "^5.1 || ^4.0",
+        "symfony/symfony": "^2.7 || ^3.0",
         "cache/psr-6-doctrine-bridge": "^2.0",
-        "cache/array-adapter":         "^0.4"
+        "cache/array-adapter": "^0.4"
     },
-    "suggest":      {
+    "suggest": {
         "cache/adapter-bundle": "To register PSR-6 compliant cache implementations as services.",
         "cache/psr-6-doctrine-bridge": "To be able to use Doctrine query, result and metadata cache."
     },
-    "autoload":     {
+    "autoload": {
         "psr-4": {
             "Cache\\CacheBundle\\": "src/"
         }
