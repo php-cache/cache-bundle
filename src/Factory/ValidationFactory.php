@@ -13,6 +13,7 @@ namespace Cache\CacheBundle\Factory;
 
 use Cache\CacheBundle\Bridge\SymfonyValidatorBridge;
 use Cache\CacheBundle\Cache\FixedTaggingCachePool;
+use Cache\Taggable\TaggablePSR6PoolAdapter;
 use Psr\Cache\CacheItemPoolInterface;
 
 /**
@@ -29,7 +30,7 @@ class ValidationFactory
     public static function get(CacheItemPoolInterface $pool, $config)
     {
         if ($config['use_tagging']) {
-            $pool = new FixedTaggingCachePool($pool, ['validation']);
+            $pool = new FixedTaggingCachePool(TaggablePSR6PoolAdapter::makeTaggable($pool), ['validation']);
         }
 
         return new SymfonyValidatorBridge($pool);

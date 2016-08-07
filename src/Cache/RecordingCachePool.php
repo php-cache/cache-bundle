@@ -12,6 +12,7 @@
 namespace Cache\CacheBundle\Cache;
 
 use Cache\Taggable\TaggablePoolInterface;
+use Cache\Taggable\TaggablePSR6PoolAdapter;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 
@@ -37,7 +38,7 @@ class RecordingCachePool implements CacheItemPoolInterface, TaggablePoolInterfac
      */
     public function __construct(CacheItemPoolInterface $cachePool)
     {
-        $this->cachePool = $cachePool;
+        $this->cachePool = TaggablePSR6PoolAdapter::makeTaggable($cachePool);
     }
 
     /**
