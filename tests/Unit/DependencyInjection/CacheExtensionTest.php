@@ -9,9 +9,9 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Cache\CacheBundle\Tests\DependencyInjection;
+namespace Cache\CacheBundle\Tests\Unit\DependencyInjection;
 
-use Cache\CacheBundle\Tests\TestCase;
+use Cache\CacheBundle\Tests\Unit\TestCase;
 
 /**
  * Class CacheExtensionTest.

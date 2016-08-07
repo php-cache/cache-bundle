@@ -12,14 +12,10 @@
   bootstrap="vendor/autoload.php"
   >
   <testsuites>
-    <testsuite name="CacheBundle for the Symfony2 Framework">
+    <testsuite name="Main testsuite for CacheBundle">
       <directory>./tests/</directory>
     </testsuite>
   </testsuites>
-
-  <logging>
-    <log type="coverage-text" target="php://stdout"/>
-  </logging>
 
   <groups>
     <exclude>

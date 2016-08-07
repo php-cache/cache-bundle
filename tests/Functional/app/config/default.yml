@@ -1,0 +1,9 @@
+imports:
+    - { resource: framework.yml }
+
+cache_adapter:
+  providers:
+    my_adapter:
+      factory: 'cache.factory.array'
+      options: []
+      aliases: ['alias.my_adapter']

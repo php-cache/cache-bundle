@@ -9,7 +9,7 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Cache\CacheBundle\Tests;
+namespace Cache\CacheBundle\Tests\Unit;
 
 /**
  * Class ContainerTest.
