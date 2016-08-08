@@ -4,6 +4,12 @@ The change log describes what is "Added", "Removed", "Changed" or "Fixed" betwee
 
 ## UNRELEASED
 
+## 0.4.3
+
+### Fixed 
+
+* Require taggable 0.4.3 to avoid bugs in 0.4.2
+
 ## 0.4.2
 
 ### Added
