@@ -26,7 +26,7 @@
     "require": {
         "php": "^5.5 || ^7.0",
         "symfony/framework-bundle": "^2.7 || ^3.0",
-        "cache/taggable-cache": "^0.4",
+        "cache/taggable-cache": "^0.4.3",
         "cache/session-handler": "^0.1"
     },
     "require-dev":  {
