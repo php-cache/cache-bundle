@@ -9,27 +9,45 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Cache\CacheBundle\Cache;
+namespace Cache\CacheBundle\Cache\Recording;
 
 use Cache\Taggable\TaggablePoolInterface;
-use Cache\Taggable\TaggablePSR6PoolAdapter;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
+use Psr\Log\LoggerInterface;
 
 /**
+ * A pool that logs and collects all your cache calls.
+ *
  * @author Aaron Scherer <aequasi@gmail.com>
+ * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-class RecordingCachePool implements CacheItemPoolInterface, TaggablePoolInterface
+class CachePool implements CacheItemPoolInterface, TaggablePoolInterface
 {
     /**
-     * @type array
+     * @var array
      */
     private $calls = [];
 
     /**
-     * @type CacheItemPoolInterface
+     * @var CacheItemPoolInterface
      */
     private $cachePool;
+
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
+     * @var string
+     */
+    private $name;
+
+    /**
+     * @var string
+     */
+    private $level = 'info';
 
     /**
      * LoggingCachePool constructor.
@@ -38,7 +56,7 @@ class RecordingCachePool implements CacheItemPoolInterface, TaggablePoolInterfac
      */
     public function __construct(CacheItemPoolInterface $cachePool)
     {
-        $this->cachePool = TaggablePSR6PoolAdapter::makeTaggable($cachePool);
+        $this->cachePool = $cachePool;
     }
 
     /**
@@ -49,6 +67,8 @@ class RecordingCachePool implements CacheItemPoolInterface, TaggablePoolInterfac
     protected function addCall($call)
     {
         $this->calls[] = $call;
+
+        $this->writeLog($call);
     }
 
     /**
@@ -57,11 +77,11 @@ class RecordingCachePool implements CacheItemPoolInterface, TaggablePoolInterfac
      *
      * @return object
      */
-    private function timeCall($name, array $arguments = [])
+    protected function timeCall($name, array $arguments = [])
     {
-        $start  = microtime(true);
+        $start = microtime(true);
         $result = call_user_func_array([$this->cachePool, $name], $arguments);
-        $time   = microtime(true) - $start;
+        $time = microtime(true) - $start;
 
         $object = (object) compact('name', 'arguments', 'start', 'time', 'result');
 
@@ -70,8 +90,8 @@ class RecordingCachePool implements CacheItemPoolInterface, TaggablePoolInterfac
 
     public function getItem($key)
     {
-        $call        = $this->timeCall(__FUNCTION__, [$key]);
-        $result      = $call->result;
+        $call = $this->timeCall(__FUNCTION__, [$key]);
+        $result = $call->result;
         $call->isHit = $result->isHit();
 
         // Display the result in a good way depending on the data type
@@ -104,10 +124,10 @@ class RecordingCachePool implements CacheItemPoolInterface, TaggablePoolInterfac
 
     public function save(CacheItemInterface $item)
     {
-        $key   = $item->getKey();
+        $key = $item->getKey();
         $value = $this->getValueRepresentation($item->get());
 
-        $call            = $this->timeCall(__FUNCTION__, [$item]);
+        $call = $this->timeCall(__FUNCTION__, [$item]);
         $call->arguments = ['<CacheItem>', $key, $value];
         $this->addCall($call);
 
@@ -116,10 +136,10 @@ class RecordingCachePool implements CacheItemPoolInterface, TaggablePoolInterfac
 
     public function saveDeferred(CacheItemInterface $item)
     {
-        $key   = $item->getKey();
+        $key = $item->getKey();
         $value = $this->getValueRepresentation($item->get());
 
-        $call            = $this->timeCall(__FUNCTION__, [$item]);
+        $call = $this->timeCall(__FUNCTION__, [$item]);
         $call->arguments = ['<CacheItem>', $key, $value];
         $this->addCall($call);
 
@@ -128,8 +148,8 @@ class RecordingCachePool implements CacheItemPoolInterface, TaggablePoolInterfac
 
     public function getItems(array $keys = [])
     {
-        $call         = $this->timeCall(__FUNCTION__, [$keys]);
-        $result       = $call->result;
+        $call = $this->timeCall(__FUNCTION__, [$keys]);
+        $result = $call->result;
         $call->result = sprintf('<DATA:%s>', gettype($result));
         $this->addCall($call);
 
@@ -197,5 +217,62 @@ class RecordingCachePool implements CacheItemPoolInterface, TaggablePoolInterfac
         }
 
         return $rep;
+    }
+
+    protected function writeLog($call)
+    {
+        if (!$this->logger) {
+            return;
+        }
+
+        $data = [
+            'name' => $this->name,
+            'method' => $call->name,
+            'arguments' => json_encode($call->arguments),
+            'hit' => isset($call->isHit) ? $call->isHit ? 'True' : 'False' : 'Invalid',
+            'time' => round($call->time * 1000, 2),
+            'result' => $call->result,
+        ];
+
+        $this->logger->log(
+            $this->level,
+            sprintf('[Cache] Provider: %s. Method: %s(%s). Hit: %s. Time: %sms. Result: %s',
+                $data['name'],
+                $data['method'],
+                $data['arguments'],
+                $data['hit'],
+                $data['time'],
+                $data['result']
+            ),
+            $data
+        );
+    }
+
+    /**
+     * @param LoggerInterface $logger
+     */
+    public function setLogger(LoggerInterface $logger = null)
+    {
+        $this->logger = $logger;
+    }
+
+    /**
+     * @param string $name
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * @param string $level
+     */
+    public function setLevel($level)
+    {
+        $this->level = $level;
+
+        return $this;
     }
 }
