@@ -32,7 +32,7 @@ class DataCollectorCompilerPass implements CompilerPassInterface
     {
         // Create a factory service
         $factoryId = 'cache.recorder_factory';
-        $factory = $container->register($factoryId, Factory::class);
+        $factory   = $container->register($factoryId, Factory::class);
         // Check if logging support is enabled
         if ($container->hasParameter('cache.logging')) {
             $config     = $container->getParameter('cache.logging');

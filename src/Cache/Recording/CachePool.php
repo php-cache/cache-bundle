@@ -25,27 +25,27 @@ use Psr\Log\LoggerInterface;
 class CachePool implements CacheItemPoolInterface, TaggablePoolInterface
 {
     /**
-     * @var array
+     * @type array
      */
     private $calls = [];
 
     /**
-     * @var CacheItemPoolInterface
+     * @type CacheItemPoolInterface
      */
     private $cachePool;
 
     /**
-     * @var LoggerInterface
+     * @type LoggerInterface
      */
     private $logger;
 
     /**
-     * @var string
+     * @type string
      */
     private $name;
 
     /**
-     * @var string
+     * @type string
      */
     private $level = 'info';
 
@@ -79,9 +79,9 @@ class CachePool implements CacheItemPoolInterface, TaggablePoolInterface
      */
     protected function timeCall($name, array $arguments = [])
     {
-        $start = microtime(true);
+        $start  = microtime(true);
         $result = call_user_func_array([$this->cachePool, $name], $arguments);
-        $time = microtime(true) - $start;
+        $time   = microtime(true) - $start;
 
         $object = (object) compact('name', 'arguments', 'start', 'time', 'result');
 
@@ -90,8 +90,8 @@ class CachePool implements CacheItemPoolInterface, TaggablePoolInterface
 
     public function getItem($key)
     {
-        $call = $this->timeCall(__FUNCTION__, [$key]);
-        $result = $call->result;
+        $call        = $this->timeCall(__FUNCTION__, [$key]);
+        $result      = $call->result;
         $call->isHit = $result->isHit();
 
         // Display the result in a good way depending on the data type
@@ -124,10 +124,10 @@ class CachePool implements CacheItemPoolInterface, TaggablePoolInterface
 
     public function save(CacheItemInterface $item)
     {
-        $key = $item->getKey();
+        $key   = $item->getKey();
         $value = $this->getValueRepresentation($item->get());
 
-        $call = $this->timeCall(__FUNCTION__, [$item]);
+        $call            = $this->timeCall(__FUNCTION__, [$item]);
         $call->arguments = ['<CacheItem>', $key, $value];
         $this->addCall($call);
 
@@ -136,10 +136,10 @@ class CachePool implements CacheItemPoolInterface, TaggablePoolInterface
 
     public function saveDeferred(CacheItemInterface $item)
     {
-        $key = $item->getKey();
+        $key   = $item->getKey();
         $value = $this->getValueRepresentation($item->get());
 
-        $call = $this->timeCall(__FUNCTION__, [$item]);
+        $call            = $this->timeCall(__FUNCTION__, [$item]);
         $call->arguments = ['<CacheItem>', $key, $value];
         $this->addCall($call);
 
@@ -148,8 +148,8 @@ class CachePool implements CacheItemPoolInterface, TaggablePoolInterface
 
     public function getItems(array $keys = [])
     {
-        $call = $this->timeCall(__FUNCTION__, [$keys]);
-        $result = $call->result;
+        $call         = $this->timeCall(__FUNCTION__, [$keys]);
+        $result       = $call->result;
         $call->result = sprintf('<DATA:%s>', gettype($result));
         $this->addCall($call);
 
@@ -226,12 +226,12 @@ class CachePool implements CacheItemPoolInterface, TaggablePoolInterface
         }
 
         $data = [
-            'name' => $this->name,
-            'method' => $call->name,
+            'name'      => $this->name,
+            'method'    => $call->name,
             'arguments' => json_encode($call->arguments),
-            'hit' => isset($call->isHit) ? $call->isHit ? 'True' : 'False' : 'Invalid',
-            'time' => round($call->time * 1000, 2),
-            'result' => $call->result,
+            'hit'       => isset($call->isHit) ? $call->isHit ? 'True' : 'False' : 'Invalid',
+            'time'      => round($call->time * 1000, 2),
+            'result'    => $call->result,
         ];
 
         $this->logger->log(
