@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of php-cache\cache-bundle package.
+ *
+ * (c) 2015-2015 Aaron Scherer <aequasi@gmail.com>, Tobias Nyholm <tobias.nyholm@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace Cache\CacheBundle\Tests\Unit\DependencyInjection;
 
 use Cache\CacheBundle\DependencyInjection\Compiler\DataCollectorCompilerPass;
@@ -20,7 +29,7 @@ class DataCollectorCompilerPassTest extends AbstractCompilerPassTestCase
         $collector = new Definition();
         $this->setDefinition('cache.data_collector', $collector);
 
-        $this->setParameter('cache.logging', ['logger'=>'foo_logger', 'level'=>'bar']);
+        $this->setParameter('cache.logging', ['logger' => 'foo_logger', 'level' => 'bar']);
         $this->compile();
 
         $this->assertContainerBuilderHasServiceDefinitionWithArgument(
@@ -49,10 +58,10 @@ class DataCollectorCompilerPassTest extends AbstractCompilerPassTestCase
         $this->assertContainerBuilderHasServiceDefinitionWithMethodCall(
             'cache.data_collector',
             'addInstance',
-            array(
+            [
                 'collected_pool',
-                new Reference('collected_pool')
-            )
+                new Reference('collected_pool'),
+            ]
         );
 
         $this->assertContainerBuilderHasService('collected_pool.inner');
