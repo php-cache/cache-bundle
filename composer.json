@@ -33,7 +33,8 @@
         "phpunit/phpunit": "^5.1 || ^4.0",
         "symfony/symfony": "^2.7 || ^3.0",
         "cache/psr-6-doctrine-bridge": "^2.0",
-        "cache/array-adapter": "^0.4"
+        "cache/array-adapter": "^0.4",
+        "matthiasnoback/symfony-dependency-injection-test": "^1.0"
     },
     "suggest": {
         "cache/adapter-bundle": "To register PSR-6 compliant cache implementations as services.",

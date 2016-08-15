@@ -16,8 +16,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
- * Class AequasiCacheBundle.
- *
  * @author Aaron Scherer <aequasi@gmail.com>
  */
 class CacheBundle extends Bundle
@@ -30,7 +28,6 @@ class CacheBundle extends Bundle
         parent::build($container);
 
         $container->addCompilerPass(new Compiler\CacheTaggingPass());
-        $container->addCompilerPass(new Compiler\LoggingCompilerPass());
         $container->addCompilerPass(new Compiler\SessionSupportCompilerPass());
         $container->addCompilerPass(new Compiler\DoctrineCompilerPass());
 

@@ -11,7 +11,7 @@
 
 namespace Cache\CacheBundle\DataCollector;
 
-use Cache\CacheBundle\Cache\RecordingCachePool;
+use Cache\CacheBundle\Cache\Recording\CachePool;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
@@ -31,15 +31,15 @@ class CacheDataCollector extends DataCollector
     const TEMPLATE = 'CacheBundle:Collector:cache.html.twig';
 
     /**
-     * @type RecordingCachePool[]
+     * @type CachePool[]
      */
     private $instances = [];
 
     /**
-     * @param                    $name
-     * @param RecordingCachePool $instance
+     * @param string    $name
+     * @param CachePool $instance
      */
-    public function addInstance($name, RecordingCachePool $instance)
+    public function addInstance($name, CachePool $instance)
     {
         $this->instances[$name] = $instance;
     }
