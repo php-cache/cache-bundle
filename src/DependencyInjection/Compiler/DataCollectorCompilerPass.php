@@ -30,6 +30,10 @@ class DataCollectorCompilerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
+        if (!$container->hasDefinition('cache.data_collector')) {
+            return;
+        }
+
         // Create a factory service
         $factoryId = 'cache.recorder_factory';
         $factory   = $container->register($factoryId, Factory::class);
@@ -57,7 +61,7 @@ class DataCollectorCompilerPass implements CompilerPassInterface
             $recorderDefinition->addArgument(new Reference($id.'.inner'));
             $recorderDefinition->setTags($poolDefinition->getTags());
 
-            // Tell the collector to add the new logger
+            // Tell the collector to add the new instance
             $collectorDefinition->addMethodCall('addInstance', [$id, new Reference($id)]);
         }
     }
