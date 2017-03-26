@@ -97,7 +97,9 @@ class FixedTaggingCachePool implements CacheItemPoolInterface
      */
     public function save(CacheItemInterface $item)
     {
-        $this->addTags($item);
+        if ($item instanceof TaggableItemInterface) {
+            $this->addTags($item);
+        }
 
         return $this->cache->save($item);
     }
