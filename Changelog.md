@@ -4,6 +4,19 @@ The change log describes what is "Added", "Removed", "Changed" or "Fixed" betwee
 
 ## UNRELEASED
 
+## 0.5.0
+
+### Changed
+
+- Using cache/session-handler: ^0.2. **This will break all cached sessions**
+- Using cache/taggable-cache: ^0.5 to support the latest versions of the adapters. 
+
+## 0.4.4
+
+### Fixed
+
+- Make sure RecordingPool does not change the type of pool. 
+
 ## 0.4.3
 
 ### Fixed 
