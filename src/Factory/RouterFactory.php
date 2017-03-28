@@ -11,8 +11,6 @@
 
 namespace Cache\CacheBundle\Factory;
 
-use Cache\Bridge\Doctrine\DoctrineCacheBridge;
-use Cache\CacheBundle\Cache\FixedTaggingCachePool;
 use Cache\CacheBundle\Routing\CachingRouter;
 use Cache\Prefixed\PrefixedCachePool;
 use Cache\Taggable\TaggablePSR6PoolAdapter;
@@ -26,8 +24,8 @@ class RouterFactory
 {
     /**
      * @param CacheItemPoolInterface $pool
-     * @param RouterInterface $router
-     * @param array $config
+     * @param RouterInterface        $router
+     * @param array                  $config
      *
      * @return CachingRouter
      */
