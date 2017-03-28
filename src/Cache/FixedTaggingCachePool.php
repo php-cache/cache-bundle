@@ -20,8 +20,7 @@ use Psr\Cache\CacheItemPoolInterface;
 use Psr\Cache\InvalidArgumentException;
 
 /**
- * This class is a decorator for a TaggablePoolInterface. It tags everything with predefined tags.
- * Use this class with the DoctrineBridge.
+ * This class is a decorator for a TaggableCacheItemPoolInterface. It tags everything with predefined tags.
  *
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
@@ -98,11 +97,13 @@ class FixedTaggingCachePool implements TaggableCacheItemPoolInterface
     /**
      * {@inheritdoc}
      */
-    public function save(TaggableCacheItemInterface $item)
+    public function save(CacheItemInterface $item)
     {
-        if ($item instanceof TaggableItemInterface) {
-            $this->addTags($item);
+        if (!$item instanceof TaggableCacheItemInterface) {
+            throw new InvalidArgumentException('Cache items are not transferable between pools. Item MUST implement TaggableCacheItemInterface.');
         }
+
+        $item->setTags($this->tags);
 
         return $this->cache->save($item);
     }
@@ -110,9 +111,13 @@ class FixedTaggingCachePool implements TaggableCacheItemPoolInterface
     /**
      * {@inheritdoc}
      */
-    public function saveDeferred(CacheItemPoolInterface $item)
+    public function saveDeferred(CacheItemInterface $item)
     {
-        $this->addTags($item);
+        if (!$item instanceof TaggableCacheItemInterface) {
+            throw new InvalidArgumentException('Cache items are not transferable between pools. Item MUST implement TaggableCacheItemInterface.');
+        }
+
+        $item->setTags($this->tags);
 
         return $this->cache->saveDeferred($item);
     }
