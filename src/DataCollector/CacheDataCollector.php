@@ -36,12 +36,12 @@ class CacheDataCollector extends DataCollector
     private $instances = array();
 
     /**
-     * @param string           $name
+     * @param string    $name
      * @param CachePool $instance
      */
-    public function addInstance(CachePool $instance)
+    public function addInstance($name, CachePool $instance)
     {
-        $this->instances[$instance->getName()] = $instance;
+        $this->instances[$name] = $instance;
     }
 
     /**

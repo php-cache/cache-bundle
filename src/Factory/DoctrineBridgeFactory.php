@@ -11,7 +11,7 @@
 
 namespace Cache\CacheBundle\Factory;
 
-use Cache\Bridge\DoctrineCacheBridge;
+use Cache\Bridge\Doctrine\DoctrineCacheBridge;
 use Cache\CacheBundle\Cache\FixedTaggingCachePool;
 use Cache\Taggable\TaggablePSR6PoolAdapter;
 use Psr\Cache\CacheItemPoolInterface;
