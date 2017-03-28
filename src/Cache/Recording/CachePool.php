@@ -25,29 +25,29 @@ use Psr\Log\LoggerInterface;
 class CachePool implements CacheItemPoolInterface
 {
     /**
-     * @var CacheItemPoolInterface
+     * @type CacheItemPoolInterface
      */
     protected $pool;
 
     /**
-     * @var LoggerInterface
+     * @type LoggerInterface
      */
     private $logger;
 
     /**
-     * @var string
+     * @type string
      */
     private $name;
 
     /**
-     * @var string
+     * @type string
      */
     private $level = 'info';
 
     /**
-     * @var array calls
+     * @type array calls
      */
-    private $calls = array();
+    private $calls = [];
 
     /**
      * @param CacheItemPoolInterface $pool
@@ -139,7 +139,7 @@ class CachePool implements CacheItemPoolInterface
     /**
      * {@inheritdoc}
      */
-    public function getItems(array $keys = array())
+    public function getItems(array $keys = [])
     {
         $event = $this->start(__FUNCTION__, $keys);
         try {
@@ -148,7 +148,7 @@ class CachePool implements CacheItemPoolInterface
             $event->end = microtime(true);
         }
         $f = function () use ($result, $event) {
-            $event->result = array();
+            $event->result = [];
             foreach ($result as $key => $item) {
                 if ($item->isHit()) {
                     ++$event->hits;
@@ -209,10 +209,10 @@ class CachePool implements CacheItemPoolInterface
 
     protected function start($name, $argument = null)
     {
-        $this->calls[] = $event = new TraceableAdapterEvent();
-        $event->name = $name;
+        $this->calls[]   = $event   = new TraceableAdapterEvent();
+        $event->name     = $name;
         $event->argument = $argument;
-        $event->start = microtime(true);
+        $event->start    = microtime(true);
 
         return $event;
     }
@@ -264,6 +264,6 @@ class TraceableAdapterEvent
     public $start;
     public $end;
     public $result;
-    public $hits = 0;
+    public $hits   = 0;
     public $misses = 0;
 }

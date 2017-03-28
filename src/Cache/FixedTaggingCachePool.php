@@ -11,12 +11,9 @@
 
 namespace Cache\CacheBundle\Cache;
 
-use Cache\Taggable\TaggableItemInterface;
-use Cache\Taggable\TaggablePoolInterface;
 use Cache\TagInterop\TaggableCacheItemInterface;
 use Cache\TagInterop\TaggableCacheItemPoolInterface;
 use Psr\Cache\CacheItemInterface;
-use Psr\Cache\CacheItemPoolInterface;
 use Psr\Cache\InvalidArgumentException;
 
 /**
@@ -38,7 +35,7 @@ class FixedTaggingCachePool implements TaggableCacheItemPoolInterface
 
     /**
      * @param TaggableCacheItemPoolInterface $cache
-     * @param array                 $tags
+     * @param array                          $tags
      */
     public function __construct(TaggableCacheItemPoolInterface $cache, array $tags)
     {
@@ -143,6 +140,6 @@ class FixedTaggingCachePool implements TaggableCacheItemPoolInterface
      */
     public function invalidateTags(array $tags)
     {
-        return $this->cache-$this->invalidateTags($tags);
+        return $this->cache - $this->invalidateTags($tags);
     }
 }
