@@ -53,9 +53,9 @@ class Factory
      */
     public function create($name, CacheItemPoolInterface $pool)
     {
-        if ($pool instanceof TaggablePoolInterface && $pool instanceof HierarchicalPoolInterface) {
+        if ($pool instanceof TaggableCacheItemPoolInterface && $pool instanceof HierarchicalPoolInterface) {
             $recorder = new HierarchyAndTaggablePool($pool);
-        } elseif ($pool instanceof TaggablePoolInterface) {
+        } elseif ($pool instanceof TaggableCacheItemPoolInterface) {
             $recorder = new TaggablePool($pool);
         } elseif ($pool instanceof HierarchicalPoolInterface) {
             $recorder = new HierarchyPool($pool);
