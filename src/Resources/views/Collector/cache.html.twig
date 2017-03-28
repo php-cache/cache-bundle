@@ -7,16 +7,7 @@
  # with this source code in the file LICENSE.
  #}
 
-{% extends 'WebProfilerBundle:Profiler:layout.html.twig' %}
-
-{% block head %}
-    {{ parent() }}
-    <style>
-        .color-red {
-            color:red;
-        }
-    </style>
-{% endblock head %}
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
 {% block toolbar %}
     {% if collector.totals.calls > 0 %}
@@ -30,22 +21,22 @@
             </span>
         {% endset %}
         {% set text %}
-        <div class="sf-toolbar-info-piece">
-            <b>Cache Calls</b>
-            <span>{{ collector.totals.calls }}</span>
-        </div>
-        <div class="sf-toolbar-info-piece">
-            <b>Total time</b>
-            <span>{{ '%0.2f'|format(collector.totals.time * 1000) }} ms</span>
-        </div>
-        <div class="sf-toolbar-info-piece">
-            <b>Cache hits</b>
-            <span>{{ collector.totals.hits }}/{{ collector.totals.reads }} ({{ collector.totals.ratio }})</span>
-        </div>
-        <div class="sf-toolbar-info-piece">
-            <b>Cache writes</b>
-            <span>{{ collector.totals.writes }}</span>
-        </div>
+            <div class="sf-toolbar-info-piece">
+                <b>Cache Calls</b>
+                <span>{{ collector.totals.calls }}</span>
+            </div>
+            <div class="sf-toolbar-info-piece">
+                <b>Total time</b>
+                <span>{{ '%0.2f'|format(collector.totals.time * 1000) }} ms</span>
+            </div>
+            <div class="sf-toolbar-info-piece">
+                <b>Cache hits</b>
+                <span>{{ collector.totals.hits }}/{{ collector.totals.reads }}{% if collector.totals.hit_read_ratio is not null %} ({{ collector.totals.hit_read_ratio }}%){% endif %}</span>
+            </div>
+            <div class="sf-toolbar-info-piece">
+                <b>Cache writes</b>
+                <span>{{ collector.totals.writes }}</span>
+            </div>
         {% endset %}
         {% include 'WebProfilerBundle:Profiler:toolbar_item.html.twig' with { 'link': profiler_url } %}
     {% endif %}
@@ -56,65 +47,128 @@
     <span class="icon">
         {{ include('@Cache/Icon/logo.svg') }}
     </span>
-    <strong>Cache</strong>
+    <strong>PHPCache</strong>
     <span class="count">
         <span>{{ collector.totals.calls }}</span>
-        <span>{{ '%0.0f'|format(collector.totals.time * 1000) }} ms</span>
+        <span>{{ '%0.2f'|format(collector.totals.time * 1000) }} ms</span>
     </span>
 </span>
 {% endblock %}
 
 {% block panel %}
-    <h2>Cache</h2>
-    {% for name, calls in collector.calls %}
-        <h3>Statistics for '{{ name }}'</h3>
-        <table>
-            <thead>
-                <tr>
-                    {% for key, value in collector.statistics[name] %}
-                        <th>{{ key|capitalize }}</th>
-                    {% endfor %}
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    {% for key, value in collector.statistics[name] %}
-                        {% if key == 'time' %}
-                            <td>{{ '%0.2f'|format(value * 1000) }} ms</td>
-                        {% else %}
-                            <td>{{ value }}</td>
-                        {% endif %}
-                    {% endfor %}
-                </tr>
-            </tbody>
-        </table>
+    <h2>PHPCache</h2>
+    <div class="metrics">
+        <div class="metric">
+            <span class="value">{{ collector.totals.calls }}</span>
+            <span class="label">Total calls</span>
+        </div>
+        <div class="metric">
+            <span class="value">{{ '%0.2f'|format(collector.totals.time * 1000) }} <span class="unit">ms</span></span>
+            <span class="label">Total time</span>
+        </div>
+        <div class="metric-divider"></div>
+        <div class="metric">
+            <span class="value">{{ collector.totals.reads }}</span>
+            <span class="label">Total reads</span>
+        </div>
+        <div class="metric">
+            <span class="value">{{ collector.totals.writes }}</span>
+            <span class="label">Total writes</span>
+        </div>
+        <div class="metric">
+            <span class="value">{{ collector.totals.deletes }}</span>
+            <span class="label">Total deletes</span>
+        </div>
+        <div class="metric-divider"></div>
+        <div class="metric">
+            <span class="value">{{ collector.totals.hits }}</span>
+            <span class="label">Total hits</span>
+        </div>
+        <div class="metric">
+            <span class="value">{{ collector.totals.misses }}</span>
+            <span class="label">Total misses</span>
+        </div>
+        <div class="metric">
+            <span class="value">
+                {% if collector.totals.hit_read_ratio is null %}
+                    n/a
+                {% else %}
+                    {{ collector.totals.hit_read_ratio }} <span class="unit">%</span>
+                {% endif %}
+            </span>
+            <span class="label">Hits/reads</span>
+        </div>
+    </div>
 
-        <h3>Calls for '{{ name }}'</h3>
+    <h2>Pools</h2>
+    <div class="sf-tabs">
+        {% for name, calls in collector.calls %}
+            <div class="tab {{ calls|length == 0 ? 'disabled' }}">
+                <h3 class="tab-title">{{ name }} <span class="badge">{{ collector.statistics[name].calls }}</span></h3>
 
-        {% if not collector.totals.calls %}
-            <p>
-                <em>No calls.</em>
-            </p>
-        {% else %}
-            <ul class="alt">
-                {% for i, call in calls %}
-                    <li class="{{ i is odd ? 'odd' : 'even' }}">
-                        <div>
-                            <strong>Name</strong>: {{ call.name }}<br />
-                            <strong>Arguments</strong>: {{ call.arguments|json_encode[:140] }}<br />
-                            <strong>Results</strong>: {% if call.result == false %}
-                                <span class="color-red">Miss</span>
-                            {% else %}
-                                {{ call.result[:140] }}
-                            {% endif %}<br />
+                <div class="tab-content">
+                    <h3>Statistics</h3>
+                    <div class="metrics">
+                        {% for key, value in collector.statistics[name] %}
+                            <div class="metric">
+                                <span class="value">
+                                    {% if key == 'time' %}
+                                        {{ '%0.2f'|format(1000 * value.value) }} <span class="unit">ms</span>
+                                    {% elseif key == 'hit_read_ratio' %}
+                                        {% if value.value is null %}
+                                            n/a
+                                        {% else %}
+                                            {{ value }} <span class="unit">%</span>
+                                        {% endif %}
+                                    {% else %}
+                                        {{ value }}
+                                    {% endif %}
+                                </span>
+                                <span class="label">{{ key == 'hit_read_ratio' ? 'Hits/reads' : key|capitalize }}</span>
+                            </div>
+                            {% if key == 'time' or key == 'deletes' %}
+                                <div class="metric-divider"></div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+
+                    <h4>Calls</h4>
+                    {% if calls|length == 0 %}
+                        <div class="empty">
+                            <p>No calls</p>
                         </div>
-                        <small>
-                            <strong>Time</strong>: {{ '%0.2f'|format(call.time * 1000) }} ms
-                        </small>
-                    </li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    {% endfor %}
+                    {% else %}
+                        <table>
+                            <thead>
+                            <tr>
+                                <th>#</th>
+                                <th class="key">Key</th>
+                                <th>Value</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for call in calls %}
+                                {% set separatorStyle = not loop.first ? ' style="border-top-width: medium;"' : '' %}
+                                <tr>
+                                    <td class="font-normal text-small text-muted nowrap" rowspan="3"{{ separatorStyle|raw }}>{{ loop.index }}</td>
+                                    <th{{ separatorStyle|raw }}>{{ call.name }}</th>
+                                    <td{{ separatorStyle|raw }}>{{ profiler_dump(call.value.argument, maxDepth=2) }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Result</th>
+                                    <td>{{ profiler_dump(call.value.result, maxDepth=1) }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Time</th>
+                                    <td>{{ '%0.2f'|format((call.end - call.start) * 1000) }} ms</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
 
 {% endblock %}

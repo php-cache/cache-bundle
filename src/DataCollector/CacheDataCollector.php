@@ -24,13 +24,6 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 class CacheDataCollector extends DataCollector
 {
     /**
-     * Template name.
-     *
-     * @type string
-     */
-    const TEMPLATE = 'CacheBundle:Collector:cache.html.twig';
-
-    /**
      * @var CachePool[]
      */
     private $instances = array();
@@ -66,7 +59,7 @@ class CacheDataCollector extends DataCollector
      */
     public function getName()
     {
-        return 'cache';
+        return 'php-cache';
     }
 
     /**
