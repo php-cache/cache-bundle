@@ -236,14 +236,6 @@ class CachePool implements CacheItemPoolInterface
     }
 
     /**
-     * @return string
-     */
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    /**
      * @param string $level
      */
     public function setLevel($level)

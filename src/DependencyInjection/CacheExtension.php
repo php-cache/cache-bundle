@@ -11,7 +11,7 @@
 
 namespace Cache\CacheBundle\DependencyInjection;
 
-use Cache\Bridge\DoctrineCacheBridge;
+use Cache\Bridge\Doctrine\DoctrineCacheBridge;
 use Cache\CacheBundle\Bridge\SymfonyValidatorBridge;
 use Cache\CacheBundle\Factory\DoctrineBridgeFactory;
 use Cache\CacheBundle\Factory\SessionHandlerFactory;
