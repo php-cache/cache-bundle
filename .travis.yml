@@ -5,7 +5,6 @@ php:
   - 7.1
   - 7.0
   - 5.6
-  - 5.5
   - hhvm
 
 env:
@@ -16,7 +15,6 @@ env:
   matrix:
     - SYMFONY_VERSION=2.7.*
     - SYMFONY_VERSION=2.8.*
-    - SYMFONY_VERSION=3.0.*
     - SYMFONY_VERSION=3.1.*
     - SYMFONY_VERSION=3.2.*
 
