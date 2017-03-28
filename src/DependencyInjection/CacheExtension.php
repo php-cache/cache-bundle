@@ -11,7 +11,7 @@
 
 namespace Cache\CacheBundle\DependencyInjection;
 
-use Cache\Bridge\DoctrineCacheBridge;
+use Cache\Bridge\Doctrine\DoctrineCacheBridge;
 use Cache\CacheBundle\Bridge\SymfonyValidatorBridge;
 use Cache\CacheBundle\Factory\DoctrineBridgeFactory;
 use Cache\CacheBundle\Factory\SessionHandlerFactory;
@@ -92,9 +92,9 @@ class CacheExtension extends Extension
      */
     private function verifyDoctrineBridgeExists($name)
     {
-        if (!class_exists('Cache\Bridge\DoctrineCacheBridge')) {
+        if (!class_exists('Cache\Bridge\Doctrine\DoctrineCacheBridge')) {
             throw new \Exception(sprintf(
-                'You need the DoctrineBridge to be able to use "%s". Please run "composer require cache/psr-6-doctrine-bridge" to install the missing dependency.',
+                'You need the DoctrineCacheBridge to be able to use "%s". Please run "composer require cache/psr-6-doctrine-bridge" to install the missing dependency.',
                 $name
             ));
         }

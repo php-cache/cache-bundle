@@ -5,7 +5,6 @@ php:
   - 7.1
   - 7.0
   - 5.6
-  - 5.5
   - hhvm
 
 env:
@@ -16,6 +15,7 @@ env:
   matrix:
     - SYMFONY_VERSION=2.7.*
     - SYMFONY_VERSION=2.8.*
+    - SYMFONY_VERSION=3.1.*
     - SYMFONY_VERSION=3.2.*
 
 branches:
@@ -26,7 +26,7 @@ branches:
 matrix:
   fast_finish: true
   include:
-    - php: 5.5
+    - php: 5.6
       env: COMPOSER_COMMAND="composer update --prefer-lowest --prefer-stable" COVERAGE=true TEST_COMMAND="php -dzend_extension=xdebug.so vendor/bin/phpunit --coverage-clover=coverage.xml" SYMFONY_VERSION=2.7.*
 
 cache:
@@ -36,7 +36,6 @@ cache:
 before_install:
   - if [[ $TRAVIS_PHP_VERSION != 'hhvm' ]]; then phpenv config-rm xdebug.ini; fi;
   - pip install --user codecov
-  - composer self-update
   - composer require symfony/symfony:${SYMFONY_VERSION} --no-update
 
 install:

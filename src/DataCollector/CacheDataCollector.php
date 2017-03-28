@@ -12,24 +12,17 @@
 namespace Cache\CacheBundle\DataCollector;
 
 use Cache\CacheBundle\Cache\Recording\CachePool;
+use Cache\CacheBundle\Cache\Recording\TraceableAdapterEvent;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 
 /**
- * Class CacheDataCollector.
- *
  * @author Aaron Scherer <aequasi@gmail.com>
+ * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
 class CacheDataCollector extends DataCollector
 {
-    /**
-     * Template name.
-     *
-     * @type string
-     */
-    const TEMPLATE = 'CacheBundle:Collector:cache.html.twig';
-
     /**
      * @type CachePool[]
      */
@@ -45,13 +38,7 @@ class CacheDataCollector extends DataCollector
     }
 
     /**
-     * Collects data for the given Request and Response.
-     *
-     * @param Request    $request   A Request instance
-     * @param Response   $response  A Response instance
-     * @param \Exception $exception An Exception instance
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
@@ -66,15 +53,11 @@ class CacheDataCollector extends DataCollector
     }
 
     /**
-     * Returns the name of the collector.
-     *
-     * @return string The collector name
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function getName()
     {
-        return 'cache';
+        return 'php-cache';
     }
 
     /**
@@ -118,36 +101,44 @@ class CacheDataCollector extends DataCollector
                 'calls'   => 0,
                 'time'    => 0,
                 'reads'   => 0,
-                'hits'    => 0,
-                'misses'  => 0,
                 'writes'  => 0,
                 'deletes' => 0,
+                'hits'    => 0,
+                'misses'  => 0,
             ];
+            /** @type TraceableAdapterEvent $call */
             foreach ($calls as $call) {
                 $statistics[$name]['calls'] += 1;
-                $statistics[$name]['time'] += $call->time;
-                if ($call->name === 'getItem') {
+                $statistics[$name]['time'] += $call->end - $call->start;
+                if ('getItem' === $call->name) {
                     $statistics[$name]['reads'] += 1;
-                    if ($call->isHit) {
+                    if ($call->hits) {
                         $statistics[$name]['hits'] += 1;
                     } else {
                         $statistics[$name]['misses'] += 1;
                     }
-                } elseif ($call->name === 'hasItem') {
+                } elseif ('getItems' === $call->name) {
+                    $count = $call->hits + $call->misses;
+                    $statistics[$name]['reads'] += $count;
+                    $statistics[$name]['hits'] += $call->hits;
+                    $statistics[$name]['misses'] += $count - $call->misses;
+                } elseif ('hasItem' === $call->name) {
                     $statistics[$name]['reads'] += 1;
-                    if ($call->result === false) {
+                    if (false === $call->result) {
                         $statistics[$name]['misses'] += 1;
+                    } else {
+                        $statistics[$name]['hits'] += 1;
                     }
-                } elseif ($call->name === 'save') {
+                } elseif ('save' === $call->name) {
                     $statistics[$name]['writes'] += 1;
-                } elseif ($call->name === 'deleteItem') {
+                } elseif ('deleteItem' === $call->name) {
                     $statistics[$name]['deletes'] += 1;
                 }
             }
             if ($statistics[$name]['reads']) {
-                $statistics[$name]['ratio'] = round(100 * $statistics[$name]['hits'] / $statistics[$name]['reads'], 2).'%';
+                $statistics[$name]['hit_read_ratio'] = round(100 * $statistics[$name]['hits'] / $statistics[$name]['reads'], 2);
             } else {
-                $statistics[$name]['ratio'] = 'N/A';
+                $statistics[$name]['hit_read_ratio'] = null;
             }
         }
 
@@ -160,16 +151,24 @@ class CacheDataCollector extends DataCollector
     private function calculateTotalStatistics()
     {
         $statistics = $this->getStatistics();
-        $totals     = ['calls' => 0, 'time' => 0, 'reads' => 0, 'hits' => 0, 'misses' => 0, 'writes' => 0];
+        $totals     = [
+            'calls'   => 0,
+            'time'    => 0,
+            'reads'   => 0,
+            'writes'  => 0,
+            'deletes' => 0,
+            'hits'    => 0,
+            'misses'  => 0,
+        ];
         foreach ($statistics as $name => $values) {
             foreach ($totals as $key => $value) {
                 $totals[$key] += $statistics[$name][$key];
             }
         }
         if ($totals['reads']) {
-            $totals['ratio'] = round(100 * $totals['hits'] / $totals['reads'], 2).'%';
+            $totals['hit_read_ratio'] = round(100 * $totals['hits'] / $totals['reads'], 2);
         } else {
-            $totals['ratio'] = 'N/A';
+            $totals['hit_read_ratio'] = null;
         }
 
         return $totals;

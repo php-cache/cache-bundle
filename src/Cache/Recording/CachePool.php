@@ -11,7 +11,6 @@
 
 namespace Cache\CacheBundle\Cache\Recording;
 
-use Cache\Taggable\TaggablePoolInterface;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
@@ -21,18 +20,14 @@ use Psr\Log\LoggerInterface;
  *
  * @author Aaron Scherer <aequasi@gmail.com>
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
+ * @author Nicolas Grekas <p@tchwork.com>
  */
-class CachePool implements CacheItemPoolInterface, TaggablePoolInterface
+class CachePool implements CacheItemPoolInterface
 {
-    /**
-     * @type array
-     */
-    private $calls = [];
-
     /**
      * @type CacheItemPoolInterface
      */
-    private $cachePool;
+    protected $pool;
 
     /**
      * @type LoggerInterface
@@ -50,202 +45,176 @@ class CachePool implements CacheItemPoolInterface, TaggablePoolInterface
     private $level = 'info';
 
     /**
-     * LoggingCachePool constructor.
-     *
-     * @param CacheItemPoolInterface $cachePool
+     * @type array calls
      */
-    public function __construct(CacheItemPoolInterface $cachePool)
+    private $calls = [];
+
+    /**
+     * @param CacheItemPoolInterface $pool
+     */
+    public function __construct(CacheItemPoolInterface $pool)
     {
-        $this->cachePool = $cachePool;
+        $this->pool = $pool;
     }
 
     /**
-     * Record a call.
-     *
-     * @param $call
+     * {@inheritdoc}
      */
-    protected function addCall($call)
-    {
-        $this->calls[] = $call;
-
-        $this->writeLog($call);
-    }
-
-    /**
-     * @param string $name
-     * @param array  $arguments
-     *
-     * @return object
-     */
-    protected function timeCall($name, array $arguments = [])
-    {
-        $start  = microtime(true);
-        $result = call_user_func_array([$this->cachePool, $name], $arguments);
-        $time   = microtime(true) - $start;
-
-        $object = (object) compact('name', 'arguments', 'start', 'time', 'result');
-
-        return $object;
-    }
-
     public function getItem($key)
     {
-        $call        = $this->timeCall(__FUNCTION__, [$key]);
-        $result      = $call->result;
-        $call->isHit = $result->isHit();
-
-        // Display the result in a good way depending on the data type
-        if ($call->isHit) {
-            $call->result = $this->getValueRepresentation($result->get());
-        } else {
-            $call->result = null;
+        $event = $this->start(__FUNCTION__, $key);
+        try {
+            $item = $this->pool->getItem($key);
+        } finally {
+            $event->end = microtime(true);
         }
+        if ($item->isHit()) {
+            ++$event->hits;
+        } else {
+            ++$event->misses;
+        }
+        $event->result = $item->get();
 
-        $this->addCall($call);
-
-        return $result;
-    }
-
-    public function hasItem($key)
-    {
-        $call = $this->timeCall(__FUNCTION__, [$key]);
-        $this->addCall($call);
-
-        return $call->result;
-    }
-
-    public function deleteItem($key)
-    {
-        $call = $this->timeCall(__FUNCTION__, [$key]);
-        $this->addCall($call);
-
-        return $call->result;
-    }
-
-    public function save(CacheItemInterface $item)
-    {
-        $key   = $item->getKey();
-        $value = $this->getValueRepresentation($item->get());
-
-        $call            = $this->timeCall(__FUNCTION__, [$item]);
-        $call->arguments = ['<CacheItem>', $key, $value];
-        $this->addCall($call);
-
-        return $call->result;
-    }
-
-    public function saveDeferred(CacheItemInterface $item)
-    {
-        $key   = $item->getKey();
-        $value = $this->getValueRepresentation($item->get());
-
-        $call            = $this->timeCall(__FUNCTION__, [$item]);
-        $call->arguments = ['<CacheItem>', $key, $value];
-        $this->addCall($call);
-
-        return $call->result;
-    }
-
-    public function getItems(array $keys = [])
-    {
-        $call         = $this->timeCall(__FUNCTION__, [$keys]);
-        $result       = $call->result;
-        $call->result = sprintf('<DATA:%s>', gettype($result));
-        $this->addCall($call);
-
-        return $result;
-    }
-
-    public function clear()
-    {
-        $call = $this->timeCall(__FUNCTION__, []);
-        $this->addCall($call);
-
-        return $call->result;
-    }
-
-    public function clearTags(array $tags)
-    {
-        $call = $this->timeCall(__FUNCTION__, [$tags]);
-        $this->addCall($call);
-
-        return $call->result;
-    }
-
-    public function deleteItems(array $keys)
-    {
-        $call = $this->timeCall(__FUNCTION__, [$keys]);
-        $this->addCall($call);
-
-        return $call->result;
-    }
-
-    public function commit()
-    {
-        $call = $this->timeCall(__FUNCTION__);
-        $this->addCall($call);
-
-        return $call->result;
+        return $item;
     }
 
     /**
-     * @return array
+     * {@inheritdoc}
      */
+    public function hasItem($key)
+    {
+        $event = $this->start(__FUNCTION__, $key);
+        try {
+            $event->result = $this->pool->hasItem($key);
+        } finally {
+            $event->end = microtime(true);
+        }
+
+        if (!$event->result) {
+            ++$event->misses;
+        }
+
+        return $event->result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function deleteItem($key)
+    {
+        $event = $this->start(__FUNCTION__, $key);
+        try {
+            return $event->result = $this->pool->deleteItem($key);
+        } finally {
+            $event->end = microtime(true);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function save(CacheItemInterface $item)
+    {
+        $event = $this->start(__FUNCTION__, $item);
+        try {
+            return $event->result = $this->pool->save($item);
+        } finally {
+            $event->end = microtime(true);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function saveDeferred(CacheItemInterface $item)
+    {
+        $event = $this->start(__FUNCTION__, $item);
+        try {
+            return $event->result = $this->pool->saveDeferred($item);
+        } finally {
+            $event->end = microtime(true);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getItems(array $keys = [])
+    {
+        $event = $this->start(__FUNCTION__, $keys);
+        try {
+            $result = $this->pool->getItems($keys);
+        } finally {
+            $event->end = microtime(true);
+        }
+        $f = function () use ($result, $event) {
+            $event->result = [];
+            foreach ($result as $key => $item) {
+                if ($item->isHit()) {
+                    ++$event->hits;
+                } else {
+                    ++$event->misses;
+                }
+                $event->result[$key] = $item->get();
+                yield $key => $item;
+            }
+        };
+
+        return $f();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function clear()
+    {
+        $event = $this->start(__FUNCTION__);
+        try {
+            return $event->result = $this->pool->clear();
+        } finally {
+            $event->end = microtime(true);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function deleteItems(array $keys)
+    {
+        $event = $this->start(__FUNCTION__, $keys);
+        try {
+            return $event->result = $this->pool->deleteItems($keys);
+        } finally {
+            $event->end = microtime(true);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function commit()
+    {
+        $event = $this->start(__FUNCTION__);
+        try {
+            return $event->result = $this->pool->commit();
+        } finally {
+            $event->end = microtime(true);
+        }
+    }
+
     public function getCalls()
     {
         return $this->calls;
     }
 
-    /**
-     * Get a string to represent the value.
-     *
-     * @param mixed $value
-     *
-     * @return string
-     */
-    private function getValueRepresentation($value)
+    protected function start($name, $argument = null)
     {
-        $type = gettype($value);
-        if (in_array($type, ['boolean', 'integer', 'double', 'string', 'NULL'])) {
-            $rep = $value;
-        } elseif ($type === 'array') {
-            $rep = json_encode($value);
-        } elseif ($type === 'object') {
-            $rep = get_class($value);
-        } else {
-            $rep = sprintf('<DATA:%s>', $type);
-        }
+        $this->calls[]   = $event   = new TraceableAdapterEvent();
+        $event->name     = $name;
+        $event->argument = $argument;
+        $event->start    = microtime(true);
 
-        return $rep;
-    }
-
-    protected function writeLog($call)
-    {
-        if (!$this->logger) {
-            return;
-        }
-
-        $data = [
-            'name'      => $this->name,
-            'method'    => $call->name,
-            'arguments' => json_encode($call->arguments),
-            'hit'       => isset($call->isHit) ? $call->isHit ? 'True' : 'False' : 'Invalid',
-            'time'      => round($call->time * 1000, 2),
-            'result'    => $call->result,
-        ];
-
-        $this->logger->log(
-            $this->level,
-            sprintf('[Cache] Provider: %s. Method: %s(%s). Hit: %s. Time: %sms. Result: %s',
-                $data['name'],
-                $data['method'],
-                $data['arguments'],
-                $data['hit'],
-                $data['time'],
-                $data['result']
-            ),
-            $data
-        );
+        return $event;
     }
 
     /**
@@ -275,4 +244,18 @@ class CachePool implements CacheItemPoolInterface, TaggablePoolInterface
 
         return $this;
     }
+}
+
+/**
+ * @internal
+ */
+class TraceableAdapterEvent
+{
+    public $name;
+    public $argument;
+    public $start;
+    public $end;
+    public $result;
+    public $hits   = 0;
+    public $misses = 0;
 }

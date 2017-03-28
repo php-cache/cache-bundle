@@ -12,7 +12,6 @@
 namespace Cache\CacheBundle\Cache\Recording;
 
 use Cache\Hierarchy\HierarchicalPoolInterface;
-use Cache\Taggable\TaggablePoolInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 
@@ -53,9 +52,9 @@ class Factory
      */
     public function create($name, CacheItemPoolInterface $pool)
     {
-        if ($pool instanceof TaggablePoolInterface && $pool instanceof HierarchicalPoolInterface) {
+        if ($pool instanceof TaggableCacheItemPoolInterface && $pool instanceof HierarchicalPoolInterface) {
             $recorder = new HierarchyAndTaggablePool($pool);
-        } elseif ($pool instanceof TaggablePoolInterface) {
+        } elseif ($pool instanceof TaggableCacheItemPoolInterface) {
             $recorder = new TaggablePool($pool);
         } elseif ($pool instanceof HierarchicalPoolInterface) {
             $recorder = new HierarchyPool($pool);

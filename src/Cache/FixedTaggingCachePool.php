@@ -11,21 +11,20 @@
 
 namespace Cache\CacheBundle\Cache;
 
-use Cache\Taggable\TaggableItemInterface;
-use Cache\Taggable\TaggablePoolInterface;
+use Cache\TagInterop\TaggableCacheItemInterface;
+use Cache\TagInterop\TaggableCacheItemPoolInterface;
 use Psr\Cache\CacheItemInterface;
-use Psr\Cache\CacheItemPoolInterface;
+use Psr\Cache\InvalidArgumentException;
 
 /**
- * This class is a decorator for a TaggablePoolInterface. It tags everything with predefined tags.
- * Use this class with the DoctrineBridge.
+ * This class is a decorator for a TaggableCacheItemPoolInterface. It tags everything with predefined tags.
  *
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-class FixedTaggingCachePool implements CacheItemPoolInterface
+class FixedTaggingCachePool implements TaggableCacheItemPoolInterface
 {
     /**
-     * @type CacheItemPoolInterface|TaggablePoolInterface
+     * @type TaggableCacheItemPoolInterface
      */
     private $cache;
 
@@ -35,10 +34,10 @@ class FixedTaggingCachePool implements CacheItemPoolInterface
     private $tags;
 
     /**
-     * @param TaggablePoolInterface $cache
-     * @param array                 $tags
+     * @param TaggableCacheItemPoolInterface $cache
+     * @param array                          $tags
      */
-    public function __construct(TaggablePoolInterface $cache, array $tags)
+    public function __construct(TaggableCacheItemPoolInterface $cache, array $tags)
     {
         $this->cache = $cache;
         $this->tags  = $tags;
@@ -97,9 +96,11 @@ class FixedTaggingCachePool implements CacheItemPoolInterface
      */
     public function save(CacheItemInterface $item)
     {
-        if ($item instanceof TaggableItemInterface) {
-            $this->addTags($item);
+        if (!$item instanceof TaggableCacheItemInterface) {
+            throw new InvalidArgumentException('Cache items are not transferable between pools. Item MUST implement TaggableCacheItemInterface.');
         }
+
+        $item->setTags($this->tags);
 
         return $this->cache->save($item);
     }
@@ -109,19 +110,13 @@ class FixedTaggingCachePool implements CacheItemPoolInterface
      */
     public function saveDeferred(CacheItemInterface $item)
     {
-        $this->addTags($item);
+        if (!$item instanceof TaggableCacheItemInterface) {
+            throw new InvalidArgumentException('Cache items are not transferable between pools. Item MUST implement TaggableCacheItemInterface.');
+        }
+
+        $item->setTags($this->tags);
 
         return $this->cache->saveDeferred($item);
-    }
-
-    /**
-     * @param TaggableItemInterface $item
-     */
-    private function addTags(TaggableItemInterface $item)
-    {
-        foreach ($this->tags as $tag) {
-            $item->addTag($tag);
-        }
     }
 
     /**
@@ -130,5 +125,21 @@ class FixedTaggingCachePool implements CacheItemPoolInterface
     public function commit()
     {
         return $this->cache->commit();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function invalidateTag($tag)
+    {
+        return $this->invalidateTag($tag);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function invalidateTags(array $tags)
+    {
+        return $this->cache - $this->invalidateTags($tags);
     }
 }

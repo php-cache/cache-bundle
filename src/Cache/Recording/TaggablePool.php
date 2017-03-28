@@ -11,18 +11,36 @@
 
 namespace Cache\CacheBundle\Cache\Recording;
 
-use Cache\Taggable\TaggablePoolInterface;
+use Cache\TagInterop\TaggableCacheItemPoolInterface;
 
 /**
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-class TaggablePool extends CachePool implements TaggablePoolInterface
+class TaggablePool extends CachePool implements TaggableCacheItemPoolInterface
 {
-    public function clearTags(array $tags)
+    /**
+     * {@inheritdoc}
+     */
+    public function invalidateTag($tag)
     {
-        $call = $this->timeCall(__FUNCTION__, [$tags]);
-        $this->addCall($call);
+        $event = $this->start(__FUNCTION__, $tag);
+        try {
+            return $event->result = $this->pool->invalidateTag($tag);
+        } finally {
+            $event->end = microtime(true);
+        }
+    }
 
-        return $call->result;
+    /**
+     * {@inheritdoc}
+     */
+    public function invalidateTags(array $tags)
+    {
+        $event = $this->start(__FUNCTION__, $tags);
+        try {
+            return $event->result = $this->pool->invalidateTags($tags);
+        } finally {
+            $event->end = microtime(true);
+        }
     }
 }
