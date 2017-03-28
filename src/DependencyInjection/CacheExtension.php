@@ -14,6 +14,7 @@ namespace Cache\CacheBundle\DependencyInjection;
 use Cache\Bridge\Doctrine\DoctrineCacheBridge;
 use Cache\CacheBundle\Bridge\SymfonyValidatorBridge;
 use Cache\CacheBundle\Factory\DoctrineBridgeFactory;
+use Cache\CacheBundle\Factory\RouterFactory;
 use Cache\CacheBundle\Factory\SessionHandlerFactory;
 use Cache\CacheBundle\Factory\ValidationFactory;
 use Cache\CacheBundle\Routing\CachingRouter;
@@ -152,6 +153,7 @@ class CacheExtension extends Extension
 
         if ($config['router']['enabled']) {
             $container->register('cache.service.router', CachingRouter::class)
+                ->setFactory([RouterFactory::class, 'get'])
                 ->setDecoratedService('router', null, 10)
                 ->addArgument(new Reference($config['router']['service_id']))
                 ->addArgument(new Reference('cache.service.router.inner'))

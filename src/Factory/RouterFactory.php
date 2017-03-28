@@ -13,32 +13,34 @@ namespace Cache\CacheBundle\Factory;
 
 use Cache\Bridge\Doctrine\DoctrineCacheBridge;
 use Cache\CacheBundle\Cache\FixedTaggingCachePool;
+use Cache\CacheBundle\Routing\CachingRouter;
 use Cache\Prefixed\PrefixedCachePool;
 use Cache\Taggable\TaggablePSR6PoolAdapter;
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-class DoctrineBridgeFactory
+class RouterFactory
 {
     /**
      * @param CacheItemPoolInterface $pool
-     * @param array                  $config
-     * @param array                  $tags
+     * @param RouterInterface $router
+     * @param array $config
      *
-     * @return DoctrineCacheBridge
+     * @return CachingRouter
      */
-    public static function get(CacheItemPoolInterface $pool, array $config, array $tags)
+    public static function get(CacheItemPoolInterface $pool, RouterInterface $router, array $config)
     {
         if ($config['use_tagging']) {
-            $pool = new FixedTaggingCachePool(TaggablePSR6PoolAdapter::makeTaggable($pool), $tags);
+            $pool = new FixedTaggingCachePool(TaggablePSR6PoolAdapter::makeTaggable($pool), ['router']);
         }
 
         if (!empty($config['prefix'])) {
             $pool = new PrefixedCachePool($pool, $config['prefix']);
         }
 
-        return new DoctrineCacheBridge($pool);
+        return new CachingRouter($pool, $router, $config);
     }
 }

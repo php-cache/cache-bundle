@@ -84,6 +84,7 @@ class Configuration implements ConfigurationInterface
             ->children()
             ->scalarNode('service_id')->isRequired()->end()
                 ->booleanNode('use_tagging')->defaultTrue()->end()
+                ->scalarNode('prefix')->defaultValue('')->end()
             ->end();
 
         return $node;
@@ -105,6 +106,7 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->scalarNode('service_id')->isRequired()->end()
                 ->booleanNode('use_tagging')->defaultTrue()->end()
+                ->scalarNode('prefix')->defaultValue('')->end()
             ->end();
 
         return $node;
@@ -126,6 +128,7 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->scalarNode('service_id')->isRequired()->end()
                 ->booleanNode('use_tagging')->defaultTrue()->end()
+                ->scalarNode('prefix')->defaultValue('')->end()
             ->end();
 
         return $node;
@@ -227,6 +230,8 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('service_id')
                     ->isRequired()
                 ->end()
+                ->booleanNode('use_tagging')->defaultTrue()->end()
+                ->scalarNode('prefix')->defaultValue('')->end()
             ->end();
 
         return $node;

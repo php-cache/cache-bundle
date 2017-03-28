@@ -27,7 +27,7 @@ class SessionHandlerFactory
      *
      * @return Psr6SessionHandler
      */
-    public static function get(CacheItemPoolInterface $pool, $config)
+    public static function get(CacheItemPoolInterface $pool, array $config)
     {
         if ($config['use_tagging']) {
             $pool = new FixedTaggingCachePool(TaggablePSR6PoolAdapter::makeTaggable($pool), ['session']);
