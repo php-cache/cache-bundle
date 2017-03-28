@@ -1,5 +1,12 @@
 # PSR-6 Cache bundle
-[![Latest Stable Version](https://poser.pugx.org/cache/cache-bundle/v/stable)](https://packagist.org/packages/cache/cache-bundle) [![codecov.io](https://codecov.io/github/php-cache/cache-bundle/coverage.svg?branch=master)](https://codecov.io/github/php-cache/cache-bundle?branch=master) [![Build Status](https://travis-ci.org/php-cache/cache-bundle.svg?branch=master)](https://travis-ci.org/php-cache/cache-bundle) [![Total Downloads](https://poser.pugx.org/cache/cache-bundle/downloads)](https://packagist.org/packages/cache/cache-bundle)  [![Monthly Downloads](https://poser.pugx.org/cache/cache-bundle/d/monthly.png)](https://packagist.org/packages/cache/cache-bundle) [![SensioLabsInsight](https://insight.sensiolabs.com/projects/21963379-2b15-4cc4-bdf6-0f98aa292f8a/mini.png)](https://insight.sensiolabs.com/projects/21963379-2b15-4cc4-bdf6-0f98aa292f8a) [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)
+[![Latest Stable Version](https://poser.pugx.org/cache/cache-bundle/v/stable)](https://packagist.org/packages/cache/cache-bundle)
+[![codecov.io](https://codecov.io/github/php-cache/cache-bundle/coverage.svg?branch=master)](https://codecov.io/github/php-cache/cache-bundle?branch=master)
+[![Build Status](https://travis-ci.org/php-cache/cache-bundle.svg?branch=master)](https://travis-ci.org/php-cache/cache-bundle)
+[![Total Downloads](https://poser.pugx.org/cache/cache-bundle/downloads)](https://packagist.org/packages/cache/cache-bundle) 
+[![Monthly Downloads](https://poser.pugx.org/cache/cache-bundle/d/monthly.png)](https://packagist.org/packages/cache/cache-bundle)
+[![Quality Score](https://img.shields.io/scrutinizer/g/php-cache/cache-bundle.svg?style=flat-square)](https://scrutinizer-ci.com/g/php-cache/cache-bundle)
+[![SensioLabsInsight](https://insight.sensiolabs.com/projects/21963379-2b15-4cc4-bdf6-0f98aa292f8a/mini.png)](https://insight.sensiolabs.com/projects/21963379-2b15-4cc4-bdf6-0f98aa292f8a)
+[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)
 
 This is a Symfony bundle that lets you you integrate your PSR-6 compliant cache service with the framework. 
 It lets you cache your sessions, routes and Doctrine results and metadata. It also provides an integration with the 
