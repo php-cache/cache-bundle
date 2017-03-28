@@ -11,10 +11,31 @@
 
 namespace Cache\CacheBundle\Tests\Functional;
 
-class BundleInitializationTest extends BaseTestCase
+use Cache\CacheBundle\CacheBundle;
+use Nyholm\BundleTest\BaseBundleTestCase;
+
+/**
+ * @author Tobias Nyholm <tobias.nyholm@gmail.com>
+ */
+class BundleInitializationTest extends BaseBundleTestCase
 {
-    public function testRegisterBundle()
+    protected function getBundleClass()
     {
-        static::createClient();
+        return CacheBundle::class;
+    }
+
+    protected function setUp()
+    {
+        parent::setUp();
+        $kernel = $this->createKernel();
+        $kernel->addConfigFile(__DIR__.'/config.yml');
+    }
+
+    public function testInitBundle()
+    {
+        $this->bootKernel();
+        $container = $this->getContainer();
+
+        $this->assertTrue($container->hasParameter('cache.provider_service_ids'));
     }
 }

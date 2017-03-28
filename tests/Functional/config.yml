@@ -1,0 +1,38 @@
+services:
+  array_cache:
+    class: Cache\Adapter\PHPArray\ArrayCachePool
+
+cache:
+  session:
+    enabled: true
+    service_id: 'array_cache'
+    use_tagging: true
+    ttl: 7200
+
+  router:
+    enabled: true
+    service_id: 'array_cache'
+    ttl: 86400
+
+  annotation:
+    enabled: true
+    service_id: 'array_cache'
+    use_tagging: true
+
+  serializer:
+    enabled: true
+    service_id: 'array_cache'
+    use_tagging: true
+
+  validation:
+    enabled: true
+    service_id: 'array_cache'
+    use_tagging: true
+
+framework:
+  annotations:
+    cache: 'cache.service.annotation'
+  serializer:
+    cache: 'cache.service.serializer'
+  validation:
+    cache: 'cache.service.validation'
