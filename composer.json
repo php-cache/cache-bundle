@@ -26,14 +26,15 @@
     "require": {
         "php": "^5.5 || ^7.0",
         "symfony/framework-bundle": "^2.7 || ^3.0",
-        "cache/taggable-cache": "^0.4.3",
-        "cache/session-handler": "^0.1"
+        "cache/taggable-cache": "^0.5",
+        "cache/session-handler": "^0.2"
     },
     "require-dev":  {
         "phpunit/phpunit": "^5.1 || ^4.0",
         "symfony/symfony": "^2.7 || ^3.0",
         "cache/psr-6-doctrine-bridge": "^2.0",
-        "cache/array-adapter": "^0.4",
+        "cache/array-adapter": "^0.5",
+        "nyholm/symfony-bundle-test": "^1.0.1",
         "matthiasnoback/symfony-dependency-injection-test": "^1.0"
     },
     "suggest": {
