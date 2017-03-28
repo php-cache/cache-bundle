@@ -34,7 +34,7 @@ class RouterFactory
     public static function get(CacheItemPoolInterface $pool, RouterInterface $router, array $config)
     {
         if ($config['use_tagging']) {
-            $pool = new FixedTaggingCachePool(TaggablePSR6PoolAdapter::makeTaggable($pool), ['router']);
+            $pool = TaggablePSR6PoolAdapter::makeTaggable($pool);
         }
 
         if (!empty($config['prefix'])) {
