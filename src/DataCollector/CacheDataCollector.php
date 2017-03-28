@@ -50,8 +50,6 @@ class CacheDataCollector extends DataCollector
 
         $this->data['instances']['statistics'] = $this->calculateStatistics();
         $this->data['total']['statistics']     = $this->calculateTotalStatistics();
-
-        $this->data = $this->cloneVar($this->data);
     }
 
     /**
