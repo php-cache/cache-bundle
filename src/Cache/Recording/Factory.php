@@ -12,6 +12,7 @@
 namespace Cache\CacheBundle\Cache\Recording;
 
 use Cache\Hierarchy\HierarchicalPoolInterface;
+use Cache\TagInterop\TaggableCacheItemPoolInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 

@@ -11,28 +11,34 @@
 
 namespace Cache\CacheBundle\Factory;
 
-use Cache\CacheBundle\Cache\FixedTaggingCachePool;
-use Cache\SessionHandler\Psr6SessionHandler;
+use Cache\CacheBundle\Routing\CachingRouter;
+use Cache\Prefixed\PrefixedCachePool;
 use Cache\Taggable\TaggablePSR6PoolAdapter;
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-class SessionHandlerFactory
+class RouterFactory
 {
     /**
      * @param CacheItemPoolInterface $pool
+     * @param RouterInterface        $router
      * @param array                  $config
      *
-     * @return Psr6SessionHandler
+     * @return CachingRouter
      */
-    public static function get(CacheItemPoolInterface $pool, array $config)
+    public static function get(CacheItemPoolInterface $pool, RouterInterface $router, array $config)
     {
         if ($config['use_tagging']) {
-            $pool = new FixedTaggingCachePool(TaggablePSR6PoolAdapter::makeTaggable($pool), ['session']);
+            $pool = TaggablePSR6PoolAdapter::makeTaggable($pool);
         }
 
-        return new Psr6SessionHandler($pool, $config);
+        if (!empty($config['prefix'])) {
+            $pool = new PrefixedCachePool($pool, $config['prefix']);
+        }
+
+        return new CachingRouter($pool, $router, $config);
     }
 }

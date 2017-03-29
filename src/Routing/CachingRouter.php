@@ -12,7 +12,7 @@
 namespace Cache\CacheBundle\Routing;
 
 use Cache\CacheBundle\KeyNormalizer;
-use Cache\Taggable\TaggableItemInterface;
+use Cache\TagInterop\TaggableCacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouterInterface;
@@ -166,7 +166,7 @@ class CachingRouter implements RouterInterface
     {
         $item = $this->cache->getItem(KeyNormalizer::noInvalid($key));
 
-        if ($item instanceof TaggableItemInterface) {
+        if ($item instanceof TaggableCacheItemInterface) {
             $item->setTags(['router', $tag]);
         }
 

@@ -13,6 +13,7 @@ namespace Cache\CacheBundle\Factory;
 
 use Cache\Bridge\Doctrine\DoctrineCacheBridge;
 use Cache\CacheBundle\Cache\FixedTaggingCachePool;
+use Cache\Prefixed\PrefixedCachePool;
 use Cache\Taggable\TaggablePSR6PoolAdapter;
 use Psr\Cache\CacheItemPoolInterface;
 
@@ -28,10 +29,14 @@ class DoctrineBridgeFactory
      *
      * @return DoctrineCacheBridge
      */
-    public static function get(CacheItemPoolInterface $pool, $config, array $tags)
+    public static function get(CacheItemPoolInterface $pool, array $config, array $tags)
     {
         if ($config['use_tagging']) {
             $pool = new FixedTaggingCachePool(TaggablePSR6PoolAdapter::makeTaggable($pool), $tags);
+        }
+
+        if (!empty($config['prefix'])) {
+            $pool = new PrefixedCachePool($pool, $config['prefix']);
         }
 
         return new DoctrineCacheBridge($pool);
