@@ -10,6 +10,7 @@ The change log describes what is "Added", "Removed", "Changed" or "Fixed" betwee
 
 - Using cache/session-handler: ^0.2. **This will break all cached sessions**
 - Using cache/taggable-cache: ^0.5 to support the latest versions of the adapters. 
+- New Collector and WebProfiler page 
 
 ## 0.4.4
 
