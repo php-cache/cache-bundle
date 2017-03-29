@@ -14,7 +14,6 @@ namespace Cache\CacheBundle\Cache;
 use Cache\TagInterop\TaggableCacheItemInterface;
 use Cache\TagInterop\TaggableCacheItemPoolInterface;
 use Psr\Cache\CacheItemInterface;
-use Psr\Cache\InvalidArgumentException;
 
 /**
  * This class is a decorator for a TaggableCacheItemPoolInterface. It tags everything with predefined tags.
