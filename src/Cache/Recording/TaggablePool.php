@@ -15,6 +15,8 @@ use Cache\TagInterop\TaggableCacheItemPoolInterface;
 
 /**
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
+ *
+ * @internal
  */
 class TaggablePool extends CachePool implements TaggableCacheItemPoolInterface
 {

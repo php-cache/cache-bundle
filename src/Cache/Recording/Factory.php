@@ -20,6 +20,8 @@ use Psr\Log\LoggerInterface;
  * Create a recording CachePool.
  *
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
+ *
+ * @internal
  */
 class Factory
 {

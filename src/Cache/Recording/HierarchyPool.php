@@ -15,6 +15,8 @@ use Cache\Hierarchy\HierarchicalPoolInterface;
 
 /**
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
+ *
+ * @internal
  */
 class HierarchyPool extends CachePool implements HierarchicalPoolInterface
 {

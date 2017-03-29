@@ -20,6 +20,8 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 /**
  * @author Aaron Scherer <aequasi@gmail.com>
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
+ *
+ * @internal
  */
 class CacheDataCollector extends DataCollector
 {

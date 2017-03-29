@@ -21,6 +21,8 @@ use Psr\Log\LoggerInterface;
  * @author Aaron Scherer <aequasi@gmail.com>
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  * @author Nicolas Grekas <p@tchwork.com>
+ *
+ * @internal
  */
 class CachePool implements CacheItemPoolInterface
 {
