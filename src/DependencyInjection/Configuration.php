@@ -238,7 +238,6 @@ class Configuration implements ConfigurationInterface
         return $node;
     }
 
-
     /**
      * @return ArrayNodeDefinition
      */
