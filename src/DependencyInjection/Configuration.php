@@ -40,6 +40,7 @@ class Configuration implements ConfigurationInterface
             ->append($this->addSerializerSection())
             ->append($this->addValidationSection())
             ->append($this->addLoggingSection())
+            ->append($this->addDataCollectorSection())
             ->end();
 
         return $treeBuilder;
@@ -232,6 +233,22 @@ class Configuration implements ConfigurationInterface
                 ->end()
                 ->booleanNode('use_tagging')->defaultTrue()->end()
                 ->scalarNode('prefix')->defaultValue('')->end()
+            ->end();
+
+        return $node;
+    }
+
+    /**
+     * @return ArrayNodeDefinition
+     */
+    private function addDataCollectorSection()
+    {
+        $tree = new TreeBuilder();
+        $node = $tree->root('data_collector');
+
+        $node
+            ->children()
+                ->booleanNode('enabled')->end()
             ->end();
 
         return $node;

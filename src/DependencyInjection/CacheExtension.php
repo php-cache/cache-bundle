@@ -57,7 +57,11 @@ class CacheExtension extends Extension
         $this->registerServices($container, $config);
 
         // Add toolbar and data collector if we are debuging
-        if ($container->getParameter('kernel.debug')) {
+        if (!isset($config['data_collector']['enabled'])) {
+            $config['data_collector']['enabled'] = $container->getParameter('kernel.debug');
+        }
+
+        if ($config['data_collector']['enabled']) {
             $loader->load('data-collector.yml');
         }
 
