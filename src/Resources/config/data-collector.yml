@@ -3,3 +3,7 @@ services:
     class: Cache\CacheBundle\DataCollector\CacheDataCollector
     tags:
       - { name: data_collector, template: 'CacheBundle:Collector:cache.html.twig', id: 'php-cache' }
+
+  cache.proxy_factory:
+    class: Cache\CacheBundle\DataCollector\ProxyFactory
+    arguments: ['%kernel.cache_dir%/phpcache/proxy']
