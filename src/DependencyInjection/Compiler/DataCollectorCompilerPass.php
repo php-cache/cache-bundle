@@ -34,7 +34,7 @@ class DataCollectorCompilerPass implements CompilerPassInterface
             return;
         }
 
-        $proxyFactory = $container->get('cache.proxy_factory');
+        $proxyFactory        = $container->get('cache.proxy_factory');
         $collectorDefinition = $container->getDefinition('cache.data_collector');
         $serviceIds          = $container->findTaggedServiceIds('cache.provider');
 
@@ -55,7 +55,7 @@ class DataCollectorCompilerPass implements CompilerPassInterface
 
                 // Create a new definition.
                 $decoratingFactory = new Definition(DecoratingFactory::class, [new Reference('cache.proxy_factory'), new Reference($innerId)]);
-                $decoratedPool = new Definition($poolDefinition->getClass());
+                $decoratedPool     = new Definition($poolDefinition->getClass());
                 $decoratedPool->setFactory([$decoratingFactory, 'create']);
                 $container->setDefinition($id, $decoratedPool);
                 $decoratedPool->addMethodCall('__setName', [$id]);

@@ -25,7 +25,7 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 class CacheDataCollector extends DataCollector
 {
     /**
-     * @var CacheProxy[]
+     * @type CacheProxy[]
      */
     private $instances = [];
 
@@ -43,14 +43,14 @@ class CacheDataCollector extends DataCollector
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
-        $empty = ['calls' => [], 'config' => [], 'options' => [], 'statistics' => []];
+        $empty      = ['calls' => [], 'config' => [], 'options' => [], 'statistics' => []];
         $this->data = ['instances' => $empty, 'total' => $empty];
         foreach ($this->instances as $name => $instance) {
             $this->data['instances']['calls'][$name] = $instance->__getCalls();
         }
 
         $this->data['instances']['statistics'] = $this->calculateStatistics();
-        $this->data['total']['statistics'] = $this->calculateTotalStatistics();
+        $this->data['total']['statistics']     = $this->calculateTotalStatistics();
     }
 
     /**
@@ -99,15 +99,15 @@ class CacheDataCollector extends DataCollector
         $statistics = [];
         foreach ($this->data['instances']['calls'] as $name => $calls) {
             $statistics[$name] = [
-                'calls' => 0,
-                'time' => 0,
-                'reads' => 0,
-                'writes' => 0,
+                'calls'   => 0,
+                'time'    => 0,
+                'reads'   => 0,
+                'writes'  => 0,
                 'deletes' => 0,
-                'hits' => 0,
-                'misses' => 0,
+                'hits'    => 0,
+                'misses'  => 0,
             ];
-            /** @var TraceableAdapterEvent $call */
+            /** @type TraceableAdapterEvent $call */
             foreach ($calls as $call) {
                 $statistics[$name]['calls'] += 1;
                 $statistics[$name]['time'] += $call->end - $call->start;
@@ -152,14 +152,14 @@ class CacheDataCollector extends DataCollector
     private function calculateTotalStatistics()
     {
         $statistics = $this->getStatistics();
-        $totals = [
-            'calls' => 0,
-            'time' => 0,
-            'reads' => 0,
-            'writes' => 0,
+        $totals     = [
+            'calls'   => 0,
+            'time'    => 0,
+            'reads'   => 0,
+            'writes'  => 0,
             'deletes' => 0,
-            'hits' => 0,
-            'misses' => 0,
+            'hits'    => 0,
+            'misses'  => 0,
         ];
         foreach ($statistics as $name => $values) {
             foreach ($totals as $key => $value) {
