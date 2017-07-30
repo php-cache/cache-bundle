@@ -11,7 +11,6 @@
 
 namespace Cache\CacheBundle\DependencyInjection\Compiler;
 
-use Cache\CacheBundle\DataCollector\DecoratingFactory;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;

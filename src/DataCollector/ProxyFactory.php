@@ -35,7 +35,7 @@ class ProxyFactory
      * Create a proxy that handles data collecting better.
      *
      * @param string $class
-     * @param string &$proxyFile  where we store the proxy class
+     * @param string &$proxyFile where we store the proxy class
      *
      * @return string the name of a much much better class
      */

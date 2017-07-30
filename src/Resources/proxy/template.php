@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of php-cache\cache-bundle package.
+ *
+ * (c) 2015-2015 Aaron Scherer <aequasi@gmail.com>, Tobias Nyholm <tobias.nyholm@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 use Cache\CacheBundle\DataCollector\CacheProxy;
 use Cache\CacheBundle\DataCollector\TraceableAdapterEvent;
 use Psr\Cache\CacheItemInterface;
@@ -18,9 +27,9 @@ class __TPL_CLASS__ extends __TPL_EXTENDS__ implements CacheProxy
             $event->end = microtime(true);
         }
         if ($item->isHit()) {
-        ++$event->hits;
+            ++$event->hits;
         } else {
-        ++$event->misses;
+            ++$event->misses;
         }
         $event->result = $item->get();
 
@@ -37,7 +46,7 @@ class __TPL_CLASS__ extends __TPL_EXTENDS__ implements CacheProxy
         }
 
         if (!$event->result) {
-        ++$event->misses;
+            ++$event->misses;
         }
 
         return $event->result;
@@ -82,12 +91,12 @@ class __TPL_CLASS__ extends __TPL_EXTENDS__ implements CacheProxy
             $event->end = microtime(true);
         }
         $f = function () use ($result, $event) {
-        $event->result = [];
+            $event->result = [];
             foreach ($result as $key => $item) {
-            if ($item->isHit()) {
-                ++$event->hits;
+                if ($item->isHit()) {
+                    ++$event->hits;
                 } else {
-                ++$event->misses;
+                    ++$event->misses;
                 }
                 $event->result[$key] = $item->get();
                 yield $key => $item;
@@ -98,8 +107,8 @@ class __TPL_CLASS__ extends __TPL_EXTENDS__ implements CacheProxy
     }
 
     public function clear()
-{
-    $event = $this->start(__FUNCTION__);
+    {
+        $event = $this->start(__FUNCTION__);
         try {
             return $event->result = parent::clear();
         } finally {
@@ -118,8 +127,8 @@ class __TPL_CLASS__ extends __TPL_EXTENDS__ implements CacheProxy
     }
 
     public function commit()
-{
-    $event = $this->start(__FUNCTION__);
+    {
+        $event = $this->start(__FUNCTION__);
         try {
             return $event->result = parent::commit();
         } finally {
@@ -148,8 +157,8 @@ class __TPL_CLASS__ extends __TPL_EXTENDS__ implements CacheProxy
     }
 
     public function __getCalls()
-{
-    return $this->__calls;
+    {
+        return $this->__calls;
     }
 
     public function __setName($name)
@@ -160,9 +169,9 @@ class __TPL_CLASS__ extends __TPL_EXTENDS__ implements CacheProxy
     private function start($name, $argument = null)
     {
         $this->__calls[]   = $event   = new TraceableAdapterEvent();
-        $event->name     = $name;
-        $event->argument = $argument;
-        $event->start    = microtime(true);
+        $event->name       = $name;
+        $event->argument   = $argument;
+        $event->start      = microtime(true);
 
         return $event;
     }
