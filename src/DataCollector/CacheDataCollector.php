@@ -30,7 +30,7 @@ class CacheDataCollector extends DataCollector
     private $instances = [];
 
     /**
-     * @param string     $name
+     * @param string              $name
      * @param CacheProxyInterface $instance
      */
     public function addInstance($name, CacheProxyInterface $instance)
