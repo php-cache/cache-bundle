@@ -11,10 +11,9 @@
 
 namespace Cache\CacheBundle\DependencyInjection\Compiler;
 
-use Cache\AdapterBundle\DummyAdapter;
-use Cache\CacheBundle\Cache\Recording\Factory;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -34,16 +33,7 @@ class DataCollectorCompilerPass implements CompilerPassInterface
             return;
         }
 
-        // Create a factory service
-        $factoryId = 'cache.recorder_factory';
-        $factory   = $container->register($factoryId, Factory::class);
-        // Check if logging support is enabled
-        if ($container->hasParameter('cache.logging')) {
-            $config     = $container->getParameter('cache.logging');
-            $factory->addArgument(new Reference($config['logger']));
-            $factory->addArgument($config['level']);
-        }
-
+        $proxyFactory        = $container->get('cache.proxy_factory');
         $collectorDefinition = $container->getDefinition('cache.data_collector');
         $serviceIds          = $container->findTaggedServiceIds('cache.provider');
 
@@ -51,15 +41,24 @@ class DataCollectorCompilerPass implements CompilerPassInterface
 
             // Get the pool definition and rename it.
             $poolDefinition = $container->getDefinition($id);
-            $poolDefinition->setPublic(false);
-            $container->setDefinition($id.'.inner', $poolDefinition);
+            if (null === $poolDefinition->getFactory()) {
+                // Just replace the class
+                $proxyClass = $proxyFactory->createProxy($poolDefinition->getClass(), $file);
+                $poolDefinition->setClass($proxyClass);
+                $poolDefinition->setFile($file);
+                $poolDefinition->addMethodCall('__setName', [$id]);
+            } else {
+                // Create a new ID for the original service
+                $innerId = $id.'.inner';
+                $container->setDefinition($innerId, $poolDefinition);
 
-            // Create a recording pool with a factory
-            $recorderDefinition = $container->register($id, DummyAdapter::class);
-            $recorderDefinition->setFactory([new Reference($factoryId), 'create']);
-            $recorderDefinition->addArgument($id);
-            $recorderDefinition->addArgument(new Reference($id.'.inner'));
-            $recorderDefinition->setTags($poolDefinition->getTags());
+                // Create a new definition.
+                $decoratedPool = new Definition($poolDefinition->getClass());
+                $decoratedPool->setFactory([new Reference('cache.decorating_factory'), 'create']);
+                $decoratedPool->setArguments([new Reference($innerId)]);
+                $container->setDefinition($id, $decoratedPool);
+                $decoratedPool->addMethodCall('__setName', [$id]);
+            }
 
             // Tell the collector to add the new instance
             $collectorDefinition->addMethodCall('addInstance', [$id, new Reference($id)]);

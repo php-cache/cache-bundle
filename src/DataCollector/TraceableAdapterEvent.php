@@ -9,15 +9,18 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Cache\CacheBundle\Cache\Recording;
-
-use Cache\Hierarchy\HierarchicalPoolInterface;
+namespace Cache\CacheBundle\DataCollector;
 
 /**
- * @author Tobias Nyholm <tobias.nyholm@gmail.com>
- *
  * @internal
  */
-class HierarchyPool extends CachePool implements HierarchicalPoolInterface
+class TraceableAdapterEvent
 {
+    public $name;
+    public $argument;
+    public $start;
+    public $end;
+    public $result;
+    public $hits   = 0;
+    public $misses = 0;
 }

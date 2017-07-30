@@ -9,15 +9,16 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Cache\CacheBundle\Cache\Recording;
-
-use Cache\Hierarchy\HierarchicalPoolInterface;
+namespace Cache\CacheBundle\DataCollector;
 
 /**
- * @author Tobias Nyholm <tobias.nyholm@gmail.com>
+ * An interface for a cache proxy. A cache proxy is created when we profile a cache pool.
  *
- * @internal
+ * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-class HierarchyAndTaggablePool extends TaggablePool implements HierarchicalPoolInterface
+interface CacheProxy
 {
+    public function __getCalls();
+
+    public function __setName($name);
 }

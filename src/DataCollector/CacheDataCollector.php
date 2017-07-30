@@ -11,7 +11,6 @@
 
 namespace Cache\CacheBundle\DataCollector;
 
-use Cache\CacheBundle\Cache\Recording\CachePool;
 use Cache\CacheBundle\Cache\Recording\TraceableAdapterEvent;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,15 +25,15 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 class CacheDataCollector extends DataCollector
 {
     /**
-     * @type CachePool[]
+     * @type CacheProxy[]
      */
     private $instances = [];
 
     /**
-     * @param string    $name
-     * @param CachePool $instance
+     * @param string     $name
+     * @param CacheProxy $instance
      */
-    public function addInstance($name, CachePool $instance)
+    public function addInstance($name, CacheProxy $instance)
     {
         $this->instances[$name] = $instance;
     }
@@ -47,7 +46,7 @@ class CacheDataCollector extends DataCollector
         $empty      = ['calls' => [], 'config' => [], 'options' => [], 'statistics' => []];
         $this->data = ['instances' => $empty, 'total' => $empty];
         foreach ($this->instances as $name => $instance) {
-            $this->data['instances']['calls'][$name] = $instance->getCalls();
+            $this->data['instances']['calls'][$name] = $instance->__getCalls();
         }
 
         $this->data['instances']['statistics'] = $this->calculateStatistics();

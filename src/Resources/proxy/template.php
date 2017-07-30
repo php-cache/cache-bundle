@@ -9,64 +9,20 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Cache\CacheBundle\Cache\Recording;
-
+use Cache\CacheBundle\DataCollector\CacheProxy;
+use Cache\CacheBundle\DataCollector\TraceableAdapterEvent;
 use Psr\Cache\CacheItemInterface;
-use Psr\Cache\CacheItemPoolInterface;
-use Psr\Log\LoggerInterface;
 
-/**
- * A pool that logs and collects all your cache calls.
- *
- * @author Aaron Scherer <aequasi@gmail.com>
- * @author Tobias Nyholm <tobias.nyholm@gmail.com>
- * @author Nicolas Grekas <p@tchwork.com>
- *
- * @internal
- */
-class CachePool implements CacheItemPoolInterface
+class __TPL_CLASS__ extends __TPL_EXTENDS__ implements CacheProxy
 {
-    /**
-     * @type CacheItemPoolInterface
-     */
-    protected $pool;
+    private $__name;
+    private $__calls = [];
 
-    /**
-     * @type LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @type string
-     */
-    private $name;
-
-    /**
-     * @type string
-     */
-    private $level = 'info';
-
-    /**
-     * @type array calls
-     */
-    private $calls = [];
-
-    /**
-     * @param CacheItemPoolInterface $pool
-     */
-    public function __construct(CacheItemPoolInterface $pool)
-    {
-        $this->pool = $pool;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getItem($key)
     {
         $event = $this->start(__FUNCTION__, $key);
         try {
-            $item = $this->pool->getItem($key);
+            $item = parent::getItem($key);
         } finally {
             $event->end = microtime(true);
         }
@@ -80,14 +36,11 @@ class CachePool implements CacheItemPoolInterface
         return $item;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasItem($key)
     {
         $event = $this->start(__FUNCTION__, $key);
         try {
-            $event->result = $this->pool->hasItem($key);
+            $event->result = parent::hasItem($key);
         } finally {
             $event->end = microtime(true);
         }
@@ -99,53 +52,41 @@ class CachePool implements CacheItemPoolInterface
         return $event->result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function deleteItem($key)
     {
         $event = $this->start(__FUNCTION__, $key);
         try {
-            return $event->result = $this->pool->deleteItem($key);
+            return $event->result = parent::deleteItem($key);
         } finally {
             $event->end = microtime(true);
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function save(CacheItemInterface $item)
     {
         $event = $this->start(__FUNCTION__, $item);
         try {
-            return $event->result = $this->pool->save($item);
+            return $event->result = parent::save($item);
         } finally {
             $event->end = microtime(true);
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function saveDeferred(CacheItemInterface $item)
     {
         $event = $this->start(__FUNCTION__, $item);
         try {
-            return $event->result = $this->pool->saveDeferred($item);
+            return $event->result = parent::saveDeferred($item);
         } finally {
             $event->end = microtime(true);
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getItems(array $keys = [])
     {
         $event = $this->start(__FUNCTION__, $keys);
         try {
-            $result = $this->pool->getItems($keys);
+            $result = parent::getItems($keys);
         } finally {
             $event->end = microtime(true);
         }
@@ -165,99 +106,73 @@ class CachePool implements CacheItemPoolInterface
         return $f();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function clear()
     {
         $event = $this->start(__FUNCTION__);
         try {
-            return $event->result = $this->pool->clear();
+            return $event->result = parent::clear();
         } finally {
             $event->end = microtime(true);
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function deleteItems(array $keys)
     {
         $event = $this->start(__FUNCTION__, $keys);
         try {
-            return $event->result = $this->pool->deleteItems($keys);
+            return $event->result = parent::deleteItems($keys);
         } finally {
             $event->end = microtime(true);
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function commit()
     {
         $event = $this->start(__FUNCTION__);
         try {
-            return $event->result = $this->pool->commit();
+            return $event->result = parent::commit();
         } finally {
             $event->end = microtime(true);
         }
     }
 
-    public function getCalls()
+    public function invalidateTag($tag)
     {
-        return $this->calls;
+        $event = $this->start(__FUNCTION__, $tag);
+        try {
+            return $event->result = parent::invalidateTag($tag);
+        } finally {
+            $event->end = microtime(true);
+        }
     }
 
-    protected function start($name, $argument = null)
+    public function invalidateTags(array $tags)
     {
-        $this->calls[]   = $event   = new TraceableAdapterEvent();
-        $event->name     = $name;
-        $event->argument = $argument;
-        $event->start    = microtime(true);
+        $event = $this->start(__FUNCTION__, $tags);
+        try {
+            return $event->result = parent::invalidateTags($tags);
+        } finally {
+            $event->end = microtime(true);
+        }
+    }
+
+    public function __getCalls()
+    {
+        return $this->__calls;
+    }
+
+    public function __setName($name)
+    {
+        $this->__name = $name;
+    }
+
+    private function start($name, $argument = null)
+    {
+        $this->__calls[]   = $event   = new TraceableAdapterEvent();
+        $event->name       = $name;
+        $event->argument   = $argument;
+        $event->start      = microtime(true);
 
         return $event;
     }
-
-    /**
-     * @param LoggerInterface $logger
-     */
-    public function setLogger(LoggerInterface $logger = null)
-    {
-        $this->logger = $logger;
-    }
-
-    /**
-     * @param string $name
-     */
-    public function setName($name)
-    {
-        $this->name = $name;
-
-        return $this;
-    }
-
-    /**
-     * @param string $level
-     */
-    public function setLevel($level)
-    {
-        $this->level = $level;
-
-        return $this;
-    }
-}
-
-/**
- * @internal
- */
-class TraceableAdapterEvent
-{
-    public $name;
-    public $argument;
-    public $start;
-    public $end;
-    public $result;
-    public $hits   = 0;
-    public $misses = 0;
 }
