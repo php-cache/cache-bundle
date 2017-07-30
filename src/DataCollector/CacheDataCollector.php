@@ -25,15 +25,15 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 class CacheDataCollector extends DataCollector
 {
     /**
-     * @type CacheProxy[]
+     * @type CacheProxyInterface[]
      */
     private $instances = [];
 
     /**
      * @param string     $name
-     * @param CacheProxy $instance
+     * @param CacheProxyInterface $instance
      */
-    public function addInstance($name, CacheProxy $instance)
+    public function addInstance($name, CacheProxyInterface $instance)
     {
         $this->instances[$name] = $instance;
     }
