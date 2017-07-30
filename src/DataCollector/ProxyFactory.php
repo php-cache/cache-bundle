@@ -32,7 +32,7 @@ class ProxyFactory
     }
 
     /**
-     * Create a proxy that handles logging better.
+     * Create a proxy that handles data collecting better.
      *
      * @param string $class
      * @param string &$proxyFile  where we store the proxy class
