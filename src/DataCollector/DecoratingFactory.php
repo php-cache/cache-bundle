@@ -12,6 +12,7 @@
 namespace Cache\CacheBundle\DataCollector;
 
 use Nyholm\NSA;
+use Psr\Cache\CacheItemPoolInterface;
 
 /**
  * A factory that decorates another factory to be able to use the proxy cache.
@@ -26,29 +27,27 @@ class DecoratingFactory
     private $proxyFactory;
 
     /**
-     * @type mixed cache pool
-     */
-    private $originalObject;
-
-    /**
      * @param ProxyFactory $proxyFactory
-     * @param mixed        $originalObject
      */
-    public function __construct(ProxyFactory $proxyFactory, $originalObject)
+    public function __construct(ProxyFactory $proxyFactory)
     {
-        $this->proxyFactory   = $proxyFactory;
-        $this->originalObject = $originalObject;
+        $this->proxyFactory = $proxyFactory;
     }
 
-    public function create()
+    /**
+     * @param CacheItemPoolInterface $originalObject original class
+     *
+     * @return CacheProxy|CacheItemPoolInterface
+     */
+    public function create($originalObject)
     {
-        $proxyClass = $this->proxyFactory->createProxy(get_class($this->originalObject));
+        $proxyClass = $this->proxyFactory->createProxy(get_class($originalObject));
         $rc         = new \ReflectionClass($proxyClass);
         $pool       = $rc->newInstanceWithoutConstructor();
 
         // Copy properties from original pool to new
-        foreach (NSA::getProperties($this->originalObject) as $property) {
-            NSA::setProperty($pool, $property, NSA::getProperty($this->originalObject, $property));
+        foreach (NSA::getProperties($originalObject) as $property) {
+            NSA::setProperty($pool, $property, NSA::getProperty($originalObject, $property));
         }
 
         return $pool;

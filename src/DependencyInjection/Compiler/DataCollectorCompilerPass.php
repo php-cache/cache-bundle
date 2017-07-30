@@ -54,9 +54,9 @@ class DataCollectorCompilerPass implements CompilerPassInterface
                 $container->setDefinition($innerId, $poolDefinition);
 
                 // Create a new definition.
-                $decoratingFactory = new Definition(DecoratingFactory::class, [new Reference('cache.proxy_factory'), new Reference($innerId)]);
-                $decoratedPool     = new Definition($poolDefinition->getClass());
-                $decoratedPool->setFactory([$decoratingFactory, 'create']);
+                $decoratedPool = new Definition($poolDefinition->getClass());
+                $decoratedPool->setFactory([new Reference('cache.decorating_factory'), 'create']);
+                $decoratedPool->setArguments([new Reference($innerId)]);
                 $container->setDefinition($id, $decoratedPool);
                 $decoratedPool->addMethodCall('__setName', [$id]);
             }

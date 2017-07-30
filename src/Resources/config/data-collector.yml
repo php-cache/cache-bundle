@@ -7,3 +7,8 @@ services:
   cache.proxy_factory:
     class: Cache\CacheBundle\DataCollector\ProxyFactory
     arguments: ['%kernel.cache_dir%/phpcache/proxy']
+
+  cache.decorating_factory:
+    class: Cache\CacheBundle\DataCollector\DecoratingFactory
+    arguments: ["@cache.proxy_factory"]
+    public: false
