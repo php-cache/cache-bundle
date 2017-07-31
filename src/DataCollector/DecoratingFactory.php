@@ -37,13 +37,13 @@ class DecoratingFactory
     /**
      * @param CacheItemPoolInterface $originalObject original class
      *
-     * @return CacheProxy|CacheItemPoolInterface
+     * @return CacheProxyInterface|CacheItemPoolInterface
      */
     public function create($originalObject)
     {
         $proxyClass = $this->proxyFactory->createProxy(get_class($originalObject));
-        $rc         = new \ReflectionClass($proxyClass);
-        $pool       = $rc->newInstanceWithoutConstructor();
+        $reflection = new \ReflectionClass($proxyClass);
+        $pool       = $reflection->newInstanceWithoutConstructor();
 
         // Copy properties from original pool to new
         foreach (NSA::getProperties($originalObject) as $property) {

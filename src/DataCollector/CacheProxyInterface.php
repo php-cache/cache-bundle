@@ -16,7 +16,7 @@ namespace Cache\CacheBundle\DataCollector;
  *
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-interface CacheProxy
+interface CacheProxyInterface
 {
     public function __getCalls();
 

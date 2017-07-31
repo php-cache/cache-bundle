@@ -9,11 +9,11 @@
  * with this source code in the file LICENSE.
  */
 
-use Cache\CacheBundle\DataCollector\CacheProxy;
+use Cache\CacheBundle\DataCollector\CacheProxyInterface;
 use Cache\CacheBundle\DataCollector\TraceableAdapterEvent;
 use Psr\Cache\CacheItemInterface;
 
-class __TPL_CLASS__ extends __TPL_EXTENDS__ implements CacheProxy
+class __TPL_CLASS__ extends __TPL_EXTENDS__ implements CacheProxyInterface
 {
     private $__name;
     private $__calls = [];
@@ -168,10 +168,10 @@ class __TPL_CLASS__ extends __TPL_EXTENDS__ implements CacheProxy
 
     private function start($name, $argument = null)
     {
-        $this->__calls[]   = $event   = new TraceableAdapterEvent();
-        $event->name       = $name;
-        $event->argument   = $argument;
-        $event->start      = microtime(true);
+        $this->__calls[] = $event = new TraceableAdapterEvent();
+        $event->name     = $name;
+        $event->argument = $argument;
+        $event->start    = microtime(true);
 
         return $event;
     }
