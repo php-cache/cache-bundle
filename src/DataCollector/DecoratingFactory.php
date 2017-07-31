@@ -37,7 +37,7 @@ class DecoratingFactory
     /**
      * @param CacheItemPoolInterface $originalObject original class
      *
-     * @return CacheProxyInterface|CacheItemPoolInterface
+     * @return CacheProxyInterface
      */
     public function create($originalObject)
     {
