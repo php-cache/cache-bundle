@@ -11,12 +11,14 @@
 
 namespace Cache\CacheBundle\DataCollector;
 
+use Psr\Cache\CacheItemPoolInterface;
+
 /**
  * An interface for a cache proxy. A cache proxy is created when we profile a cache pool.
  *
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-interface CacheProxyInterface
+interface CacheProxyInterface extends CacheItemPoolInterface
 {
     public function __getCalls();
 

@@ -30,9 +30,8 @@ class CacheBundle extends Bundle
         $container->addCompilerPass(new Compiler\CacheTaggingPass());
         $container->addCompilerPass(new Compiler\SessionSupportCompilerPass());
         $container->addCompilerPass(new Compiler\DoctrineCompilerPass());
+        $container->addCompilerPass(new Compiler\LoggerPass());
+        $container->addCompilerPass(new Compiler\DataCollectorCompilerPass());
 
-        if ($container->getParameter('kernel.debug')) {
-            $container->addCompilerPass(new Compiler\DataCollectorCompilerPass());
-        }
     }
 }

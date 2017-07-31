@@ -148,7 +148,6 @@ class Configuration implements ConfigurationInterface
             ->addDefaultsIfNotSet()
             ->children()
                 ->scalarNode('logger')->defaultValue('logger')->end()
-                ->scalarNode('level')->defaultValue('info')->end()
             ->end();
 
         return $node;
