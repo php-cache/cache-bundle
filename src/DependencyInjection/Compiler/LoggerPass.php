@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Add logging to pool implementing LoggerAwareInterface
+ * Add logging to pool implementing LoggerAwareInterface.
  *
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */

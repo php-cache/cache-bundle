@@ -32,6 +32,5 @@ class CacheBundle extends Bundle
         $container->addCompilerPass(new Compiler\DoctrineCompilerPass());
         $container->addCompilerPass(new Compiler\LoggerPass());
         $container->addCompilerPass(new Compiler\DataCollectorCompilerPass());
-
     }
 }
