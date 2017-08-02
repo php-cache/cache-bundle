@@ -2,7 +2,17 @@
 
 The change log describes what is "Added", "Removed", "Changed" or "Fixed" between each release. 
 
-## UNRELEASED
+## 1.0.0
+
+### Added
+
+- Adds an option to disable the data collector
+- Support for SimpleCache
+
+### Changed
+
+- Using stable depedencies
+- Added dynamic proxy classes to handle data collection when debugging
 
 ## 0.5.0
 
