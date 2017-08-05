@@ -15,8 +15,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\VarDumper\Caster\CutStub;
-use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Cloner\Stub;
+use Symfony\Component\VarDumper\Cloner\VarCloner;
 
 /**
  * @author Aaron Scherer <aequasi@gmail.com>
@@ -27,12 +27,12 @@ use Symfony\Component\VarDumper\Cloner\Stub;
 class CacheDataCollector extends DataCollector
 {
     /**
-     * @var CacheProxyInterface[]
+     * @type CacheProxyInterface[]
      */
     private $instances = [];
 
     /**
-     * @var VarCloner
+     * @type VarCloner
      */
     private $cloner = null;
 
@@ -50,7 +50,7 @@ class CacheDataCollector extends DataCollector
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
-        $empty = ['calls' => [], 'config' => [], 'options' => [], 'statistics' => []];
+        $empty      = ['calls' => [], 'config' => [], 'options' => [], 'statistics' => []];
         $this->data = ['instances' => $empty, 'total' => $empty];
         foreach ($this->instances as $name => $instance) {
             $calls = $instance->__getCalls();
@@ -66,7 +66,7 @@ class CacheDataCollector extends DataCollector
         }
 
         $this->data['instances']['statistics'] = $this->calculateStatistics();
-        $this->data['total']['statistics'] = $this->calculateTotalStatistics();
+        $this->data['total']['statistics']     = $this->calculateTotalStatistics();
     }
 
     /**
@@ -136,15 +136,15 @@ class CacheDataCollector extends DataCollector
         $statistics = [];
         foreach ($this->data['instances']['calls'] as $name => $calls) {
             $statistics[$name] = [
-                'calls' => 0,
-                'time' => 0,
-                'reads' => 0,
-                'writes' => 0,
+                'calls'   => 0,
+                'time'    => 0,
+                'reads'   => 0,
+                'writes'  => 0,
                 'deletes' => 0,
-                'hits' => 0,
-                'misses' => 0,
+                'hits'    => 0,
+                'misses'  => 0,
             ];
-            /** @var TraceableAdapterEvent $call */
+            /** @type TraceableAdapterEvent $call */
             foreach ($calls as $call) {
                 $statistics[$name]['calls'] += 1;
                 $statistics[$name]['time'] += $call->end - $call->start;
@@ -189,14 +189,14 @@ class CacheDataCollector extends DataCollector
     private function calculateTotalStatistics()
     {
         $statistics = $this->getStatistics();
-        $totals = [
-            'calls' => 0,
-            'time' => 0,
-            'reads' => 0,
-            'writes' => 0,
+        $totals     = [
+            'calls'   => 0,
+            'time'    => 0,
+            'reads'   => 0,
+            'writes'  => 0,
             'deletes' => 0,
-            'hits' => 0,
-            'misses' => 0,
+            'hits'    => 0,
+            'misses'  => 0,
         ];
         foreach ($statistics as $name => $values) {
             foreach ($totals as $key => $value) {
@@ -217,7 +217,7 @@ class CacheDataCollector extends DataCollector
      */
     private function getCasters()
     {
-        return array(
+        return [
             '*' => function ($v, array $a, Stub $s, $isNested) {
                 if (!$v instanceof Stub) {
                     foreach ($a as $k => $v) {
@@ -229,6 +229,6 @@ class CacheDataCollector extends DataCollector
 
                 return $a;
             },
-        );
+        ];
     }
 }
