@@ -11,10 +11,12 @@
 
 namespace Cache\CacheBundle\DataCollector;
 
-use Cache\CacheBundle\Cache\Recording\TraceableAdapterEvent;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
+use Symfony\Component\VarDumper\Caster\CutStub;
+use Symfony\Component\VarDumper\Cloner\Stub;
+use Symfony\Component\VarDumper\Cloner\VarCloner;
 
 /**
  * @author Aaron Scherer <aequasi@gmail.com>
@@ -28,6 +30,11 @@ class CacheDataCollector extends DataCollector
      * @type CacheProxyInterface[]
      */
     private $instances = [];
+
+    /**
+     * @type VarCloner
+     */
+    private $cloner = null;
 
     /**
      * @param string              $name
@@ -46,11 +53,41 @@ class CacheDataCollector extends DataCollector
         $empty      = ['calls' => [], 'config' => [], 'options' => [], 'statistics' => []];
         $this->data = ['instances' => $empty, 'total' => $empty];
         foreach ($this->instances as $name => $instance) {
-            $this->data['instances']['calls'][$name] = $instance->__getCalls();
+            $calls = $instance->__getCalls();
+            foreach ($calls as $call) {
+                if (isset($call->result)) {
+                    $call->result = $this->cloneData($call->result);
+                }
+                if (isset($call->argument)) {
+                    $call->argument = $this->cloneData($call->argument);
+                }
+            }
+            $this->data['instances']['calls'][$name] = $calls;
         }
 
         $this->data['instances']['statistics'] = $this->calculateStatistics();
         $this->data['total']['statistics']     = $this->calculateTotalStatistics();
+    }
+
+    /**
+     * To be compatible with many versions of Symfony.
+     *
+     * @param $var
+     */
+    private function cloneData($var)
+    {
+        if (method_exists($this, 'cloneVar')) {
+            // Symfony 3.2 or higher
+            return $this->cloneVar($var);
+        }
+
+        if (null === $this->cloner) {
+            $this->cloner = new VarCloner();
+            $this->cloner->setMaxItems(-1);
+            $this->cloner->addCasters($this->getCasters());
+        }
+
+        return $this->cloner->cloneVar($var);
     }
 
     /**
@@ -173,5 +210,25 @@ class CacheDataCollector extends DataCollector
         }
 
         return $totals;
+    }
+
+    /**
+     * @return callable[] The casters to add to the cloner
+     */
+    private function getCasters()
+    {
+        return [
+            '*' => function ($v, array $a, Stub $s, $isNested) {
+                if (!$v instanceof Stub) {
+                    foreach ($a as $k => $v) {
+                        if (is_object($v) && !$v instanceof \DateTimeInterface && !$v instanceof Stub) {
+                            $a[$k] = new CutStub($v);
+                        }
+                    }
+                }
+
+                return $a;
+            },
+        ];
     }
 }
