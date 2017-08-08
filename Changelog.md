@@ -2,6 +2,12 @@
 
 The change log describes what is "Added", "Removed", "Changed" or "Fixed" between each release. 
 
+## 1.0.2
+
+### Fixed
+
+- Fixed inheritence issues with for SF3.3 and above.
+
 ## 1.0.1
 
 ### Fixed
