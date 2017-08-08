@@ -2,6 +2,12 @@
 
 The change log describes what is "Added", "Removed", "Changed" or "Fixed" between each release. 
 
+## 1.0.1
+
+### Fixed
+
+- Make sure we clone data better in the DataCollector.
+
 ## 1.0.0
 
 ### Added
