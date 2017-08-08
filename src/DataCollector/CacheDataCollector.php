@@ -84,7 +84,7 @@ class CacheDataCollector extends DataCollector
         if (null === $this->cloner) {
             $this->cloner = new VarCloner();
             $this->cloner->setMaxItems(-1);
-            $this->cloner->addCasters($this->getCasters());
+            $this->cloner->addCasters($this->getCloneCasters());
         }
 
         return $this->cloner->cloneVar($var);
@@ -215,7 +215,7 @@ class CacheDataCollector extends DataCollector
     /**
      * @return callable[] The casters to add to the cloner
      */
-    private function getCasters()
+    private function getCloneCasters()
     {
         return [
             '*' => function ($v, array $a, Stub $s, $isNested) {
