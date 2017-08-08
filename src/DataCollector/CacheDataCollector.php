@@ -215,7 +215,7 @@ class CacheDataCollector extends DataCollector
     /**
      * @return callable[] The casters to add to the cloner
      */
-    private function getCasters()
+    protected function getCasters()
     {
         return [
             '*' => function ($v, array $a, Stub $s, $isNested) {
