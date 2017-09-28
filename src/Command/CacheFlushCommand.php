@@ -11,7 +11,6 @@
 
 namespace Cache\CacheBundle\Command;
 
-use Cache\Adapter\Chain\CachePoolChain;
 use Cache\CacheBundle\DataCollector\CacheProxyInterface;
 use Cache\Taggable\TaggablePoolInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -29,7 +28,7 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 class CacheFlushCommand extends ContainerAwareCommand
 {
     /**
-     * @var CacheProxyInterface[]
+     * @type CacheProxyInterface[]
      */
     private $instances = [];
 
@@ -95,11 +94,11 @@ EOD
         if ($type === 'all') {
             $result = true;
             foreach ($builtInTypes as $builtInType) {
-                $output->writeln(" // Clearing cache for built in type <info>'" . $builtInType . '"</info>');
+                $output->writeln(" // Clearing cache for built in type <info>'".$builtInType.'"</info>');
                 $result = $result && $this->clearCacheForBuiltInType($builtInType);
             }
             foreach (array_keys($this->instances) as $instance) {
-                $output->writeln(" // Clearing cache for provider <info>'" . $instance . '"</info>');
+                $output->writeln(" // Clearing cache for provider <info>'".$instance.'"</info>');
                 $result = $result && $this->clearCacheForProvider($instance);
             }
             $result = $result && $this->clearSymfonyCache($output);
