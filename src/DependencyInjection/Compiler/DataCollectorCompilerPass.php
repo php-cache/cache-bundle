@@ -33,9 +33,10 @@ class DataCollectorCompilerPass implements CompilerPassInterface
             return;
         }
 
-        $proxyFactory        = $container->get('cache.proxy_factory');
-        $collectorDefinition = $container->getDefinition('cache.data_collector');
-        $serviceIds          = $container->findTaggedServiceIds('cache.provider');
+        $proxyFactory           = $container->get('cache.proxy_factory');
+        $collectorDefinition    = $container->getDefinition('cache.data_collector');
+        $clearCommandDefinition = $container->getDefinition('cache.cache_flush_command');
+        $serviceIds             = $container->findTaggedServiceIds('cache.provider');
 
         foreach (array_keys($serviceIds) as $id) {
 
@@ -60,8 +61,9 @@ class DataCollectorCompilerPass implements CompilerPassInterface
                 $decoratedPool->addMethodCall('__setName', [$id]);
             }
 
-            // Tell the collector to add the new instance
+            // Add provider instances to related services
             $collectorDefinition->addMethodCall('addInstance', [$id, new Reference($id)]);
+            $clearCommandDefinition->addMethodCall('addInstance', [$id, new Reference($id)]);
         }
     }
 }
