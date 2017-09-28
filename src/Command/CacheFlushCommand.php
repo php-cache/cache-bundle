@@ -94,11 +94,11 @@ EOD
         if ($type === 'all') {
             $result = true;
             foreach ($builtInTypes as $builtInType) {
-                $output->writeln(" // Clearing cache for built in type <info>'".$builtInType.'"</info>');
+                $output->writeln(" // Clearing cache for built in type <info>'".$builtInType."'</info>");
                 $result = $result && $this->clearCacheForBuiltInType($builtInType);
             }
             foreach (array_keys($this->instances) as $instance) {
-                $output->writeln(" // Clearing cache for provider <info>'".$instance.'"</info>');
+                $output->writeln(" // Clearing cache for provider <info>'".$instance."'</info>");
                 $result = $result && $this->clearCacheForProvider($instance);
             }
             $result = $result && $this->clearSymfonyCache($output);
