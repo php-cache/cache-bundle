@@ -50,6 +50,8 @@ class CacheExtension extends Extension
             }
         }
 
+        $loader->load('command.yml');
+
         if ($config['doctrine']['enabled']) {
             $this->verifyDoctrineBridgeExists('doctrine');
         }

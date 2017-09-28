@@ -1,0 +1,5 @@
+services:
+  cache.cache_flush_command:
+    class: Cache\CacheBundle\Command\CacheFlushCommand
+    tags:
+      - { name: console.command }
