@@ -80,7 +80,7 @@ EOD
 
         $builtInTypes = ['annotation', 'doctrine', 'serializer', 'session', 'router', 'validation'];
         if (in_array($type, $builtInTypes)) {
-            return $this->clearCacheForBuiltInType($type) ? 0 : 1;
+            return $this->clearCacheForBuiltInType($type, $output) ? 0 : 1;
         }
 
         if ($type === 'symfony') {
@@ -88,18 +88,16 @@ EOD
         }
 
         if ($type === 'provider') {
-            return $this->clearCacheForProvider($input->getArgument('service')) ? 0 : 1;
+            return $this->clearCacheForProvider($input->getArgument('service', $output)) ? 0 : 1;
         }
 
         if ($type === 'all') {
             $result = true;
             foreach ($builtInTypes as $builtInType) {
-                $output->writeln(" // Clearing cache for built in type <info>'".$builtInType."'</info>");
-                $result = $result && $this->clearCacheForBuiltInType($builtInType);
+                $result = $result && $this->clearCacheForBuiltInType($builtInType, $output);
             }
             foreach (array_keys($this->instances) as $instance) {
-                $output->writeln(" // Clearing cache for provider <info>'".$instance."'</info>");
-                $result = $result && $this->clearCacheForProvider($instance);
+                $result = $result && $this->clearCacheForProvider($instance, $output);
             }
             $result = $result && $this->clearSymfonyCache($output);
 
@@ -114,24 +112,28 @@ EOD
      *
      * @return bool
      */
-    private function clearCacheForBuiltInType($type)
+    private function clearCacheForBuiltInType($type, $output)
     {
         if (!$this->getContainer()->hasParameter(sprintf('cache.%s', $type))) {
+            $output->writeln("<error> ✗ </error> Unable to clear cache for built in type <info>'".$type."'</info>, as cache service can not be found.");
+
             return true;
         }
 
         $config = $this->getContainer()->getParameter(sprintf('cache.%s', $type));
 
+        $output->writeln(" // Clearing cache for built in type <info>'".$type."'</info>");
+
         if ($type === 'doctrine') {
             $result = true;
-            $result = $result && $this->clearTypedCacheFromService($type, $config['metadata']['service_id']);
-            $result = $result && $this->clearTypedCacheFromService($type, $config['result']['service_id']);
-            $result = $result && $this->clearTypedCacheFromService($type, $config['query']['service_id']);
+            $result = $result && $this->clearTypedCacheFromService($type, $config['metadata']['service_id'], $output);
+            $result = $result && $this->clearTypedCacheFromService($type, $config['result']['service_id'], $output);
+            $result = $result && $this->clearTypedCacheFromService($type, $config['query']['service_id'], $output);
 
             return $result;
-        } else {
-            return $this->clearTypedCacheFromService($type, $config['service_id']);
         }
+
+        return $this->clearTypedCacheFromService($type, $config['service_id'], $output);
     }
 
     /**
@@ -140,13 +142,17 @@ EOD
      *
      * @return bool
      */
-    private function clearTypedCacheFromService($type, $serviceId)
+    private function clearTypedCacheFromService($type, $serviceId, $output)
     {
         /** @type \Psr\Cache\CacheItemPoolInterface $service */
         $service = $this->getContainer()->get($serviceId);
         if ($service instanceof TaggablePoolInterface) {
+            $output->writeln(" // Clearing taggable cache pool interface <info>'".$type."'</info> from service <info>'".$serviceId."'</info>");
+
             return $service->clearTags([$type]);
         } else {
+            $output->writeln(" // Clearing typed cache <info>'".$type."'</info> from service <info>'".$serviceId."'</info>");
+
             return $service->clear();
         }
     }
@@ -202,10 +208,12 @@ EOD
      *
      * @return bool
      */
-    protected function clearCacheForProvider($serviceId)
+    protected function clearCacheForProvider($serviceId, $output)
     {
         /** @type \Psr\Cache\CacheItemPoolInterface $service */
         $service = $this->getContainer()->get($serviceId);
+
+        $output->writeln(" // Clearing cache for provider <info>'".$serviceId."'</info>");
 
         return $service->clear();
     }
@@ -220,6 +228,7 @@ EOD
         $command   = $this->getApplication()->find('cache:clear');
         $arguments = [
             'command' => 'cache:clear',
+            '--no-warmup' => true,
         ];
 
         return $command->run(new ArrayInput($arguments), $output) === 0;
