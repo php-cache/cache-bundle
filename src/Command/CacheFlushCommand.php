@@ -109,6 +109,7 @@ EOD
      * Clear the cache for a type.
      *
      * @param string $type
+     * @param OutputInterface $output
      *
      * @return bool
      */
@@ -139,6 +140,7 @@ EOD
     /**
      * @param string $type
      * @param string $serviceId
+     * @param OutputInterface $output
      *
      * @return bool
      */
@@ -205,6 +207,7 @@ EOD
 
     /**
      * @param string $serviceId
+     * @param OutputInterface $output
      *
      * @return bool
      */
