@@ -49,6 +49,12 @@ class ProxyFactory
             return $proxyClass;
         }
 
+        if (file_exists($proxyFile)) {
+            require $proxyFile;
+
+            return $proxyClass;
+        }
+
         $content = file_get_contents(dirname(__DIR__).'/Resources/proxy/template.php');
         $content = str_replace('__TPL_CLASS__', $proxyClass, $content);
         $content = str_replace('__TPL_EXTENDS__', $class, $content);
