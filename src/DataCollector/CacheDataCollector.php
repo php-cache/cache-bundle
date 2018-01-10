@@ -70,7 +70,7 @@ class CacheDataCollector extends DataCollector
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function reset()
     {
