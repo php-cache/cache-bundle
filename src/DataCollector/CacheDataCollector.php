@@ -70,6 +70,15 @@ class CacheDataCollector extends DataCollector
     }
 
     /**
+     * @inheritdoc
+     */
+    public function reset()
+    {
+        $empty      = ['calls' => [], 'config' => [], 'options' => [], 'statistics' => []];
+        $this->data = ['instances' => $empty, 'total' => $empty];
+    }
+
+    /**
      * To be compatible with many versions of Symfony.
      *
      * @param $var
