@@ -12,6 +12,7 @@
 namespace Cache\CacheBundle\Tests\Unit;
 
 use Cache\CacheBundle\DependencyInjection\CacheExtension;
+use PHPUnit\Framework\TestCase as BaseTestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
@@ -22,7 +23,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
  *
  * @author Aaron Scherer <aequasi@gmail.com>
  */
-class TestCase extends \PHPUnit_Framework_TestCase
+class TestCase extends BaseTestCase
 {
     /**
      * @param ContainerBuilder $container

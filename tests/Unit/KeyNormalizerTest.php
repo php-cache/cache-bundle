@@ -13,7 +13,7 @@ namespace Cache\CacheBundle\Tests\Unit;
 
 use Cache\CacheBundle\KeyNormalizer;
 
-class KeyNormalizerTest extends \PHPUnit_Framework_TestCase
+class KeyNormalizerTest extends TestCase
 {
     public function testOnlyValid()
     {
