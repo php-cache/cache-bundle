@@ -29,10 +29,3 @@ cache:
     service_id: 'array_cache'
     use_tagging: true
 
-framework:
-  annotations:
-    cache: 'cache.service.annotation'
-  serializer:
-    cache: 'cache.service.serializer'
-  validation:
-    cache: 'cache.service.validation'
