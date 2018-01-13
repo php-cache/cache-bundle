@@ -36,7 +36,7 @@ matrix:
 
           # Test LTS versions
         - php: 7.2
-          env: DEPENDENCIES="dunglas/symfony-lock:^2 doctrine/annotations symfony/serializer-bundle"
+          env: DEPENDENCIES="dunglas/symfony-lock:^2 doctrine/annotations symfony/framework-bundle"
         - php: 7.2
           env: DEPENDENCIES="dunglas/symfony-lock:^3 doctrine/annotations"
         - php: 7.2
