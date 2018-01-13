@@ -17,7 +17,6 @@ use Cache\CacheBundle\CacheBundle;
 use Cache\CacheBundle\Routing\CachingRouter;
 use Cache\SessionHandler\Psr6SessionHandler;
 use Nyholm\BundleTest\BaseBundleTestCase;
-use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\Kernel;
 
 /**
