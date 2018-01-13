@@ -27,7 +27,6 @@
         "php": "^5.6 || ^7.0",
         "cache/session-handler": "^1.0",
         "cache/taggable-cache": "^1.0",
-        "dunglas/symfony-lock": "^3",
         "nyholm/nsa": "^1.1",
         "symfony/config": "^2.7 || ^3.0 || ^4.0",
         "symfony/console": "^2.7 || ^3.0 || ^4.0",
