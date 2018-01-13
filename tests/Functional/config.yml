@@ -2,6 +2,11 @@ services:
   array_cache:
     class: Cache\Adapter\PHPArray\ArrayCachePool
 
+  dummy_normalizer:
+    class: Cache\CacheBundle\Tests\Functional\DummyNormalizer
+    tags:
+      - { name: serializer.normalizer }
+
 cache:
   session:
     enabled: true
