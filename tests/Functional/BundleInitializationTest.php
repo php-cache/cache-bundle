@@ -17,6 +17,7 @@ use Cache\CacheBundle\CacheBundle;
 use Cache\CacheBundle\Routing\CachingRouter;
 use Cache\SessionHandler\Psr6SessionHandler;
 use Nyholm\BundleTest\BaseBundleTestCase;
+use Symfony\Component\HttpKernel\Kernel;
 
 /**
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
@@ -33,6 +34,10 @@ class BundleInitializationTest extends BaseBundleTestCase
         parent::setUp();
         $kernel = $this->createKernel();
         $kernel->addConfigFile(__DIR__.'/config.yml');
+
+        if (Kernel::MAJOR_VERSION < 4) {
+            $kernel->addConfigFile(__DIR__.'/sf2_and_3.yml');
+        }
     }
 
     public function testInitBundle()
@@ -41,10 +46,13 @@ class BundleInitializationTest extends BaseBundleTestCase
         $container = $this->getContainer();
 
         $this->assertTrue($container->hasParameter('cache.provider_service_ids'));
-        $this->assertInstanceOf(DoctrineCacheBridge::class, $container->get('cache.service.annotation'));
-        $this->assertInstanceOf(DoctrineCacheBridge::class, $container->get('cache.service.serializer'));
-        $this->assertInstanceOf(SymfonyValidatorBridge::class, $container->get('cache.service.validation'));
-        $this->assertInstanceOf(Psr6SessionHandler::class, $container->get('cache.service.session'));
-        $this->assertInstanceOf(CachingRouter::class, $container->get('cache.service.router'));
+
+        if (Kernel::MAJOR_VERSION < 4) {
+            $this->assertInstanceOf(DoctrineCacheBridge::class, $container->get('cache.service.annotation'));
+            $this->assertInstanceOf(DoctrineCacheBridge::class, $container->get('cache.service.serializer'));
+            $this->assertInstanceOf(SymfonyValidatorBridge::class, $container->get('cache.service.validation'));
+            $this->assertInstanceOf(Psr6SessionHandler::class, $container->get('cache.service.session'));
+            $this->assertInstanceOf(CachingRouter::class, $container->get('cache.service.router'));
+        }
     }
 }
