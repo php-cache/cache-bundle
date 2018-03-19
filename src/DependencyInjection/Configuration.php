@@ -12,6 +12,7 @@
 namespace Cache\CacheBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
@@ -47,6 +48,30 @@ class Configuration implements ConfigurationInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    private function normalizeEnabled(NodeDefinition $node)
+    {
+        $node->beforeNormalization()
+                ->always()
+                ->then(
+                    function ($v) {
+                        if (is_string($v['enabled'])) {
+                            $v['enabled'] = $v['enabled'] === 'true';
+                        }
+                        if (is_int($v['enabled'])) {
+                            $v['enabled'] = $v['enabled'] === 1;
+                        }
+
+                        return $v;
+                    }
+                )
+            ->end();
+
+        return $this;
+    }
+
+    /**
      * Configure the "cache.session" section.
      *
      * @return ArrayNodeDefinition
@@ -65,6 +90,8 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('prefix')->defaultValue('session_')->end()
                 ->scalarNode('ttl')->end()
             ->end();
+
+        $this->normalizeEnabled($node);
 
         return $node;
     }
@@ -88,6 +115,8 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('prefix')->defaultValue('')->end()
             ->end();
 
+        $this->normalizeEnabled($node);
+
         return $node;
     }
 
@@ -109,6 +138,8 @@ class Configuration implements ConfigurationInterface
                 ->booleanNode('use_tagging')->defaultTrue()->end()
                 ->scalarNode('prefix')->defaultValue('')->end()
             ->end();
+
+        $this->normalizeEnabled($node);
 
         return $node;
     }
@@ -132,6 +163,8 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('prefix')->defaultValue('')->end()
             ->end();
 
+        $this->normalizeEnabled($node);
+
         return $node;
     }
 
@@ -148,7 +181,10 @@ class Configuration implements ConfigurationInterface
             ->addDefaultsIfNotSet()
             ->children()
                 ->scalarNode('logger')->defaultValue('logger')->end()
+                ->scalarNode('level')->defaultValue('info')->end()
             ->end();
+
+        $this->normalizeEnabled($node);
 
         return $node;
     }
@@ -171,6 +207,8 @@ class Configuration implements ConfigurationInterface
                     ->defaultTrue()
                 ->end()
             ->end();
+
+        $this->normalizeEnabled($node);
 
         $types = ['metadata', 'result', 'query'];
         foreach ($types as $type) {
@@ -234,6 +272,8 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('prefix')->defaultValue('')->end()
             ->end();
 
+        $this->normalizeEnabled($node);
+
         return $node;
     }
 
@@ -246,9 +286,13 @@ class Configuration implements ConfigurationInterface
         $node = $tree->root('data_collector');
 
         $node
+            ->canBeEnabled()
+            ->addDefaultsIfNotSet()
             ->children()
                 ->booleanNode('enabled')->end()
             ->end();
+
+        $this->normalizeEnabled($node);
 
         return $node;
     }
