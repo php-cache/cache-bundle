@@ -48,7 +48,7 @@ class Configuration implements ConfigurationInterface
     }
 
     /**
-     * Normalizes the enabled field to be truthy
+     * Normalizes the enabled field to be truthy.
      *
      * @param NodeDefinition $node
      *
