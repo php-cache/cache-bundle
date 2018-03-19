@@ -48,7 +48,11 @@ class Configuration implements ConfigurationInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Normalizes the enabled field to be truthy
+     *
+     * @param NodeDefinition $node
+     *
+     * @return Configuration
      */
     private function normalizeEnabled(NodeDefinition $node)
     {
