@@ -13,6 +13,7 @@ namespace Cache\CacheBundle\DependencyInjection;
 
 use Cache\Bridge\Doctrine\DoctrineCacheBridge;
 use Cache\CacheBundle\Bridge\SymfonyValidatorBridge;
+use Cache\CacheBundle\Command\CacheFlushCommand;
 use Cache\CacheBundle\Factory\DoctrineBridgeFactory;
 use Cache\CacheBundle\Factory\RouterFactory;
 use Cache\CacheBundle\Factory\SessionHandlerFactory;
@@ -21,6 +22,7 @@ use Cache\CacheBundle\Routing\CachingRouter;
 use Cache\SessionHandler\Psr6SessionHandler;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
@@ -69,6 +71,9 @@ class CacheExtension extends Extension
         $serviceIds = [];
         $this->findServiceIds($config, $serviceIds);
         $container->setParameter('cache.provider_service_ids', $serviceIds);
+
+        $container->register(CacheFlushCommand::class, CacheFlushCommand::class)
+            ->addTag('console.command', ['command' => 'cache:flush']);
     }
 
     /**
@@ -98,10 +103,12 @@ class CacheExtension extends Extension
     private function verifyDoctrineBridgeExists($name)
     {
         if (!class_exists('Cache\Bridge\Doctrine\DoctrineCacheBridge')) {
-            throw new \Exception(sprintf(
-                'You need the DoctrineCacheBridge to be able to use "%s". Please run "composer require cache/psr-6-doctrine-bridge" to install the missing dependency.',
-                $name
-            ));
+            throw new \Exception(
+                sprintf(
+                    'You need the DoctrineCacheBridge to be able to use "%s". Please run "composer require cache/psr-6-doctrine-bridge" to install the missing dependency.',
+                    $name
+                )
+            );
         }
     }
 
@@ -117,7 +124,7 @@ class CacheExtension extends Extension
      * Register services. All service ids will start witn "cache.service.".
      *
      * @param ContainerBuilder $container
-     * @param $config
+     * @param                  $config
      *
      * @throws \Exception
      */
