@@ -2,7 +2,7 @@ services:
   cache.data_collector:
     class: Cache\CacheBundle\DataCollector\CacheDataCollector
     tags:
-      - { name: data_collector, template: 'CacheBundle:Collector:cache.html.twig', id: 'php-cache' }
+      - { name: data_collector, template: '@Cache/Collector/cache.html.twig', id: 'php-cache' }
 
   cache.proxy_factory:
     class: Cache\CacheBundle\DataCollector\ProxyFactory
