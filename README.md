@@ -1,41 +1,96 @@
-# PSR-6 Cache bundle
+# PHP Cache Bundle
+
+[![CI](https://github.com/php-cache/cache-bundle/actions/workflows/ci.yml/badge.svg)](https://github.com/php-cache/cache-bundle/actions/workflows/ci.yml)
 [![Latest Stable Version](https://poser.pugx.org/cache/cache-bundle/v/stable)](https://packagist.org/packages/cache/cache-bundle)
-[![codecov.io](https://codecov.io/github/php-cache/cache-bundle/coverage.svg?branch=master)](https://codecov.io/github/php-cache/cache-bundle?branch=master)
-[![Build Status](https://travis-ci.org/php-cache/cache-bundle.svg?branch=master)](https://travis-ci.org/php-cache/cache-bundle)
-[![Total Downloads](https://poser.pugx.org/cache/cache-bundle/downloads)](https://packagist.org/packages/cache/cache-bundle) 
-[![Monthly Downloads](https://poser.pugx.org/cache/cache-bundle/d/monthly.png)](https://packagist.org/packages/cache/cache-bundle)
-[![Quality Score](https://img.shields.io/scrutinizer/g/php-cache/cache-bundle.svg?style=flat-square)](https://scrutinizer-ci.com/g/php-cache/cache-bundle)
-[![SensioLabsInsight](https://insight.sensiolabs.com/projects/21963379-2b15-4cc4-bdf6-0f98aa292f8a/mini.png)](https://insight.sensiolabs.com/projects/21963379-2b15-4cc4-bdf6-0f98aa292f8a)
-[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)
+[![Total Downloads](https://poser.pugx.org/cache/cache-bundle/downloads)](https://packagist.org/packages/cache/cache-bundle)
+[![License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE)
 
-This is a Symfony bundle that lets you you integrate your PSR-6 compliant cache service with the framework. 
-It lets you cache your sessions, routes and Doctrine results and metadata. It also provides an integration with the 
-debug toolbar. This bundle does not contain any pool implementation nor does it help you register cache pool services. 
-You maybe interested in [AdapterBundle](https://github.com/php-cache/adapter-bundle) which will help you configure and
-register PSR-6 cache pools as services. 
+This Symfony bundle connects PSR-6 cache pools to framework services. It supports session storage, route caching, PSR-3 logging, the Symfony profiler, and targeted cache clearing. Use [Adapter Bundle](https://github.com/php-cache/adapter-bundle) when you also need to register cache pool services from configuration.
 
-This bundle  is a part of the PHP Cache organisation. To read about features like tagging and hierarchy support please 
-read the shared documentation at [www.php-cache.com](http://www.php-cache.com).
+Version 2 requires PHP 8.2 or newer, Symfony 6.4, 7, or 8, PSR Cache 3, and PHP Cache 2 packages.
 
-### To Install
+## Installation
 
-Run the following in your project root, assuming you have composer set up for your project
-```sh
-composer require cache/cache-bundle
+```bash
+composer require cache/cache-bundle:^2.0
 ```
 
-Add the bundle to app/AppKernel.php
+Symfony Flex may register the bundle automatically. Otherwise, add it to `config/bundles.php`:
 
 ```php
-$bundles(
-    // ...
-    new Cache\CacheBundle\CacheBundle(),
-    // ...
-);
+<?php
+
+return [
+    Cache\CacheBundle\CacheBundle::class => ['all' => true],
+];
 ```
 
-Read the documentation at [www.php-cache.com/symfony/cache-bundle](http://www.php-cache.com/en/latest/symfony/cache-bundle/).
+## Configuration
 
-### Contribute
+The referenced cache pool must already be registered as a service:
 
-Contributions are very welcome! Send a pull request or report any issues you find on the [issue tracker](http://issues.php-cache.com).
+```yaml
+# config/packages/cache.yaml
+cache:
+  session:
+    enabled: true
+    service_id: cache.provider.app
+    ttl: 7200
+    lock_factory: lock.factory
+    lock_ttl: 300
+
+  router:
+    enabled: true
+    service_id: cache.provider.app
+    ttl: 86400
+
+  logging:
+    enabled: true
+    logger: monolog.logger.cache
+```
+
+Enable Symfony sessions when using the session integration:
+
+```yaml
+# config/packages/framework.yaml
+framework:
+  session: true
+```
+
+The session handler acquires an exclusive Symfony lock before reading a session and holds it until the session closes or is destroyed. `lock_ttl` is the maximum expected request duration in seconds. Increase it when a request can keep a session open for longer than five minutes.
+
+Symfony uses a local semaphore or file lock by default. That is sufficient for one application host. When several hosts share the session cache, configure `framework.lock` with a shared store such as Redis so every host contends for the same lock. Set `lock_factory` when the session handler should use a named or custom Symfony lock factory.
+
+The profiler collector is enabled by default in debug mode. Set `cache.data_collector.enabled` explicitly to override that default.
+
+Profiler decoration preserves native tag support. It records failed operations and tag invalidations, and clears its call buffer between requests in long-running workers.
+
+Clear a configured pool with `bin/console cache:flush`:
+
+```bash
+bin/console cache:flush session
+bin/console cache:flush router
+bin/console cache:flush symfony
+bin/console cache:flush provider cache.provider.app
+bin/console cache:flush all
+```
+
+## Upgrading from 1.x
+
+Version 2 removes the Doctrine, annotation, serializer, and validation integrations. Configure those consumers with their native Symfony or Doctrine cache options instead. The generated subclass profiler proxies are also replaced by a regular PSR-6 decorator.
+
+Session storage now requires Symfony Lock and serializes access to each session ID. Review `lock_ttl` and use a shared lock store before deploying to more than one application host.
+
+PHP Cache 2 changes APCu payloads, Redis and Predis tag indexes, namespaced tag indexes, and hierarchy storage paths. Do not mix version 1 and version 2 workers on an affected store.
+
+Clear a namespaced store when a namespace contains bytes outside `[A-Za-z0-9_.]` or lowercase `_x`. Also clear it when a public key contains `|`, `!`, or lowercase `_x`.
+
+Clear namespaced stores containing tagged or hierarchy items. Clear a prefixed store when its prefix contains bytes outside `[A-Za-z0-9_.]` or lowercase `_x`.
+
+Stop or drain old workers, clear each affected store, and then deploy version 2. Follow the same sequence before rolling back.
+
+See the [full Cache Bundle documentation](https://www.php-cache.com/en/latest/symfony/cache-bundle/) for all options.
+
+## Contributing
+
+Send pull requests to the [GitHub repository](https://github.com/php-cache/cache-bundle). Report problems on the [GitHub issue tracker](https://github.com/php-cache/cache-bundle/issues).

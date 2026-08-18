@@ -1,170 +1,141 @@
 <?php
 
-/*
- * This file is part of php-cache\cache-bundle package.
- *
- * (c) 2015 Aaron Scherer <aequasi@gmail.com>, Tobias Nyholm <tobias.nyholm@gmail.com>
- *
- * This source file is subject to the MIT license that is bundled
- * with this source code in the file LICENSE.
- */
+declare(strict_types=1);
 
 namespace Cache\CacheBundle\Routing;
 
-use Cache\CacheBundle\KeyNormalizer;
 use Cache\TagInterop\TaggableCacheItemInterface;
+use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Routing\RequestContext;
+use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
 
-/**
- * @author Tobias Nyholm <tobias.nyholm@gmail.com>
- */
-class CachingRouter implements RouterInterface
+final class CachingRouter implements RouterInterface
 {
     /**
-     * @type CacheItemPoolInterface
+     * @param array{ttl: int} $config
      */
-    private $cache;
-
-    /**
-     * @type int
-     */
-    private $ttl;
-
-    /**
-     * @type RouterInterface
-     */
-    private $router;
-
-    /**
-     * @param CacheItemPoolInterface $cache
-     * @param RouterInterface        $router
-     * @param array                  $config
-     */
-    public function __construct(CacheItemPoolInterface $cache, RouterInterface $router, array $config)
-    {
-        $this->cache  = $cache;
-        $this->ttl    = $config['ttl'];
-        $this->router = $router;
+    public function __construct(
+        private readonly CacheItemPoolInterface $cache,
+        private readonly RouterInterface $router,
+        private readonly array $config,
+    ) {
     }
 
     /**
-     * {@inheritdoc}
+     * @return array<string, mixed>
      */
-    public function match($pathinfo)
+    public function match(string $pathinfo): array
     {
-        $cacheItem = $this->getCacheItemMatch($pathinfo);
+        $cacheItem = $this->getMatchItem($pathinfo);
         if ($cacheItem->isHit()) {
-            return $cacheItem->get();
+            $result = $cacheItem->get();
+
+            return is_array($result) ? $result : [];
         }
 
-        // Get the result form the router
         $result = $this->router->match($pathinfo);
-
-        // Save the result
-        $cacheItem->set($result)
-            ->expiresAfter($this->ttl);
+        $cacheItem->set($result)->expiresAfter($this->config['ttl']);
         $this->cache->save($cacheItem);
 
         return $result;
     }
 
     /**
-     * {@inheritdoc}
+     * @param array<string, mixed> $parameters
      */
-    public function generate($name, $parameters = [], $referenceType = self::ABSOLUTE_PATH)
+    public function generate(string $name, array $parameters = [], int $referenceType = self::ABSOLUTE_PATH): string
     {
-        $cacheItem = $this->getCacheItemGenerate($name, $parameters, $referenceType);
+        $cacheItem = $this->getGenerateItem($name, $parameters, $referenceType);
         if ($cacheItem->isHit()) {
-            return $cacheItem->get();
+            $result = $cacheItem->get();
+
+            return is_string($result) ? $result : '';
         }
 
-        // Get the result form the router
         $result = $this->router->generate($name, $parameters, $referenceType);
-
-        // Save the result
-        $cacheItem->set($result)
-            ->expiresAfter($this->ttl);
+        $cacheItem->set($result)->expiresAfter($this->config['ttl']);
         $this->cache->save($cacheItem);
 
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getRouteCollection()
+    public function getRouteCollection(): RouteCollection
     {
         return $this->router->getRouteCollection();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setContext(RequestContext $context)
+    public function setContext(RequestContext $context): void
     {
         $this->router->setContext($context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getContext()
+    public function getContext(): RequestContext
     {
         return $this->router->getContext();
     }
 
-    /**
-     * Get a cache item for a call to match().
-     *
-     * @param string $pathinfo
-     *
-     * @return \Psr\Cache\CacheItemInterface
-     */
-    private function getCacheItemMatch($pathinfo)
+    private function getMatchItem(string $pathinfo): CacheItemInterface
     {
-        /** @type RequestContext $c */
-        $c   = $this->getContext();
-        $key = sprintf('%s__%s__%s__%s', $c->getHost(), $pathinfo, $c->getMethod(), $c->getQueryString());
+        $context = $this->getContext();
+        $key = $this->cacheKey([
+            'match',
+            $pathinfo,
+            $context->getBaseUrl(),
+            $context->getMethod(),
+            $context->getHost(),
+            $context->getScheme(),
+            $context->getHttpPort(),
+            $context->getHttpsPort(),
+            $context->getQueryString(),
+            $context->getParameters(),
+        ]);
 
-        return $this->getCacheItemFromKey($key, 'match');
+        return $this->getItem($key, 'match');
     }
 
     /**
-     * Get a cache item for a call to generate().
-     *
-     * @param $name
-     * @param array $parameters
-     * @param $referenceType
-     *
-     * @return \Psr\Cache\CacheItemInterface
+     * @param array<string, mixed> $parameters
      */
-    private function getCacheItemGenerate($name, array $parameters, $referenceType)
+    private function getGenerateItem(string $name, array $parameters, int $referenceType): CacheItemInterface
     {
-        asort($parameters);
-        $key = sprintf('%s.%s.%s', $name, $referenceType ? 'true' : 'false', http_build_query($parameters));
+        ksort($parameters);
+        $context = $this->getContext();
+        $key = $this->cacheKey([
+            'generate',
+            $name,
+            $referenceType,
+            $parameters,
+            $context->getBaseUrl(),
+            $context->getPathInfo(),
+            $context->getHost(),
+            $context->getScheme(),
+            $context->getHttpPort(),
+            $context->getHttpsPort(),
+            $context->getParameters(),
+        ]);
 
-        return $this->getCacheItemFromKey($key, 'generate');
+        return $this->getItem($key, 'generate');
     }
 
     /**
-     * Passes through all unknown calls onto the router object.
+     * @param array<mixed> $values
      */
-    public function __call($method, $args)
+    private function cacheKey(array $values): string
     {
-        return call_user_func_array([$this->router, $method], $args);
+        try {
+            $serialized = serialize($values);
+        } catch (\Throwable) {
+            $serialized = random_bytes(32);
+        }
+
+        return hash('sha256', $serialized);
     }
 
-    /**
-     * @param string $key
-     * @param string $tag
-     *
-     * @return \Psr\Cache\CacheItemInterface
-     */
-    private function getCacheItemFromKey($key, $tag)
+    private function getItem(string $key, string $tag): CacheItemInterface
     {
-        $item = $this->cache->getItem(KeyNormalizer::noInvalid($key));
+        $item = $this->cache->getItem($key);
 
         if ($item instanceof TaggableCacheItemInterface) {
             $item->setTags(['router', $tag]);

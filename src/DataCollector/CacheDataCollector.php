@@ -1,243 +1,170 @@
 <?php
 
-/*
- * This file is part of php-cache\cache-bundle package.
- *
- * (c) 2015 Aaron Scherer <aequasi@gmail.com>, Tobias Nyholm <tobias.nyholm@gmail.com>
- *
- * This source file is subject to the MIT license that is bundled
- * with this source code in the file LICENSE.
- */
+declare(strict_types=1);
 
 namespace Cache\CacheBundle\DataCollector;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
-use Symfony\Component\VarDumper\Caster\CutStub;
-use Symfony\Component\VarDumper\Cloner\Stub;
-use Symfony\Component\VarDumper\Cloner\VarCloner;
 
-/**
- * @author Aaron Scherer <aequasi@gmail.com>
- * @author Tobias Nyholm <tobias.nyholm@gmail.com>
- *
- * @internal
- */
-class CacheDataCollector extends DataCollector
+final class CacheDataCollector extends DataCollector
 {
-    /**
-     * @type CacheProxyInterface[]
-     */
-    private $instances = [];
+    /** @var array<string, CacheProxyInterface> */
+    private array $instances = [];
 
-    /**
-     * @type VarCloner
-     */
-    private $cloner = null;
+    public function __construct()
+    {
+        $this->reset();
+    }
 
-    /**
-     * @param string              $name
-     * @param CacheProxyInterface $instance
-     */
-    public function addInstance($name, CacheProxyInterface $instance)
+    public function addInstance(string $name, CacheProxyInterface $instance): void
     {
         $this->instances[$name] = $instance;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function collect(Request $request, Response $response, \Exception $exception = null)
+    public function collect(Request $request, Response $response, ?\Throwable $exception = null): void
     {
-        $empty      = ['calls' => [], 'config' => [], 'options' => [], 'statistics' => []];
-        $this->data = ['instances' => $empty, 'total' => $empty];
+        $calls = [];
         foreach ($this->instances as $name => $instance) {
-            $calls = $instance->__getCalls();
-            foreach ($calls as $call) {
-                if (isset($call->result)) {
-                    $call->result = $this->cloneData($call->result);
-                }
-                if (isset($call->argument)) {
-                    $call->argument = $this->cloneData($call->argument);
-                }
+            $calls[$name] = $instance->getCalls();
+        }
+
+        $statistics = $this->calculateStatistics($calls);
+        foreach ($calls as $poolCalls) {
+            foreach ($poolCalls as $call) {
+                $call->result = $this->cloneVar($call->result);
+                $call->argument = $this->cloneVar($call->argument);
             }
-            $this->data['instances']['calls'][$name] = $calls;
         }
 
-        $this->data['instances']['statistics'] = $this->calculateStatistics();
-        $this->data['total']['statistics']     = $this->calculateTotalStatistics();
+        $this->data = [
+            'calls' => $calls,
+            'statistics' => $statistics,
+            'totals' => $this->calculateTotals($statistics),
+        ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function reset()
+    public function reset(): void
     {
-        $empty      = ['calls' => [], 'config' => [], 'options' => [], 'statistics' => []];
-        $this->data = ['instances' => $empty, 'total' => $empty];
-    }
-
-    /**
-     * To be compatible with many versions of Symfony.
-     *
-     * @param $var
-     */
-    private function cloneData($var)
-    {
-        if (method_exists($this, 'cloneVar')) {
-            // Symfony 3.2 or higher
-            return $this->cloneVar($var);
+        foreach ($this->instances as $instance) {
+            $instance->clearCalls();
         }
 
-        if (null === $this->cloner) {
-            $this->cloner = new VarCloner();
-            $this->cloner->setMaxItems(-1);
-            $this->cloner->addCasters($this->getCloneCasters());
-        }
-
-        return $this->cloner->cloneVar($var);
+        $this->data = [
+            'calls' => [],
+            'statistics' => [],
+            'totals' => $this->emptyStatistics(),
+        ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'php-cache';
     }
 
     /**
-     * Method returns amount of logged Cache reads: "get" calls.
-     *
-     * @return array
+     * @return array<string, array{calls: int, time: float, reads: int, writes: int, deletes: int, hits: int, misses: int, hit_read_ratio: float|null}>
      */
-    public function getStatistics()
+    public function getStatistics(): array
     {
-        return $this->data['instances']['statistics'];
+        return $this->data['statistics'];
     }
 
     /**
-     * Method returns the statistic totals.
-     *
-     * @return array
+     * @return array{calls: int, time: float, reads: int, writes: int, deletes: int, hits: int, misses: int, hit_read_ratio: float|null}
      */
-    public function getTotals()
+    public function getTotals(): array
     {
-        return $this->data['total']['statistics'];
+        return $this->data['totals'];
     }
 
     /**
-     * Method returns all logged Cache call objects.
-     *
-     * @return mixed
+     * @return array<string, list<TraceableAdapterEvent>>
      */
-    public function getCalls()
+    public function getCalls(): array
     {
-        return $this->data['instances']['calls'];
+        return $this->data['calls'];
     }
 
     /**
-     * @return array
+     * @param array<string, list<TraceableAdapterEvent>> $callsByPool
+     *
+     * @return array<string, array{calls: int, time: float, reads: int, writes: int, deletes: int, hits: int, misses: int, hit_read_ratio: float|null}>
      */
-    private function calculateStatistics()
+    private function calculateStatistics(array $callsByPool): array
     {
         $statistics = [];
-        foreach ($this->data['instances']['calls'] as $name => $calls) {
-            $statistics[$name] = [
-                'calls'   => 0,
-                'time'    => 0,
-                'reads'   => 0,
-                'writes'  => 0,
-                'deletes' => 0,
-                'hits'    => 0,
-                'misses'  => 0,
-            ];
-            /** @type TraceableAdapterEvent $call */
+        foreach ($callsByPool as $name => $calls) {
+            $values = $this->emptyStatistics();
             foreach ($calls as $call) {
-                $statistics[$name]['calls'] += 1;
-                $statistics[$name]['time'] += $call->end - $call->start;
-                if ('getItem' === $call->name) {
-                    $statistics[$name]['reads'] += 1;
-                    if ($call->hits) {
-                        $statistics[$name]['hits'] += 1;
-                    } else {
-                        $statistics[$name]['misses'] += 1;
-                    }
+                ++$values['calls'];
+                $values['time'] += $call->end - $call->start;
+
+                if ('getItem' === $call->name || 'hasItem' === $call->name) {
+                    ++$values['reads'];
+                    $hit = 'getItem' === $call->name ? $call->hits : (int) (true === $call->result);
+                    $values['hits'] += $hit;
+                    $values['misses'] += 1 - $hit;
                 } elseif ('getItems' === $call->name) {
-                    $count = $call->hits + $call->misses;
-                    $statistics[$name]['reads'] += $count;
-                    $statistics[$name]['hits'] += $call->hits;
-                    $statistics[$name]['misses'] += $count - $call->misses;
-                } elseif ('hasItem' === $call->name) {
-                    $statistics[$name]['reads'] += 1;
-                    if (false === $call->result) {
-                        $statistics[$name]['misses'] += 1;
-                    } else {
-                        $statistics[$name]['hits'] += 1;
-                    }
-                } elseif ('save' === $call->name) {
-                    $statistics[$name]['writes'] += 1;
+                    $values['reads'] += $call->hits + $call->misses;
+                    $values['hits'] += $call->hits;
+                    $values['misses'] += $call->misses;
+                } elseif ('save' === $call->name || 'saveDeferred' === $call->name) {
+                    ++$values['writes'];
                 } elseif ('deleteItem' === $call->name) {
-                    $statistics[$name]['deletes'] += 1;
+                    ++$values['deletes'];
+                } elseif ('deleteItems' === $call->name && is_array($call->argument)) {
+                    $values['deletes'] += count($call->argument);
                 }
             }
-            if ($statistics[$name]['reads']) {
-                $statistics[$name]['hit_read_ratio'] = round(100 * $statistics[$name]['hits'] / $statistics[$name]['reads'], 2);
-            } else {
-                $statistics[$name]['hit_read_ratio'] = null;
-            }
+            $values['hit_read_ratio'] = $values['reads'] > 0
+                ? round(100 * $values['hits'] / $values['reads'], 2)
+                : null;
+            $statistics[$name] = $values;
         }
 
         return $statistics;
     }
 
     /**
-     * @return array
+     * @param array<string, array{calls: int, time: float, reads: int, writes: int, deletes: int, hits: int, misses: int, hit_read_ratio: float|null}> $statistics
+     *
+     * @return array{calls: int, time: float, reads: int, writes: int, deletes: int, hits: int, misses: int, hit_read_ratio: float|null}
      */
-    private function calculateTotalStatistics()
+    private function calculateTotals(array $statistics): array
     {
-        $statistics = $this->getStatistics();
-        $totals     = [
-            'calls'   => 0,
-            'time'    => 0,
-            'reads'   => 0,
-            'writes'  => 0,
-            'deletes' => 0,
-            'hits'    => 0,
-            'misses'  => 0,
-        ];
-        foreach ($statistics as $name => $values) {
-            foreach ($totals as $key => $value) {
-                $totals[$key] += $statistics[$name][$key];
-            }
+        $totals = $this->emptyStatistics();
+        foreach ($statistics as $values) {
+            $totals['calls'] += $values['calls'];
+            $totals['time'] += $values['time'];
+            $totals['reads'] += $values['reads'];
+            $totals['writes'] += $values['writes'];
+            $totals['deletes'] += $values['deletes'];
+            $totals['hits'] += $values['hits'];
+            $totals['misses'] += $values['misses'];
         }
-        if ($totals['reads']) {
-            $totals['hit_read_ratio'] = round(100 * $totals['hits'] / $totals['reads'], 2);
-        } else {
-            $totals['hit_read_ratio'] = null;
-        }
+        $totals['hit_read_ratio'] = $totals['reads'] > 0
+            ? round(100 * $totals['hits'] / $totals['reads'], 2)
+            : null;
 
         return $totals;
     }
 
     /**
-     * @return callable[] The casters to add to the cloner
+     * @return array{calls: int, time: float, reads: int, writes: int, deletes: int, hits: int, misses: int, hit_read_ratio: float|null}
      */
-    private function getCloneCasters()
+    private function emptyStatistics(): array
     {
         return [
-            '*' => function ($v, array $a, Stub $s, $isNested) {
-                if (!$v instanceof Stub) {
-                    foreach ($a as $k => $v) {
-                        if (is_object($v) && !$v instanceof \DateTimeInterface && !$v instanceof Stub) {
-                            $a[$k] = new CutStub($v);
-                        }
-                    }
-                }
-
-                return $a;
-            },
+            'calls' => 0,
+            'time' => 0.0,
+            'reads' => 0,
+            'writes' => 0,
+            'deletes' => 0,
+            'hits' => 0,
+            'misses' => 0,
+            'hit_read_ratio' => null,
         ];
     }
 }

@@ -2,6 +2,48 @@
 
 The change log describes what is "Added", "Removed", "Changed" or "Fixed" between each release. 
 
+## 2.0.0
+
+### Added
+
+- Support for PHP 8.2 through 8.5, Symfony 6.4 through 8, and PSR Cache 3.
+- PHPStan level 9, the Symfony PHP-CS-Fixer rules, and a 100% line coverage gate.
+- A typed PSR-6 decorator for profiler tracing.
+- Exclusive session locking backed by Symfony Lock, with configurable factory and lease duration.
+
+### Changed
+
+- Require PHP Cache 2 packages.
+- Use modern Symfony command, dependency injection, routing, session, and profiler APIs.
+- Use the `@Cache/Collector/cache.html.twig` profiler template namespace.
+
+### Removed
+
+- Doctrine, annotation, serializer, and validator integrations.
+- Generated subclass proxies and their runtime proxy cache.
+- Support for PHP versions below 8.2, Symfony versions below 6.4, and PSR Cache versions below 3.
+
+### Fixed
+
+- Count multi-key reads, deferred writes, and bulk deletes correctly in profiler statistics.
+- Configure the cache-backed session handler through Symfony's current session factory services.
+- Hold each session lock through reads, writes, timestamp updates, and session ID regeneration.
+- Include the complete routing request context in cached match and URL-generation keys.
+- Preserve tag support while profiling and trace failed operations and tag invalidations.
+- Reset profiler call buffers between requests in long-running workers.
+- Resolve private configured providers through a generated service locator in `cache:flush`.
+
+## 1.1.0
+
+### Added
+
+- Support Symfony 4.
+
+### Fixed
+
+- Reset the data collector between requests.
+- Load existing profiler proxy classes before reuse.
+
 ## 1.0.2
 
 ### Fixed

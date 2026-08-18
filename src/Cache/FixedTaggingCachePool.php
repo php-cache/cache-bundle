@@ -1,13 +1,6 @@
 <?php
 
-/*
- * This file is part of php-cache\cache-bundle package.
- *
- * (c) 2015 Aaron Scherer <aequasi@gmail.com>, Tobias Nyholm <tobias.nyholm@gmail.com>
- *
- * This source file is subject to the MIT license that is bundled
- * with this source code in the file LICENSE.
- */
+declare(strict_types=1);
 
 namespace Cache\CacheBundle\Cache;
 
@@ -15,132 +8,81 @@ use Cache\TagInterop\TaggableCacheItemInterface;
 use Cache\TagInterop\TaggableCacheItemPoolInterface;
 use Psr\Cache\CacheItemInterface;
 
-/**
- * This class is a decorator for a TaggableCacheItemPoolInterface. It tags everything with predefined tags.
- *
- * @author Tobias Nyholm <tobias.nyholm@gmail.com>
- *
- * @internal
- */
-class FixedTaggingCachePool implements TaggableCacheItemPoolInterface
+final class FixedTaggingCachePool implements TaggableCacheItemPoolInterface
 {
     /**
-     * @type TaggableCacheItemPoolInterface
+     * @param list<string> $tags
      */
-    private $cache;
-
-    /**
-     * @type array
-     */
-    private $tags;
-
-    /**
-     * @param TaggableCacheItemPoolInterface $cache
-     * @param array                          $tags
-     */
-    public function __construct(TaggableCacheItemPoolInterface $cache, array $tags)
-    {
-        $this->cache = $cache;
-        $this->tags  = $tags;
+    public function __construct(
+        private readonly TaggableCacheItemPoolInterface $cache,
+        private readonly array $tags,
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getItem($key)
+    public function getItem(string $key): TaggableCacheItemInterface
     {
         return $this->cache->getItem($key);
     }
 
     /**
-     * {@inheritdoc}
+     * @return iterable<string, TaggableCacheItemInterface>
      */
-    public function getItems(array $keys = [])
+    public function getItems(array $keys = []): iterable
     {
         return $this->cache->getItems($keys);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function hasItem($key)
+    public function hasItem(string $key): bool
     {
         return $this->cache->hasItem($key);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function clear()
+    public function clear(): bool
     {
         return $this->cache->clear();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function deleteItem($key)
+    public function deleteItem(string $key): bool
     {
         return $this->cache->deleteItem($key);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function deleteItems(array $keys)
+    public function deleteItems(array $keys): bool
     {
         return $this->cache->deleteItems($keys);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function save(CacheItemInterface $item)
+    public function save(CacheItemInterface $item): bool
     {
-        if (!$item instanceof TaggableCacheItemInterface) {
-            throw new \InvalidArgumentException('Cache items are not transferable between pools. Item MUST implement TaggableCacheItemInterface.');
-        }
-
-        $item->setTags($this->tags);
-
-        return $this->cache->save($item);
+        return $this->cache->save($this->tag($item));
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function saveDeferred(CacheItemInterface $item)
+    public function saveDeferred(CacheItemInterface $item): bool
     {
-        if (!$item instanceof TaggableCacheItemInterface) {
-            throw new \InvalidArgumentException('Cache items are not transferable between pools. Item MUST implement TaggableCacheItemInterface.');
-        }
-
-        $item->setTags($this->tags);
-
-        return $this->cache->saveDeferred($item);
+        return $this->cache->saveDeferred($this->tag($item));
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function commit()
+    public function commit(): bool
     {
         return $this->cache->commit();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function invalidateTag($tag)
+    public function invalidateTag(string $tag): bool
     {
-        return $this->invalidateTag($tag);
+        return $this->cache->invalidateTag($tag);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function invalidateTags(array $tags)
+    public function invalidateTags(array $tags): bool
     {
-        return $this->cache - $this->invalidateTags($tags);
+        return $this->cache->invalidateTags($tags);
+    }
+
+    private function tag(CacheItemInterface $item): TaggableCacheItemInterface
+    {
+        if (!$item instanceof TaggableCacheItemInterface) {
+            throw new \InvalidArgumentException('Cache items must implement TaggableCacheItemInterface.');
+        }
+
+        return $item->setTags($this->tags);
     }
 }

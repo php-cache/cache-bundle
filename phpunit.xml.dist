@@ -1,34 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<phpunit backupGlobals="false"
-  backupStaticAttributes="false"
-  colors="true"
-  convertErrorsToExceptions="true"
-  convertNoticesToExceptions="true"
-  convertWarningsToExceptions="true"
-  processIsolation="false"
-  stopOnFailure="false"
-  syntaxCheck="false"
-  bootstrap="vendor/autoload.php"
-  >
-  <testsuites>
-    <testsuite name="Main testsuite for CacheBundle">
-      <directory>./tests/</directory>
-    </testsuite>
-  </testsuites>
-
-  <groups>
-    <exclude>
-      <group>benchmark</group>
-    </exclude>
-  </groups>
-
-  <filter>
-    <whitelist>
-      <directory>src/</directory>
-      <exclude>
-        <directory>Resources</directory>
-      </exclude>
-    </whitelist>
-  </filter>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.5/phpunit.xsd"
+         bootstrap="vendor/autoload.php"
+         cacheDirectory=".phpunit.cache"
+         colors="true">
+    <testsuites>
+        <testsuite name="main">
+            <directory>tests</directory>
+        </testsuite>
+    </testsuites>
+    <source>
+        <include>
+            <directory>src</directory>
+        </include>
+    </source>
 </phpunit>

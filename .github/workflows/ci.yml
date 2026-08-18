@@ -1,0 +1,75 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    name: PHP ${{ matrix.php }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['8.2', '8.3', '8.4', '8.5']
+
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7
+        with:
+          repository: php-cache/cache
+          path: .ci/cache
+      - uses: shivammathur/setup-php@2.37.2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+          tools: composer:v2
+      - run: composer validate --strict --no-check-lock
+      - run: composer config repositories.php-cache path .ci/cache
+      - run: composer update --no-interaction --prefer-dist --optimize-autoloader
+      - run: composer test
+
+  minimum-dependencies:
+    name: Minimum dependencies
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7
+        with:
+          repository: php-cache/cache
+          path: .ci/cache
+      - uses: shivammathur/setup-php@2.37.2
+        with:
+          php-version: '8.2'
+          coverage: none
+          tools: composer:v2
+      - run: composer config repositories.php-cache path .ci/cache
+      - run: composer update --no-interaction --prefer-dist --prefer-lowest --prefer-stable
+      - run: composer test
+
+  quality:
+    name: Quality and coverage
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7
+        with:
+          repository: php-cache/cache
+          path: .ci/cache
+      - uses: shivammathur/setup-php@2.37.2
+        with:
+          php-version: '8.5'
+          coverage: xdebug
+          tools: composer:v2
+      - run: composer config repositories.php-cache path .ci/cache
+      - run: composer update --no-interaction --prefer-dist --optimize-autoloader
+      - run: composer cs:check
+      - run: composer phpstan
+      - run: composer coverage

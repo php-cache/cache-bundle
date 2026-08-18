@@ -1,39 +1,53 @@
 <?php
 
-/*
- * This file is part of php-cache\cache-bundle package.
- *
- * (c) 2015 Aaron Scherer <aequasi@gmail.com>, Tobias Nyholm <tobias.nyholm@gmail.com>
- *
- * This source file is subject to the MIT license that is bundled
- * with this source code in the file LICENSE.
- */
+declare(strict_types=1);
 
 namespace Cache\CacheBundle\DependencyInjection\Compiler;
 
+use Cache\CacheBundle\Command\CacheFlushCommand;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
-/**
- * Make sure to tag all cache services we can find.
- *
- * @author Tobias Nyholm <tobias.nyholm@gmail.com>
- */
-class CacheTaggingPass implements CompilerPassInterface
+final class CacheTaggingPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
-        // get service ids form parameters
-        $serviceIds = $container->getParameter('cache.provider_service_ids');
+        $pools = [];
+        if ($container->hasParameter('cache.provider_service_ids')) {
+            $serviceIds = $container->getParameter('cache.provider_service_ids');
+            if (is_array($serviceIds)) {
+                foreach ($serviceIds as $id) {
+                    if (!is_string($id) || !$container->has($id)) {
+                        continue;
+                    }
 
-        foreach ($serviceIds as $id) {
-            $def = $container->findDefinition($id);
-            if (!$def->hasTag('cache.provider')) {
-                $def->addTag('cache.provider');
+                    $pools[$id] = new Reference($id);
+                    $definition = $container->findDefinition($id);
+                    if (!$definition->hasTag('cache.provider')) {
+                        $definition->addTag('cache.provider');
+                    }
+                }
             }
         }
+
+        if (!$container->hasDefinition(CacheFlushCommand::class)) {
+            return;
+        }
+
+        foreach (array_keys($container->findTaggedServiceIds('cache.provider')) as $id) {
+            $pools[$id] ??= new Reference($id);
+        }
+        foreach ($container->getAliases() as $id => $alias) {
+            if ($alias->isPublic() && $container->findDefinition($id)->hasTag('cache.provider')) {
+                $pools[$id] ??= new Reference($id);
+            }
+        }
+
+        $container->getDefinition(CacheFlushCommand::class)->setArgument(
+            0,
+            ServiceLocatorTagPass::register($container, $pools, CacheFlushCommand::class),
+        );
     }
 }

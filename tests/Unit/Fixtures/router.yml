@@ -1,4 +1,0 @@
-cache:
-    router:
-        enabled: true
-        service_id: default

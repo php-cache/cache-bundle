@@ -1,36 +1,23 @@
 services:
   array_cache:
     class: Cache\Adapter\PHPArray\ArrayCachePool
+    public: true
 
-  dummy_normalizer:
-    class: Cache\CacheBundle\Tests\Functional\DummyNormalizer
-    tags:
-      - { name: serializer.normalizer }
+framework:
+  profiler:
+    enabled: true
+  session: true
 
 cache:
   session:
     enabled: true
-    service_id: 'array_cache'
-    use_tagging: true
+    service_id: array_cache
     ttl: 7200
 
   router:
     enabled: true
-    service_id: 'array_cache'
+    service_id: array_cache
     ttl: 86400
 
-  annotation:
+  data_collector:
     enabled: true
-    service_id: 'array_cache'
-    use_tagging: true
-
-  serializer:
-    enabled: true
-    service_id: 'array_cache'
-    use_tagging: true
-
-  validation:
-    enabled: true
-    service_id: 'array_cache'
-    use_tagging: true
-

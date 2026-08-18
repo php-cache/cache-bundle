@@ -1,0 +1,8 @@
+parameters:
+    level: 9
+    phpVersion: 80200
+    treatPhpDocTypesAsCertain: false
+    paths:
+        - src
+        - tests
+        - tools

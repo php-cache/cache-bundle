@@ -1,302 +1,56 @@
 <?php
 
-/*
- * This file is part of php-cache\cache-bundle package.
- *
- * (c) 2015 Aaron Scherer <aequasi@gmail.com>, Tobias Nyholm <tobias.nyholm@gmail.com>
- *
- * This source file is subject to the MIT license that is bundled
- * with this source code in the file LICENSE.
- */
+declare(strict_types=1);
 
 namespace Cache\CacheBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
-use Symfony\Component\Config\Definition\Builder\NodeDefinition;
+use Symfony\Component\Config\Definition\Builder\ScalarNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
-/**
- * Class Configuration.
- *
- * @author Aaron Scherer <aequasi@gmail.com>
- */
-class Configuration implements ConfigurationInterface
+final class Configuration implements ConfigurationInterface
 {
-    /**
-     * Generates the configuration tree builder.
-     *
-     * @return TreeBuilder The tree builder
-     */
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode    = $treeBuilder->root('cache');
+        $treeBuilder = new TreeBuilder('cache');
+        $rootNode = $treeBuilder->getRootNode();
+        if ($rootNode instanceof ArrayNodeDefinition) {
+            $children = $rootNode->children();
 
-        $rootNode->children()
-            ->append($this->addSessionSupportSection())
-            ->append($this->addDoctrineSection())
-            ->append($this->addRouterSection())
-            ->append($this->addAnnotationSection())
-            ->append($this->addSerializerSection())
-            ->append($this->addValidationSection())
-            ->append($this->addLoggingSection())
-            ->append($this->addDataCollectorSection())
-            ->end();
+            $session = $children->arrayNode('session')->canBeEnabled();
+            $sessionChildren = $session->children();
+            $sessionChildren->append($this->stringNode('service_id')->isRequired());
+            $sessionChildren->booleanNode('use_tagging')->defaultTrue();
+            $sessionChildren->append($this->stringNode('prefix')->defaultValue('session_'));
+            $sessionChildren->integerNode('ttl')->defaultNull();
+            $sessionChildren->append($this->stringNode('lock_factory')->defaultValue('lock.factory'));
+            $sessionChildren->integerNode('lock_ttl')->min(1)->defaultValue(300);
+
+            $router = $children->arrayNode('router')->canBeEnabled();
+            $routerChildren = $router->children();
+            $routerChildren->append($this->stringNode('service_id')->isRequired());
+            $routerChildren->integerNode('ttl')->defaultValue(604800);
+            $routerChildren->booleanNode('use_tagging')->defaultTrue();
+            $routerChildren->append($this->stringNode('prefix')->defaultValue(''));
+
+            $logging = $children->arrayNode('logging')->canBeEnabled();
+            $logging->children()->append($this->stringNode('logger')->defaultValue('logger'));
+
+            $dataCollector = $children->arrayNode('data_collector')->addDefaultsIfNotSet();
+            $dataCollector->children()->booleanNode('enabled')->defaultNull();
+        }
 
         return $treeBuilder;
     }
 
-    /**
-     * Normalizes the enabled field to be truthy.
-     *
-     * @param NodeDefinition $node
-     *
-     * @return Configuration
-     */
-    private function normalizeEnabled(NodeDefinition $node)
+    private function stringNode(string $name): ScalarNodeDefinition
     {
-        $node->beforeNormalization()
-                ->always()
-                ->then(
-                    function ($v) {
-                        if (is_string($v['enabled'])) {
-                            $v['enabled'] = $v['enabled'] === 'true';
-                        }
-                        if (is_int($v['enabled'])) {
-                            $v['enabled'] = $v['enabled'] === 1;
-                        }
-
-                        return $v;
-                    }
-                )
+        $node = new ScalarNodeDefinition($name);
+        $node->validate()
+            ->ifTrue(static fn (mixed $value): bool => !is_string($value))
+            ->thenInvalid('The value must be a string.')
             ->end();
-
-        return $this;
-    }
-
-    /**
-     * Configure the "cache.session" section.
-     *
-     * @return ArrayNodeDefinition
-     */
-    private function addSessionSupportSection()
-    {
-        $tree = new TreeBuilder();
-        $node = $tree->root('session');
-
-        $node
-            ->canBeEnabled()
-            ->addDefaultsIfNotSet()
-            ->children()
-                ->scalarNode('service_id')->isRequired()->end()
-                ->booleanNode('use_tagging')->defaultTrue()->end()
-                ->scalarNode('prefix')->defaultValue('session_')->end()
-                ->scalarNode('ttl')->end()
-            ->end();
-
-        $this->normalizeEnabled($node);
-
-        return $node;
-    }
-
-    /**
-     * Configure the "cache.serializer" section.
-     *
-     * @return ArrayNodeDefinition
-     */
-    private function addSerializerSection()
-    {
-        $tree = new TreeBuilder();
-        $node = $tree->root('serializer');
-
-        $node
-            ->canBeEnabled()
-            ->addDefaultsIfNotSet()
-            ->children()
-            ->scalarNode('service_id')->isRequired()->end()
-                ->booleanNode('use_tagging')->defaultTrue()->end()
-                ->scalarNode('prefix')->defaultValue('')->end()
-            ->end();
-
-        $this->normalizeEnabled($node);
-
-        return $node;
-    }
-
-    /**
-     * Configure the "cache.serializer" section.
-     *
-     * @return ArrayNodeDefinition
-     */
-    private function addValidationSection()
-    {
-        $tree = new TreeBuilder();
-        $node = $tree->root('validation');
-
-        $node
-            ->canBeEnabled()
-            ->addDefaultsIfNotSet()
-            ->children()
-                ->scalarNode('service_id')->isRequired()->end()
-                ->booleanNode('use_tagging')->defaultTrue()->end()
-                ->scalarNode('prefix')->defaultValue('')->end()
-            ->end();
-
-        $this->normalizeEnabled($node);
-
-        return $node;
-    }
-
-    /**
-     * Configure the "cache.annotation" section.
-     *
-     * @return ArrayNodeDefinition
-     */
-    private function addAnnotationSection()
-    {
-        $tree = new TreeBuilder();
-        $node = $tree->root('annotation');
-
-        $node
-            ->canBeEnabled()
-            ->addDefaultsIfNotSet()
-            ->children()
-                ->scalarNode('service_id')->isRequired()->end()
-                ->booleanNode('use_tagging')->defaultTrue()->end()
-                ->scalarNode('prefix')->defaultValue('')->end()
-            ->end();
-
-        $this->normalizeEnabled($node);
-
-        return $node;
-    }
-
-    /**
-     * @return ArrayNodeDefinition
-     */
-    private function addLoggingSection()
-    {
-        $tree = new TreeBuilder();
-        $node = $tree->root('logging');
-
-        $node
-            ->canBeEnabled()
-            ->addDefaultsIfNotSet()
-            ->children()
-                ->scalarNode('logger')->defaultValue('logger')->end()
-                ->scalarNode('level')->defaultValue('info')->end()
-            ->end();
-
-        $this->normalizeEnabled($node);
-
-        return $node;
-    }
-
-    /**
-     * Configure the "cache.doctrine" section.
-     *
-     * @return ArrayNodeDefinition
-     */
-    private function addDoctrineSection()
-    {
-        $tree = new TreeBuilder();
-        $node = $tree->root('doctrine');
-
-        $node
-            ->canBeEnabled()
-            ->addDefaultsIfNotSet()
-            ->children()
-                ->booleanNode('use_tagging')
-                    ->defaultTrue()
-                ->end()
-            ->end();
-
-        $this->normalizeEnabled($node);
-
-        $types = ['metadata', 'result', 'query'];
-        foreach ($types as $type) {
-            $node->children()
-                    ->arrayNode($type)
-                        ->canBeUnset()
-                        ->children()
-                            ->scalarNode('service_id')->isRequired()->end()
-                            ->arrayNode('entity_managers')
-                                ->defaultValue([])
-                                ->beforeNormalization()
-                                    ->ifString()
-                                    ->then(
-                                        function ($v) {
-                                            return (array) $v;
-                                        }
-                                    )
-                                    ->end()
-                                    ->prototype('scalar')->end()
-                                ->end()
-                            ->arrayNode('document_managers')
-                                ->defaultValue([])
-                                ->beforeNormalization()
-                                    ->ifString()
-                                    ->then(
-                                        function ($v) {
-                                            return (array) $v;
-                                        }
-                                    )
-                                ->end()
-                                ->prototype('scalar')->end()
-                            ->end()
-                    ->end()
-                ->end();
-        }
-
-        return $node;
-    }
-
-    /**
-     * Configure the "cache.router" section.
-     *
-     * @return ArrayNodeDefinition
-     */
-    private function addRouterSection()
-    {
-        $tree = new TreeBuilder();
-        $node = $tree->root('router');
-
-        $node
-            ->canBeEnabled()
-            ->addDefaultsIfNotSet()
-            ->children()
-                ->integerNode('ttl')
-                    ->defaultValue(604800)
-                ->end()
-                ->scalarNode('service_id')
-                    ->isRequired()
-                ->end()
-                ->booleanNode('use_tagging')->defaultTrue()->end()
-                ->scalarNode('prefix')->defaultValue('')->end()
-            ->end();
-
-        $this->normalizeEnabled($node);
-
-        return $node;
-    }
-
-    /**
-     * @return ArrayNodeDefinition
-     */
-    private function addDataCollectorSection()
-    {
-        $tree = new TreeBuilder();
-        $node = $tree->root('data_collector');
-
-        $node
-            ->canBeEnabled()
-            ->addDefaultsIfNotSet()
-            ->children()
-                ->booleanNode('enabled')->end()
-            ->end();
-
-        $this->normalizeEnabled($node);
 
         return $node;
     }

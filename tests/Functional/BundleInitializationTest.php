@@ -1,58 +1,54 @@
 <?php
 
-/*
- * This file is part of php-cache\cache-bundle package.
- *
- * (c) 2015 Aaron Scherer <aequasi@gmail.com>, Tobias Nyholm <tobias.nyholm@gmail.com>
- *
- * This source file is subject to the MIT license that is bundled
- * with this source code in the file LICENSE.
- */
+declare(strict_types=1);
 
 namespace Cache\CacheBundle\Tests\Functional;
 
-use Cache\Bridge\Doctrine\DoctrineCacheBridge;
-use Cache\CacheBundle\Bridge\SymfonyValidatorBridge;
 use Cache\CacheBundle\CacheBundle;
+use Cache\CacheBundle\DataCollector\CacheDataCollector;
+use Cache\CacheBundle\DataCollector\TraceableCachePool;
 use Cache\CacheBundle\Routing\CachingRouter;
 use Cache\SessionHandler\Psr6SessionHandler;
-use Nyholm\BundleTest\BaseBundleTestCase;
-use Symfony\Component\HttpKernel\Kernel;
+use Nyholm\BundleTest\TestKernel;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Bundle\TwigBundle\TwigBundle;
+use Symfony\Bundle\WebProfilerBundle\WebProfilerBundle;
+use Symfony\Component\HttpKernel\KernelInterface;
 
-/**
- * @author Tobias Nyholm <tobias.nyholm@gmail.com>
- */
-class BundleInitializationTest extends BaseBundleTestCase
+final class BundleInitializationTest extends KernelTestCase
 {
-    protected function getBundleClass()
+    protected static function getKernelClass(): string
     {
-        return CacheBundle::class;
+        return TestKernel::class;
     }
 
-    protected function setUp()
+    /**
+     * @param array<string, mixed> $options
+     */
+    protected static function createKernel(array $options = []): KernelInterface
     {
-        parent::setUp();
-        $kernel = $this->createKernel();
-        $kernel->addConfigFile(__DIR__.'/config.yml');
+        $kernel = parent::createKernel($options);
+        self::assertInstanceOf(TestKernel::class, $kernel);
+        $kernel->addTestBundle(TwigBundle::class);
+        $kernel->addTestBundle(WebProfilerBundle::class);
+        $kernel->addTestBundle(CacheBundle::class);
+        $kernel->addTestConfig(__DIR__.'/config.yml');
+        $kernel->handleOptions($options);
 
-        if (Kernel::MAJOR_VERSION < 4) {
-            $kernel->addConfigFile(__DIR__.'/sf2_and_3.yml');
-        }
+        return $kernel;
     }
 
-    public function testInitBundle()
+    #[RunInSeparateProcess]
+    public function testBootsWithRouterAndProfilerIntegrations(): void
     {
-        $this->bootKernel();
-        $container = $this->getContainer();
+        self::bootKernel();
+        $container = self::getContainer();
 
-        $this->assertTrue($container->hasParameter('cache.provider_service_ids'));
-
-        if (Kernel::MAJOR_VERSION < 4) {
-            $this->assertInstanceOf(DoctrineCacheBridge::class, $container->get('cache.service.annotation'));
-            $this->assertInstanceOf(DoctrineCacheBridge::class, $container->get('cache.service.serializer'));
-            $this->assertInstanceOf(SymfonyValidatorBridge::class, $container->get('cache.service.validation'));
-            $this->assertInstanceOf(Psr6SessionHandler::class, $container->get('cache.service.session'));
-            $this->assertInstanceOf(CachingRouter::class, $container->get('cache.service.router'));
-        }
+        self::assertSame(['array_cache'], $container->getParameter('cache.provider_service_ids'));
+        self::assertInstanceOf(TraceableCachePool::class, $container->get('array_cache'));
+        self::assertInstanceOf(Psr6SessionHandler::class, $container->get('cache.service.session'));
+        self::assertInstanceOf(CachingRouter::class, $container->get('cache.service.router'));
+        self::assertInstanceOf(CacheDataCollector::class, $container->get('cache.data_collector'));
     }
 }

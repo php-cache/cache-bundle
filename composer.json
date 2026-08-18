@@ -1,56 +1,61 @@
 {
     "name": "cache/cache-bundle",
+    "description": "Symfony integration for PSR-6 cache pools",
+    "license": "MIT",
     "type": "symfony-bundle",
-    "description": "Symfony 2 bundle providing integration between PSR-6 compliant cache services and the framework. It supports cache for sessions, routing and Doctrine",
     "keywords": [
         "cache",
-        "psr6",
-        "doctrine",
-        "router",
-        "session"
+        "psr-6",
+        "symfony"
     ],
-    "homepage": "http://www.php-cache.com/en/latest/",
-    "license": "MIT",
     "authors": [
         {
-            "name":     "Aaron Scherer",
-            "email":    "aequasi@gmail.com",
+            "name": "Aaron Scherer",
+            "email": "aequasi@gmail.com",
             "homepage": "https://github.com/aequasi"
         },
         {
-            "name":     "Tobias Nyholm",
-            "email":    "tobias.nyholm@gmail.com",
+            "name": "Tobias Nyholm",
+            "email": "tobias.nyholm@gmail.com",
             "homepage": "https://github.com/nyholm"
         }
     ],
+    "homepage": "https://www.php-cache.com/en/latest/",
     "require": {
-        "php": "^5.6 || ^7.0",
-        "cache/session-handler": "^1.0",
-        "cache/taggable-cache": "^1.0",
-        "nyholm/nsa": "^1.1",
-        "symfony/config": "^2.7 || ^3.0 || ^4.0",
-        "symfony/console": "^2.7 || ^3.0 || ^4.0",
-        "symfony/dependency-injection": "^2.7 || ^3.0 || ^4.0",
-        "symfony/framework-bundle": "^2.7 || ^3.0 || ^4.0",
-        "symfony/http-foundation": "^2.7 || ^3.0 || ^4.0",
-        "symfony/http-kernel": "^2.7 || ^3.0 || ^4.0",
-        "symfony/var-dumper": "^2.7 || ^3.3 || ^4.0"
+        "php": "^8.2",
+        "cache/prefixed-cache": "^2.0",
+        "cache/session-handler": "^2.0",
+        "cache/tag-interop": "^2.0",
+        "cache/taggable-cache": "^2.0",
+        "psr/cache": "^3.0",
+        "psr/container": "^2.0",
+        "symfony/config": "^6.4 || ^7.0 || ^8.0",
+        "symfony/console": "^6.4 || ^7.0 || ^8.0",
+        "symfony/dependency-injection": "^6.4 || ^7.0 || ^8.0",
+        "symfony/framework-bundle": "^6.4 || ^7.0 || ^8.0",
+        "symfony/http-foundation": "^6.4 || ^7.0 || ^8.0",
+        "symfony/http-kernel": "^6.4 || ^7.0 || ^8.0",
+        "symfony/lock": "^6.4 || ^7.0 || ^8.0",
+        "symfony/routing": "^6.4 || ^7.0 || ^8.0",
+        "symfony/var-dumper": "^6.4 || ^7.0 || ^8.0"
     },
-    "require-dev":  {
-        "cache/array-adapter": "^1.0",
-        "cache/psr-6-doctrine-bridge": "^3.0",
-        "doctrine/annotations": "^1.0",
-        "matthiasnoback/symfony-dependency-injection-test": "^1.1 || ^2.3",
-        "nyholm/symfony-bundle-test": "^1.2",
-        "symfony/phpunit-bridge": "^3.3 || ^4.0",
-        "symfony/routing": "^2.7 || ^3.0 || ^4.0",
-        "symfony/serializer": "^2.7 || ^3.0 || ^4.0",
-        "symfony/validator": "^2.7 || ^3.0 || ^4.0"
+    "require-dev": {
+        "cache/array-adapter": "^2.0",
+        "cache/cache": "^2.0",
+        "mockery/mockery": "^1.6",
+        "nyholm/symfony-bundle-test": "^3.1",
+        "php-cs-fixer/shim": "3.95.19",
+        "phpstan/phpstan": "2.2.8",
+        "phpunit/phpunit": "^11.5",
+        "symfony/web-profiler-bundle": "^6.4 || ^7.0 || ^8.0",
+        "symfony/yaml": "^6.4 || ^7.0 || ^8.0",
+        "twig/twig": "^3.12"
     },
     "suggest": {
-        "cache/adapter-bundle": "To register PSR-6 compliant cache implementations as services.",
-        "cache/psr-6-doctrine-bridge": "To be able to use Doctrine query, result and metadata cache."
+        "cache/adapter-bundle": "Registers PSR-6 cache implementations as Symfony services"
     },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "autoload": {
         "psr-4": {
             "Cache\\CacheBundle\\": "src/"
@@ -61,11 +66,27 @@
             "Cache\\CacheBundle\\Tests\\": "tests/"
         }
     },
-    "scripts": {
-        "test": "vendor/bin/simple-phpunit",
-        "test-ci": "vendor/bin/simple-phpunit --coverage-text --coverage-clover=build/coverage.xml"
-    },
     "config": {
         "sort-packages": true
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.0-dev"
+        }
+    },
+    "scripts": {
+        "coverage": [
+            "@php -d xdebug.mode=coverage vendor/bin/phpunit --coverage-clover build/coverage.xml",
+            "@php tools/check-coverage.php build/coverage.xml 100"
+        ],
+        "cs:check": "php-cs-fixer fix --dry-run --diff --sequential",
+        "cs:fix": "php-cs-fixer fix --sequential",
+        "phpstan": "phpstan analyse --debug --no-progress --memory-limit=1G",
+        "quality": [
+            "@cs:check",
+            "@phpstan",
+            "@test"
+        ],
+        "test": "phpunit"
     }
 }
