@@ -2,6 +2,15 @@
 
 declare(strict_types=1);
 
+$header = <<<'HEADER'
+This file is part of php-cache\cache-bundle package.
+
+(c) 2015 Aaron Scherer <aequasi@gmail.com>, Tobias Nyholm <tobias.nyholm@gmail.com>
+
+This source file is subject to the MIT license that is bundled
+with this source code in the file LICENSE.
+HEADER;
+
 $finder = PhpCsFixer\Finder::create()
     ->in([
         __DIR__.'/src',
@@ -14,6 +23,7 @@ return (new PhpCsFixer\Config())
         '@Symfony' => true,
         '@Symfony:risky' => true,
         'declare_strict_types' => false,
+        'header_comment' => ['header' => $header],
         'modern_serialization_methods' => false,
         'no_php4_constructor' => false,
         'no_trailing_whitespace_in_string' => true,
