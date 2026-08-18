@@ -114,8 +114,8 @@ final class CacheDataCollector extends DataCollector
                     ++$values['writes'];
                 } elseif ('deleteItem' === $call->name) {
                     ++$values['deletes'];
-                } elseif ('deleteItems' === $call->name && is_array($call->argument)) {
-                    $values['deletes'] += count($call->argument);
+                } elseif ('deleteItems' === $call->name && \is_array($call->argument)) {
+                    $values['deletes'] += \count($call->argument);
                 }
             }
             $values['hit_read_ratio'] = $values['reads'] > 0

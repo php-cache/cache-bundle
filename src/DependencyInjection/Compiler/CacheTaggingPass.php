@@ -17,9 +17,9 @@ final class CacheTaggingPass implements CompilerPassInterface
         $pools = [];
         if ($container->hasParameter('cache.provider_service_ids')) {
             $serviceIds = $container->getParameter('cache.provider_service_ids');
-            if (is_array($serviceIds)) {
+            if (\is_array($serviceIds)) {
                 foreach ($serviceIds as $id) {
-                    if (!is_string($id) || !$container->has($id)) {
+                    if (!\is_string($id) || !$container->has($id)) {
                         continue;
                     }
 

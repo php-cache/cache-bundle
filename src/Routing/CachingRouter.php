@@ -32,7 +32,7 @@ final class CachingRouter implements RouterInterface
         if ($cacheItem->isHit()) {
             $result = $cacheItem->get();
 
-            return is_array($result) ? $result : [];
+            return \is_array($result) ? $result : [];
         }
 
         $result = $this->router->match($pathinfo);
@@ -51,7 +51,7 @@ final class CachingRouter implements RouterInterface
         if ($cacheItem->isHit()) {
             $result = $cacheItem->get();
 
-            return is_string($result) ? $result : '';
+            return \is_string($result) ? $result : '';
         }
 
         $result = $this->router->generate($name, $parameters, $referenceType);

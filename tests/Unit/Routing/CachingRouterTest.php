@@ -195,6 +195,6 @@ final class CachingRouterTest extends TestCase
             $context->getHttpsPort(),
             $context->getQueryString(),
             $context->getParameters(),
-        ], JSON_THROW_ON_ERROR);
+        ], \JSON_THROW_ON_ERROR);
     }
 }

@@ -17,14 +17,14 @@ final class LoggerPass implements CompilerPassInterface
         }
 
         $config = $container->getParameter('cache.logging');
-        if (!is_array($config) || !isset($config['logger']) || !is_string($config['logger'])) {
+        if (!\is_array($config) || !isset($config['logger']) || !\is_string($config['logger'])) {
             return;
         }
 
         foreach (array_keys($container->findTaggedServiceIds('cache.provider')) as $id) {
             $definition = $container->findDefinition($id);
             $class = $definition->getClass();
-            if (!is_string($class) || !method_exists($class, 'setLogger')) {
+            if (!\is_string($class) || !method_exists($class, 'setLogger')) {
                 continue;
             }
 

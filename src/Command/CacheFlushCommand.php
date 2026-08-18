@@ -48,8 +48,8 @@ final class CacheFlushCommand extends Command
             $type = 'all';
         }
 
-        if (!is_string($type) || !in_array($type, $this->validTypes(), true)) {
-            $output->writeln(sprintf('<error>Unknown cache type "%s".</error>', is_scalar($type) ? (string) $type : get_debug_type($type)));
+        if (!\is_string($type) || !\in_array($type, $this->validTypes(), true)) {
+            $output->writeln(\sprintf('<error>Unknown cache type "%s".</error>', \is_scalar($type) ? (string) $type : get_debug_type($type)));
 
             return self::FAILURE;
         }
@@ -78,12 +78,12 @@ final class CacheFlushCommand extends Command
 
     private function clearBuiltIn(string $type): bool
     {
-        if (!array_key_exists($type, $this->builtInPools)) {
+        if (!\array_key_exists($type, $this->builtInPools)) {
             return true;
         }
 
         $serviceId = $this->builtInPools[$type];
-        if (!is_string($serviceId)) {
+        if (!\is_string($serviceId)) {
             return false;
         }
 
@@ -98,7 +98,7 @@ final class CacheFlushCommand extends Command
     private function clearProvider(InputInterface $input, OutputInterface $output): int
     {
         $serviceId = $input->getArgument('service');
-        if (!is_string($serviceId) || '' === $serviceId || !$this->pools->has($serviceId)) {
+        if (!\is_string($serviceId) || '' === $serviceId || !$this->pools->has($serviceId)) {
             $output->writeln('<error>Pass a cache pool service ID that exists.</error>');
 
             return self::FAILURE;

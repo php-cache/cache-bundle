@@ -48,7 +48,7 @@ final class Configuration implements ConfigurationInterface
     {
         $node = new ScalarNodeDefinition($name);
         $node->validate()
-            ->ifTrue(static fn (mixed $value): bool => !is_string($value))
+            ->ifTrue(static fn (mixed $value): bool => !\is_string($value))
             ->thenInvalid('The value must be a string.')
             ->end();
 

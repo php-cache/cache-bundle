@@ -153,13 +153,13 @@ class TraceableCachePool implements CacheProxyInterface
                 $items = [];
                 foreach ($operation() as $item) {
                     if (!$item instanceof $itemType) {
-                        throw new \UnexpectedValueException(sprintf('Cache pools must return instances of %s.', $itemType));
+                        throw new \UnexpectedValueException(\sprintf('Cache pools must return instances of %s.', $itemType));
                     }
 
                     $items[] = [$item->getKey(), $item];
                     $event->hits += (int) $item->isHit();
                 }
-                $event->misses = max(0, count($keys) - $event->hits);
+                $event->misses = max(0, \count($keys) - $event->hits);
 
                 return $items;
             },
