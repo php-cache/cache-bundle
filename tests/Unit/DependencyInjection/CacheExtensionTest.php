@@ -11,12 +11,12 @@ use Symfony\Component\DependencyInjection\Reference;
 
 final class CacheExtensionTest extends TestCase
 {
-    public function testUsesCacheAlias(): void
+    public function testUsesCacheAlias()
     {
         self::assertSame('cache', (new CacheExtension())->getAlias());
     }
 
-    public function testRegistersRetainedIntegrations(): void
+    public function testRegistersRetainedIntegrations()
     {
         $container = $this->createContainer(false);
 
@@ -48,7 +48,7 @@ final class CacheExtensionTest extends TestCase
         self::assertFalse($container->hasDefinition('cache.data_collector'));
     }
 
-    public function testDebugModeEnablesTheDataCollectorByDefault(): void
+    public function testDebugModeEnablesTheDataCollectorByDefault()
     {
         $container = $this->createContainer(true);
 
@@ -61,7 +61,7 @@ final class CacheExtensionTest extends TestCase
         ]], $definition->getTag('data_collector'));
     }
 
-    public function testDataCollectorCanBeDisabledInDebugMode(): void
+    public function testDataCollectorCanBeDisabledInDebugMode()
     {
         $container = $this->createContainer(true);
 

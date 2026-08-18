@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 final class DataCollectorCompilerPassTest extends TestCase
 {
-    public function testDecoratesTaggedPoolsWithoutInstantiatingThemDuringCompilation(): void
+    public function testDecoratesTaggedPoolsWithoutInstantiatingThemDuringCompilation()
     {
         $container = new ContainerBuilder();
         $container->register('cache.data_collector', CacheDataCollector::class)->setPublic(true);
@@ -37,7 +37,7 @@ final class DataCollectorCompilerPassTest extends TestCase
         self::assertSame('cache.pool', $container->get('cache.pool')->getName());
     }
 
-    public function testDoesNothingWithoutACollector(): void
+    public function testDoesNothingWithoutACollector()
     {
         $container = new ContainerBuilder();
         $container->register('cache.pool', ArrayCachePool::class)->addTag('cache.provider');
@@ -47,7 +47,7 @@ final class DataCollectorCompilerPassTest extends TestCase
         self::assertSame(ArrayCachePool::class, $container->getDefinition('cache.pool')->getClass());
     }
 
-    public function testDecoratedTaggablePoolsKeepTargetedInvalidation(): void
+    public function testDecoratedTaggablePoolsKeepTargetedInvalidation()
     {
         $container = new ContainerBuilder();
         $container->register('cache.data_collector', CacheDataCollector::class)->setPublic(true);

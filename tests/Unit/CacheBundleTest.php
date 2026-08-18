@@ -14,7 +14,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 final class CacheBundleTest extends TestCase
 {
-    public function testRegistersCompilerPasses(): void
+    public function testRegistersCompilerPasses()
     {
         $container = new ContainerBuilder();
 

@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 final class CacheFlushCommandTest extends TestCase
 {
-    public function testClearsAProvider(): void
+    public function testClearsAProvider()
     {
         $pool = new ArrayCachePool();
         $pool->save($pool->getItem('key')->set('value'));
@@ -35,7 +35,7 @@ final class CacheFlushCommandTest extends TestCase
         self::assertFalse($pool->hasItem('key'));
     }
 
-    public function testClearsAPrivateConfiguredProviderAfterCompilation(): void
+    public function testClearsAPrivateConfiguredProviderAfterCompilation()
     {
         $container = new ContainerBuilder();
         $container->setParameter('cache.provider_service_ids', ['cache.pool']);
@@ -59,7 +59,7 @@ final class CacheFlushCommandTest extends TestCase
         self::assertSame(Command::SUCCESS, $status);
     }
 
-    public function testOnlyExposesPublicAliasesForTaggedProvidersAfterCompilation(): void
+    public function testOnlyExposesPublicAliasesForTaggedProvidersAfterCompilation()
     {
         $container = new ContainerBuilder();
         $container->setParameter('cache.provider_service_ids', []);
@@ -92,7 +92,7 @@ final class CacheFlushCommandTest extends TestCase
         ]));
     }
 
-    public function testInvalidatesTheTagForABuiltInIntegration(): void
+    public function testInvalidatesTheTagForABuiltInIntegration()
     {
         $pool = new ArrayCachePool();
         $router = $pool->getItem('router')->set('router')->setTags(['router']);
@@ -109,7 +109,7 @@ final class CacheFlushCommandTest extends TestCase
         self::assertTrue($pool->hasItem('session'));
     }
 
-    public function testRejectsUnknownTypes(): void
+    public function testRejectsUnknownTypes()
     {
         $tester = $this->tester(new ContainerBuilder());
 
@@ -119,7 +119,7 @@ final class CacheFlushCommandTest extends TestCase
         self::assertStringContainsString('Unknown cache type "unknown"', $tester->getDisplay());
     }
 
-    public function testProviderRequiresAnExistingService(): void
+    public function testProviderRequiresAnExistingService()
     {
         $tester = $this->tester(new ContainerBuilder());
 
@@ -129,7 +129,7 @@ final class CacheFlushCommandTest extends TestCase
         self::assertStringContainsString('Pass a cache pool service ID', $tester->getDisplay());
     }
 
-    public function testProviderRejectsServicesThatAreNotPools(): void
+    public function testProviderRejectsServicesThatAreNotPools()
     {
         $container = new ContainerBuilder();
         $container->set('not_a_pool', new \stdClass());
@@ -142,7 +142,7 @@ final class CacheFlushCommandTest extends TestCase
         self::assertSame(Command::FAILURE, $status);
     }
 
-    public function testClearsANonTaggableBuiltInPool(): void
+    public function testClearsANonTaggableBuiltInPool()
     {
         $inner = new ArrayCachePool();
         $pool = new TraceableCachePool($inner, 'cache.pool');
@@ -156,7 +156,7 @@ final class CacheFlushCommandTest extends TestCase
         self::assertFalse($inner->hasItem('key'));
     }
 
-    public function testFailsForInvalidBuiltInConfiguration(): void
+    public function testFailsForInvalidBuiltInConfiguration()
     {
         $container = new ContainerBuilder();
         self::assertSame(
@@ -165,7 +165,7 @@ final class CacheFlushCommandTest extends TestCase
         );
     }
 
-    public function testMissingBuiltInConfigurationIsAlreadyClear(): void
+    public function testMissingBuiltInConfigurationIsAlreadyClear()
     {
         self::assertSame(
             Command::SUCCESS,
@@ -173,7 +173,7 @@ final class CacheFlushCommandTest extends TestCase
         );
     }
 
-    public function testRunsTheSymfonyCacheClearCommand(): void
+    public function testRunsTheSymfonyCacheClearCommand()
     {
         $tester = $this->tester(new ContainerBuilder(), new class('cache:clear') extends Command {
             protected function execute(\Symfony\Component\Console\Input\InputInterface $input, \Symfony\Component\Console\Output\OutputInterface $output): int
@@ -190,7 +190,7 @@ final class CacheFlushCommandTest extends TestCase
         self::assertStringContainsString('cleared', $tester->getDisplay());
     }
 
-    public function testSymfonyClearFailsWhenTheCommandIsUnavailable(): void
+    public function testSymfonyClearFailsWhenTheCommandIsUnavailable()
     {
         self::assertSame(
             Command::FAILURE,
@@ -198,7 +198,7 @@ final class CacheFlushCommandTest extends TestCase
         );
     }
 
-    public function testDecliningTheInteractivePromptDoesNothing(): void
+    public function testDecliningTheInteractivePromptDoesNothing()
     {
         $tester = $this->tester(new ContainerBuilder());
         $tester->setInputs(['no']);
@@ -206,7 +206,7 @@ final class CacheFlushCommandTest extends TestCase
         self::assertSame(Command::SUCCESS, $tester->execute([]));
     }
 
-    public function testConfirmingTheInteractivePromptClearsEverything(): void
+    public function testConfirmingTheInteractivePromptClearsEverything()
     {
         $tester = $this->tester(new ContainerBuilder(), new class('cache:clear') extends Command {
             protected function execute(\Symfony\Component\Console\Input\InputInterface $input, \Symfony\Component\Console\Output\OutputInterface $output): int
@@ -219,7 +219,7 @@ final class CacheFlushCommandTest extends TestCase
         self::assertSame(Command::SUCCESS, $tester->execute([]));
     }
 
-    public function testClearAllPropagatesFailures(): void
+    public function testClearAllPropagatesFailures()
     {
         $container = new ContainerBuilder();
         self::assertSame(

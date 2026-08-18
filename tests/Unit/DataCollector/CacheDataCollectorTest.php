@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class CacheDataCollectorTest extends TestCase
 {
-    public function testCollectsPerPoolAndTotalStatistics(): void
+    public function testCollectsPerPoolAndTotalStatistics()
     {
         $pool = new TraceableCachePool(new ArrayCachePool(), 'cache.pool');
         $item = $pool->getItem('key')->set('value');
@@ -45,7 +45,7 @@ final class CacheDataCollectorTest extends TestCase
         self::assertSame('php-cache', $collector->getName());
     }
 
-    public function testResetClearsCollectedData(): void
+    public function testResetClearsCollectedData()
     {
         $collector = new CacheDataCollector();
         $collector->collect(new Request(), new Response());
@@ -56,7 +56,7 @@ final class CacheDataCollectorTest extends TestCase
         self::assertNull($collector->getTotals()['hit_read_ratio']);
     }
 
-    public function testResetPreventsCallsLeakingIntoTheNextRequest(): void
+    public function testResetPreventsCallsLeakingIntoTheNextRequest()
     {
         $pool = new TraceableCachePool(new ArrayCachePool(), 'cache.pool');
         $collector = new CacheDataCollector();
@@ -77,7 +77,7 @@ final class CacheDataCollectorTest extends TestCase
         self::assertSame('hasItem', $secondRequestCalls[0]->name);
     }
 
-    public function testCountsBulkDeletesWithoutInventingAReadRatio(): void
+    public function testCountsBulkDeletesWithoutInventingAReadRatio()
     {
         $event = new TraceableAdapterEvent('deleteItems', ['one', 'two'], 1.0);
         $event->end = 2.0;

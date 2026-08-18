@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 final class CompilerPassesTest extends TestCase
 {
-    public function testTagsConfiguredCachePools(): void
+    public function testTagsConfiguredCachePools()
     {
         $container = new ContainerBuilder();
         $container->setParameter('cache.provider_service_ids', ['cache.pool', 'missing', 42]);
@@ -27,7 +27,7 @@ final class CompilerPassesTest extends TestCase
         self::assertTrue($container->getDefinition('cache.pool')->hasTag('cache.provider'));
     }
 
-    public function testTaggingPassIgnoresMissingOrInvalidParameters(): void
+    public function testTaggingPassIgnoresMissingOrInvalidParameters()
     {
         $container = new ContainerBuilder();
         (new CacheTaggingPass())->process($container);
@@ -37,7 +37,7 @@ final class CompilerPassesTest extends TestCase
         self::assertFalse($container->hasDefinition('cache.pool'));
     }
 
-    public function testAddsConfiguredLoggerToAwarePools(): void
+    public function testAddsConfiguredLoggerToAwarePools()
     {
         $container = new ContainerBuilder();
         $container->setParameter('cache.logging', ['enabled' => true, 'logger' => 'logger.cache']);
@@ -53,7 +53,7 @@ final class CompilerPassesTest extends TestCase
         self::assertInstanceOf(NullLogger::class, $pool->logger);
     }
 
-    public function testLoggerPassIgnoresMissingConfigurationAndUnawarePools(): void
+    public function testLoggerPassIgnoresMissingConfigurationAndUnawarePools()
     {
         $container = new ContainerBuilder();
         (new LoggerPass())->process($container);
@@ -66,7 +66,7 @@ final class CompilerPassesTest extends TestCase
         self::assertSame([], $container->getDefinition('cache.pool')->getMethodCalls());
     }
 
-    public function testConfiguresTheSessionHandlerAlias(): void
+    public function testConfiguresTheSessionHandlerAlias()
     {
         $container = new ContainerBuilder();
         $container->setParameter('cache.session', ['enabled' => true]);
@@ -77,7 +77,7 @@ final class CompilerPassesTest extends TestCase
         self::assertSame('cache.service.session', (string) $container->getAlias('session.handler'));
     }
 
-    public function testSessionPassRequiresSymfonySessionSupport(): void
+    public function testSessionPassRequiresSymfonySessionSupport()
     {
         $container = new ContainerBuilder();
         (new SessionSupportCompilerPass())->process($container);

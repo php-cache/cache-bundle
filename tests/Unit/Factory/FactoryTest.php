@@ -13,7 +13,7 @@ use Symfony\Component\Routing\RouterInterface;
 
 final class FactoryTest extends TestCase
 {
-    public function testCreatesConfiguredSessionHandler(): void
+    public function testCreatesConfiguredSessionHandler()
     {
         $lock = new RecordingSessionLock();
         $handler = SessionHandlerFactory::get(new ArrayCachePool(), $lock, [
@@ -29,7 +29,7 @@ final class FactoryTest extends TestCase
         self::assertSame(['id'], $lock->released);
     }
 
-    public function testCreatesTaggableSessionHandler(): void
+    public function testCreatesTaggableSessionHandler()
     {
         $pool = new ArrayCachePool();
         $handler = SessionHandlerFactory::get($pool, new RecordingSessionLock(), [
@@ -43,7 +43,7 @@ final class FactoryTest extends TestCase
         self::assertSame('', $handler->read('id'));
     }
 
-    public function testCreatesPrefixedRouterWithoutTagging(): void
+    public function testCreatesPrefixedRouterWithoutTagging()
     {
         $inner = $this->createMock(RouterInterface::class);
         $inner->expects(self::once())->method('match')->willReturn(['_route' => 'home']);
@@ -58,7 +58,7 @@ final class FactoryTest extends TestCase
         self::assertSame(['_route' => 'home'], $router->match('/'));
     }
 
-    public function testCreatesTaggableRouter(): void
+    public function testCreatesTaggableRouter()
     {
         $inner = $this->createMock(RouterInterface::class);
         $inner->expects(self::once())->method('match')->willReturn(['_route' => 'home']);

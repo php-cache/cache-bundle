@@ -12,7 +12,7 @@ use Psr\Cache\CacheItemInterface;
 
 final class FixedTaggingCachePoolTest extends TestCase
 {
-    public function testReturnsTaggableItems(): void
+    public function testReturnsTaggableItems()
     {
         $pool = new FixedTaggingCachePool(new ArrayCachePool(), ['tag']);
 
@@ -25,7 +25,7 @@ final class FixedTaggingCachePoolTest extends TestCase
         self::assertSame(['one', '123'], $keys);
     }
 
-    public function testSavedItemsReceiveTheFixedTags(): void
+    public function testSavedItemsReceiveTheFixedTags()
     {
         $inner = new ArrayCachePool();
         $pool = new FixedTaggingCachePool($inner, ['session']);
@@ -37,7 +37,7 @@ final class FixedTaggingCachePoolTest extends TestCase
         self::assertFalse($pool->getItem('key')->isHit());
     }
 
-    public function testDeferredItemsReceiveTheFixedTags(): void
+    public function testDeferredItemsReceiveTheFixedTags()
     {
         $inner = new ArrayCachePool();
         $pool = new FixedTaggingCachePool($inner, ['router']);
@@ -49,7 +49,7 @@ final class FixedTaggingCachePoolTest extends TestCase
         self::assertFalse($pool->getItem('key')->isHit());
     }
 
-    public function testRejectsItemsFromNonTaggablePools(): void
+    public function testRejectsItemsFromNonTaggablePools()
     {
         $pool = new FixedTaggingCachePool(new ArrayCachePool(), ['tag']);
 
@@ -57,7 +57,7 @@ final class FixedTaggingCachePoolTest extends TestCase
         $pool->save($this->createMock(CacheItemInterface::class));
     }
 
-    public function testDelegatesRegularPoolOperations(): void
+    public function testDelegatesRegularPoolOperations()
     {
         $inner = new ArrayCachePool();
         $pool = new FixedTaggingCachePool($inner, ['tag']);

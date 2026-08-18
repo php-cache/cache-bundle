@@ -40,7 +40,7 @@ final class BundleInitializationTest extends KernelTestCase
     }
 
     #[RunInSeparateProcess]
-    public function testBootsWithRouterAndProfilerIntegrations(): void
+    public function testBootsWithRouterAndProfilerIntegrations()
     {
         self::bootKernel();
         $container = self::getContainer();

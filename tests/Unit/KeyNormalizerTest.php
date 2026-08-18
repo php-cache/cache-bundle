@@ -9,12 +9,12 @@ use PHPUnit\Framework\TestCase;
 
 final class KeyNormalizerTest extends TestCase
 {
-    public function testOnlyValid(): void
+    public function testOnlyValid()
     {
         self::assertSame('foobar', KeyNormalizer::onlyValid('%foo!bar-'));
     }
 
-    public function testNoInvalid(): void
+    public function testNoInvalid()
     {
         self::assertSame('foobar', KeyNormalizer::noInvalid('{foo@bar}'));
     }

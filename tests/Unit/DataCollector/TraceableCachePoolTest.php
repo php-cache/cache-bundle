@@ -17,14 +17,14 @@ use Psr\Cache\CacheItemPoolInterface;
 
 final class TraceableCachePoolTest extends TestCase
 {
-    public function testFactoryKeepsNonTaggablePoolsNonTaggable(): void
+    public function testFactoryKeepsNonTaggablePoolsNonTaggable()
     {
         $pool = TraceableCachePool::create($this->createMock(CacheItemPoolInterface::class), 'cache.pool');
 
         self::assertSame(TraceableCachePool::class, $pool::class);
     }
 
-    public function testRecordsPoolOperationsAndHitCounts(): void
+    public function testRecordsPoolOperationsAndHitCounts()
     {
         $pool = new TraceableCachePool(new ArrayCachePool(), 'cache.pool');
         $item = $pool->getItem('key')->set('value');
@@ -43,7 +43,7 @@ final class TraceableCachePoolTest extends TestCase
         self::assertSame('cache.pool', $pool->getName());
     }
 
-    public function testDelegatesDeferredAndBulkOperations(): void
+    public function testDelegatesDeferredAndBulkOperations()
     {
         $pool = new TraceableCachePool(new ArrayCachePool(), 'cache.pool');
         $item = $pool->getItem('one')->set('value');
@@ -58,7 +58,7 @@ final class TraceableCachePoolTest extends TestCase
         );
     }
 
-    public function testGetItemsPreservesNumericStringKeys(): void
+    public function testGetItemsPreservesNumericStringKeys()
     {
         $pool = new TraceableCachePool(new ArrayCachePool(), 'cache.pool');
 
@@ -71,7 +71,7 @@ final class TraceableCachePoolTest extends TestCase
         self::assertSame(['123'], $keys);
     }
 
-    public function testRecordsPublicKeysFromNamespacedPools(): void
+    public function testRecordsPublicKeysFromNamespacedPools()
     {
         $pool = new TraceableCachePool(
             new NamespacedCachePool(new ArrayCachePool(), 'namespace'),
@@ -91,7 +91,7 @@ final class TraceableCachePoolTest extends TestCase
      * @param \Closure(TraceableCachePool, CacheItemInterface): mixed $operation
      */
     #[DataProvider('failingOperations')]
-    public function testFinalizesTheTraceAndRethrowsPoolExceptions(string $method, \Closure $operation): void
+    public function testFinalizesTheTraceAndRethrowsPoolExceptions(string $method, \Closure $operation)
     {
         $inner = $this->createMock(CacheItemPoolInterface::class);
         $exception = new \RuntimeException('pool failed');
@@ -117,7 +117,7 @@ final class TraceableCachePoolTest extends TestCase
         self::assertSame(1, $collector->getTotals()['calls']);
     }
 
-    public function testTracesTagInvalidationOperations(): void
+    public function testTracesTagInvalidationOperations()
     {
         $inner = new ArrayCachePool();
         $pool = TraceableCachePool::create($inner, 'cache.pool');
@@ -131,7 +131,7 @@ final class TraceableCachePoolTest extends TestCase
         self::assertSame([true, true], array_column($calls, 'result'));
     }
 
-    public function testTaggableTraceReturnsAndRecordsTaggableItems(): void
+    public function testTaggableTraceReturnsAndRecordsTaggableItems()
     {
         $pool = TraceableCachePool::create(new ArrayCachePool(), 'cache.pool');
         self::assertInstanceOf(TaggableCacheItemPoolInterface::class, $pool);
@@ -147,7 +147,7 @@ final class TraceableCachePoolTest extends TestCase
         self::assertSame(['getItem', 'getItems'], array_column($pool->getCalls(), 'name'));
     }
 
-    public function testTaggableTraceRejectsNonTaggableBulkItems(): void
+    public function testTaggableTraceRejectsNonTaggableBulkItems()
     {
         $inner = $this->createMock(TaggableCacheItemPoolInterface::class);
         $inner->method('getItems')->willReturn([$this->createMock(CacheItemInterface::class)]);

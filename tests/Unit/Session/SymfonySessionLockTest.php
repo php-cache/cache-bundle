@@ -11,7 +11,7 @@ use Symfony\Component\Lock\SharedLockInterface;
 
 final class SymfonySessionLockTest extends TestCase
 {
-    public function testAcquiresEachSessionOnceAndReleasesIt(): void
+    public function testAcquiresEachSessionOnceAndReleasesIt()
     {
         $nativeLock = $this->createMock(SharedLockInterface::class);
         $nativeLock->expects(self::once())
@@ -35,7 +35,7 @@ final class SymfonySessionLockTest extends TestCase
         $lock->release('session-id');
     }
 
-    public function testDoesNotRetainALockThatCouldNotBeAcquired(): void
+    public function testDoesNotRetainALockThatCouldNotBeAcquired()
     {
         $failedLock = $this->createMock(SharedLockInterface::class);
         $failedLock->expects(self::once())->method('acquire')->with(true)->willReturn(false);

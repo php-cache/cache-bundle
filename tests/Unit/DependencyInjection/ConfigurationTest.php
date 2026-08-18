@@ -11,7 +11,7 @@ use Symfony\Component\Config\Definition\Processor;
 
 final class ConfigurationTest extends TestCase
 {
-    public function testDefaultsDisableOptionalIntegrations(): void
+    public function testDefaultsDisableOptionalIntegrations()
     {
         $config = (new Processor())->processConfiguration(new Configuration(), []);
 
@@ -21,7 +21,7 @@ final class ConfigurationTest extends TestCase
         self::assertNull($config['data_collector']['enabled']);
     }
 
-    public function testProcessesRetainedIntegrationOptions(): void
+    public function testProcessesRetainedIntegrationOptions()
     {
         $config = (new Processor())->processConfiguration(new Configuration(), [[
             'session' => [
@@ -55,7 +55,7 @@ final class ConfigurationTest extends TestCase
         self::assertFalse($config['data_collector']['enabled']);
     }
 
-    public function testProcessesSessionLockOptions(): void
+    public function testProcessesSessionLockOptions()
     {
         $config = (new Processor())->processConfiguration(new Configuration(), [[
             'session' => [
@@ -70,7 +70,7 @@ final class ConfigurationTest extends TestCase
         self::assertSame(900, $config['session']['lock_ttl']);
     }
 
-    public function testRejectsNonStringServiceIds(): void
+    public function testRejectsNonStringServiceIds()
     {
         $this->expectException(InvalidConfigurationException::class);
 
@@ -82,7 +82,7 @@ final class ConfigurationTest extends TestCase
         ]]);
     }
 
-    public function testRejectsNonPositiveSessionLockTtl(): void
+    public function testRejectsNonPositiveSessionLockTtl()
     {
         $this->expectException(InvalidConfigurationException::class);
 

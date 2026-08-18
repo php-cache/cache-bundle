@@ -95,7 +95,7 @@ final class CachingRouterTest extends TestCase
         ];
     }
 
-    public function testCachesMatchedRoutes(): void
+    public function testCachesMatchedRoutes()
     {
         $inner = $this->createMock(RouterInterface::class);
         $inner->expects(self::once())->method('match')->with('/articles')->willReturn(['_route' => 'articles']);
@@ -106,7 +106,7 @@ final class CachingRouterTest extends TestCase
         self::assertSame(['_route' => 'articles'], $router->match('/articles'));
     }
 
-    public function testDoesNotReuseKeysForNonSerializableContexts(): void
+    public function testDoesNotReuseKeysForNonSerializableContexts()
     {
         $context = new RequestContext();
         $context->setParameter('callback', static fn (): null => null);
@@ -120,7 +120,7 @@ final class CachingRouterTest extends TestCase
     }
 
     #[DataProvider('matchingContextChanges')]
-    public function testMatchedRoutesDoNotCrossRequestContexts(\Closure $configure, \Closure $change): void
+    public function testMatchedRoutesDoNotCrossRequestContexts(\Closure $configure, \Closure $change)
     {
         $context = new RequestContext();
         $configure($context);
@@ -138,7 +138,7 @@ final class CachingRouterTest extends TestCase
         self::assertNotSame($first, $second);
     }
 
-    public function testCachesGeneratedUrlsRegardlessOfParameterOrder(): void
+    public function testCachesGeneratedUrlsRegardlessOfParameterOrder()
     {
         $inner = $this->createMock(RouterInterface::class);
         $inner->expects(self::once())->method('generate')->willReturn('/article/10?page=2');
@@ -149,7 +149,7 @@ final class CachingRouterTest extends TestCase
     }
 
     #[DataProvider('generationContextChanges')]
-    public function testGeneratedUrlsDoNotCrossRequestContexts(\Closure $configure, \Closure $change, int $referenceType): void
+    public function testGeneratedUrlsDoNotCrossRequestContexts(\Closure $configure, \Closure $change, int $referenceType)
     {
         $context = new RequestContext();
         $configure($context);
@@ -167,7 +167,7 @@ final class CachingRouterTest extends TestCase
         self::assertNotSame($first, $second);
     }
 
-    public function testDelegatesContextAndRouteCollection(): void
+    public function testDelegatesContextAndRouteCollection()
     {
         $context = new RequestContext();
         $routes = new RouteCollection();
