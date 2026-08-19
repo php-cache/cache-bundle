@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Cache\CacheBundle\DataCollector;
 
+use Cache\Adapter\Common\PhpCachePool;
 use Cache\TagInterop\TaggableCacheItemPoolInterface;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
@@ -30,6 +31,10 @@ class TraceableCachePool implements CacheProxyInterface
 
     public static function create(CacheItemPoolInterface $pool, string $name): self
     {
+        if ($pool instanceof PhpCachePool) {
+            return new TraceablePhpCachePool($pool, $name);
+        }
+
         if ($pool instanceof TaggableCacheItemPoolInterface) {
             return new TraceableTaggableCachePool($pool, $name);
         }
