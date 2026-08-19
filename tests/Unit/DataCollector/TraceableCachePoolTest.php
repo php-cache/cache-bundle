@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Cache\CacheBundle\Tests\Unit\DataCollector;
 
 use Cache\Adapter\PHPArray\ArrayCachePool;
+use Cache\CacheBundle\Cache\FixedTaggingCachePool;
 use Cache\CacheBundle\DataCollector\CacheDataCollector;
 use Cache\CacheBundle\DataCollector\TraceableCachePool;
 use Cache\Namespaced\NamespacedCachePool;
@@ -154,6 +155,26 @@ final class TraceableCachePoolTest extends TestCase
 
         self::assertSame(['one', '123'], $keys);
         self::assertSame(['getItem', 'getItems'], array_column($pool->getCalls(), 'name'));
+    }
+
+    public function testTracesTaggablePoolsWithoutPhpCacheExtensions()
+    {
+        $inner = new FixedTaggingCachePool(new ArrayCachePool(), []);
+        self::assertTrue($inner->save($inner->getItem('one')->set('value')));
+
+        $pool = TraceableCachePool::create($inner, 'cache.pool');
+        self::assertInstanceOf(TaggableCacheItemPoolInterface::class, $pool);
+
+        self::assertSame('value', $pool->getItem('one')->get());
+        $items = iterator_to_array($pool->getItems(['one']));
+        self::assertSame('value', $items['one']->get());
+        self::assertTrue($pool->invalidateTag('router'));
+        self::assertTrue($pool->invalidateTags(['session', 'router']));
+
+        self::assertSame(
+            ['getItem', 'getItems', 'invalidateTag', 'invalidateTags'],
+            array_column($pool->getCalls(), 'name'),
+        );
     }
 
     public function testTaggableTraceRejectsNonTaggableBulkItems()
