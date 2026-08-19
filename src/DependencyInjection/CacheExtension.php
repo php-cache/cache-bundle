@@ -54,6 +54,7 @@ final class CacheExtension extends Extension
             ?? (bool) $container->getParameter('kernel.debug');
         if ($dataCollectorEnabled) {
             $container->register('cache.data_collector', CacheDataCollector::class)
+                ->setArguments([$config['data_collector']['include_values']])
                 ->addTag('data_collector', [
                     'template' => '@Cache/Collector/cache.html.twig',
                     'id' => 'php-cache',

@@ -142,26 +142,34 @@
                             <thead>
                             <tr>
                                 <th>#</th>
-                                <th class="key">Key</th>
-                                <th>Value</th>
+                                <th{% if collector.includeValues %} class="key"{% endif %}>{{ collector.includeValues ? 'Key' : 'Operation' }}</th>
+                                <th>{{ collector.includeValues ? 'Value' : 'Time' }}</th>
                             </tr>
                             </thead>
                             <tbody>
                             {% for call in calls %}
                                 {% set separatorStyle = not loop.first ? ' style="border-top-width: medium;"' : '' %}
-                                <tr>
-                                    <td class="font-normal text-small text-muted nowrap" rowspan="3"{{ separatorStyle|raw }}>{{ loop.index }}</td>
-                                    <th{{ separatorStyle|raw }}>{{ call.name }}</th>
-                                    <td{{ separatorStyle|raw }}>{{ dump(call.argument) }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Result</th>
-                                    <td>{{ dump(call.result) }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Time</th>
-                                    <td>{{ '%0.2f'|format((call.end - call.start) * 1000) }} ms</td>
-                                </tr>
+                                {% if collector.includeValues %}
+                                    <tr>
+                                        <td class="font-normal text-small text-muted nowrap" rowspan="3"{{ separatorStyle|raw }}>{{ loop.index }}</td>
+                                        <th{{ separatorStyle|raw }}>{{ call.name }}</th>
+                                        <td{{ separatorStyle|raw }}>{{ dump(call.argument) }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Result</th>
+                                        <td>{{ dump(call.result) }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Time</th>
+                                        <td>{{ '%0.2f'|format((call.end - call.start) * 1000) }} ms</td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td class="font-normal text-small text-muted nowrap"{{ separatorStyle|raw }}>{{ loop.index }}</td>
+                                        <th{{ separatorStyle|raw }}>{{ call.name }}</th>
+                                        <td{{ separatorStyle|raw }}>{{ '%0.2f'|format((call.end - call.start) * 1000) }} ms</td>
+                                    </tr>
+                                {% endif %}
                             {% endfor %}
                             </tbody>
                         </table>

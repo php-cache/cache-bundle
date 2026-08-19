@@ -22,7 +22,7 @@ final class CacheDataCollector extends DataCollector
     /** @var array<string, CacheProxyInterface> */
     private array $instances = [];
 
-    public function __construct()
+    public function __construct(private readonly bool $includeValues = true)
     {
         $this->reset();
     }
@@ -42,8 +42,13 @@ final class CacheDataCollector extends DataCollector
         $statistics = $this->calculateStatistics($calls);
         foreach ($calls as $poolCalls) {
             foreach ($poolCalls as $call) {
-                $call->result = $this->cloneVar($call->result);
-                $call->argument = $this->cloneVar($call->argument);
+                if ($this->includeValues) {
+                    $call->result = $this->cloneVar($call->result);
+                    $call->argument = $this->cloneVar($call->argument);
+                } else {
+                    $call->result = null;
+                    $call->argument = null;
+                }
             }
         }
 
@@ -70,6 +75,11 @@ final class CacheDataCollector extends DataCollector
     public function getName(): string
     {
         return 'php-cache';
+    }
+
+    public function getIncludeValues(): bool
+    {
+        return $this->includeValues;
     }
 
     /**

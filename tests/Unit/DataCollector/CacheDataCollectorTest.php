@@ -21,6 +21,11 @@ use Cache\CacheBundle\DataCollector\TraceableCachePool;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Twig\Environment;
+use Twig\Loader\ArrayLoader;
+use Twig\Loader\ChainLoader;
+use Twig\Loader\FilesystemLoader;
+use Twig\TwigFunction;
 
 final class CacheDataCollectorTest extends TestCase
 {
@@ -100,5 +105,65 @@ final class CacheDataCollectorTest extends TestCase
 
         self::assertSame(2, $collector->getTotals()['deletes']);
         self::assertNull($collector->getStatistics()['cache.pool']['hit_read_ratio']);
+    }
+
+    public function testCanDiscardCallValuesWithoutChangingStatistics()
+    {
+        $pool = new TraceableCachePool(new ArrayCachePool(), 'cache.pool');
+        $item = $pool->getItem('key')->set(['secret' => 'value']);
+        self::assertTrue($pool->save($item));
+        self::assertTrue($pool->hasItem('key'));
+
+        $collector = new CacheDataCollector(false);
+        $collector->addInstance('cache.pool', $pool);
+        $collector->collect(new Request(), new Response());
+
+        $calls = $collector->getCalls()['cache.pool'];
+        self::assertSame([null, null, null], array_column($calls, 'argument'));
+        self::assertSame([null, null, null], array_column($calls, 'result'));
+        self::assertSame([
+            'calls' => 3,
+            'time' => $collector->getStatistics()['cache.pool']['time'],
+            'reads' => 2,
+            'writes' => 1,
+            'deletes' => 0,
+            'hits' => 1,
+            'misses' => 1,
+            'hit_read_ratio' => 50.0,
+        ], $collector->getTotals());
+    }
+
+    public function testPanelOmitsValueColumnsWhenValuesAreDiscarded()
+    {
+        $pool = new TraceableCachePool(new ArrayCachePool(), 'cache.pool');
+        self::assertTrue($pool->save($pool->getItem('key')->set('secret-value')));
+        $collector = new CacheDataCollector(false);
+        $collector->addInstance('cache.pool', $pool);
+        $collector->collect(new Request(), new Response());
+
+        $html = $this->renderPanel($collector);
+
+        self::assertStringNotContainsString('secret-value', $html);
+        self::assertStringNotContainsString('<th class="key">Key</th>', $html);
+        self::assertStringNotContainsString('<th>Value</th>', $html);
+        self::assertStringContainsString('<th>Operation</th>', $html);
+        self::assertStringContainsString('<th>Time</th>', $html);
+    }
+
+    private function renderPanel(CacheDataCollector $collector): string
+    {
+        $cacheLoader = new FilesystemLoader();
+        $cacheLoader->addPath(__DIR__.'/../../../src/Resources/views', 'Cache');
+        $layoutLoader = new ArrayLoader([
+            '@WebProfiler/Profiler/layout.html.twig' => '{% block toolbar %}{% endblock %}{% block menu %}{% endblock %}{% block panel %}{% endblock %}',
+            '@WebProfiler/Profiler/toolbar_item.html.twig' => '',
+        ]);
+        $twig = new Environment(new ChainLoader([$layoutLoader, $cacheLoader]));
+        $twig->addFunction(new TwigFunction('dump', static fn (mixed $value): string => var_export($value, true)));
+
+        return $twig->render('@Cache/Collector/cache.html.twig', [
+            'collector' => $collector,
+            'profiler_url' => '#',
+        ]);
     }
 }

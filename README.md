@@ -47,6 +47,10 @@ cache:
   logging:
     enabled: true
     logger: monolog.logger.cache
+
+  data_collector:
+    enabled: true
+    include_values: false
 ```
 
 Enable Symfony sessions when using the session integration:
@@ -63,7 +67,9 @@ Symfony uses a local semaphore or file lock by default. That is sufficient for o
 
 The profiler collector is enabled by default in debug mode. Set `cache.data_collector.enabled` explicitly to override that default.
 
-Profiler decoration preserves native tag support. It records failed operations and tag invalidations, and clears its call buffer between requests in long-running workers.
+Set `cache.data_collector.include_values` to `false` when cached values are large or sensitive. The collector omits call arguments and results from profiler storage and the panel. It still records operations, timings, hit ratios, and per-pool statistics.
+
+Profiler decoration preserves native tag support. Chain providers keep member-level calls, so the panel shows each member's hits and misses. The collector records failed operations and tag invalidations. It also clears its call buffer between requests in long-running workers.
 
 Clear a configured pool with `bin/console cache:flush`:
 

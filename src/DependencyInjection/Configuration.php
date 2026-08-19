@@ -47,7 +47,9 @@ final class Configuration implements ConfigurationInterface
             $logging->children()->append($this->stringNode('logger')->defaultValue('logger'));
 
             $dataCollector = $children->arrayNode('data_collector')->addDefaultsIfNotSet();
-            $dataCollector->children()->booleanNode('enabled')->defaultNull();
+            $dataCollectorChildren = $dataCollector->children();
+            $dataCollectorChildren->booleanNode('enabled')->defaultNull();
+            $dataCollectorChildren->booleanNode('include_values')->defaultTrue();
         }
 
         return $treeBuilder;

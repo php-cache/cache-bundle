@@ -2,6 +2,16 @@
 
 The change log describes what is "Added", "Removed", "Changed" or "Fixed" between each release. 
 
+## 2.1.0
+
+### Added
+
+- Add `data_collector.include_values`. Set it to `false` to omit call arguments and results from profiler storage and the panel.
+
+### Fixed
+
+- Preserve `PhpCachePool` while profiling so chain providers compile and record each member's hits and misses.
+
 ## 2.0.0
 
 ### Added

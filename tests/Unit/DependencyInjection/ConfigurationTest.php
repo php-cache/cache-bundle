@@ -28,6 +28,7 @@ final class ConfigurationTest extends TestCase
         self::assertFalse($config['router']['enabled']);
         self::assertFalse($config['logging']['enabled']);
         self::assertNull($config['data_collector']['enabled']);
+        self::assertTrue($config['data_collector']['include_values']);
     }
 
     public function testProcessesRetainedIntegrationOptions()

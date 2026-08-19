@@ -81,6 +81,17 @@ final class CacheExtensionTest extends TestCase
         self::assertFalse($container->hasDefinition('cache.data_collector'));
     }
 
+    public function testDataCollectorCanDiscardValues()
+    {
+        $container = $this->createContainer(true);
+
+        (new CacheExtension())->load([[
+            'data_collector' => ['include_values' => false],
+        ]], $container);
+
+        self::assertFalse($container->getDefinition('cache.data_collector')->getArgument(0));
+    }
+
     private function createContainer(bool $debug): ContainerBuilder
     {
         $container = new ContainerBuilder();
