@@ -26,7 +26,7 @@
         "cache/prefixed-cache": "^2.0",
         "cache/session-handler": "^2.0",
         "cache/tag-interop": "^2.0",
-        "cache/taggable-cache": "^2.0",
+        "cache/taggable-cache": "^2.0 || ^3.0",
         "psr/cache": "^3.0",
         "psr/container": "^2.0",
         "symfony/config": "^6.4 || ^7.0 || ^8.0",
@@ -40,8 +40,8 @@
         "symfony/var-dumper": "^6.4 || ^7.0 || ^8.0"
     },
     "require-dev": {
-        "cache/array-adapter": "^2.0",
-        "cache/cache": "^2.0",
+        "cache/array-adapter": "^3.0",
+        "cache/cache": "^2.0 || ^3.0",
         "mockery/mockery": "^1.6",
         "nyholm/symfony-bundle-test": "^3.1",
         "php-cs-fixer/shim": "3.95.19",
@@ -71,7 +71,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "2.1-dev"
+            "dev-master": "2.2-dev"
         }
     },
     "scripts": {

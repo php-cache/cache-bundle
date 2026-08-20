@@ -2,6 +2,12 @@
 
 The change log describes what is "Added", "Removed", "Changed" or "Fixed" between each release. 
 
+## 2.2.0
+
+### Added
+
+- Support PHP Cache 3, including `cache/taggable-cache` 3.
+
 ## 2.1.0
 
 ### Added

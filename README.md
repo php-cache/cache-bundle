@@ -7,12 +7,12 @@
 
 This Symfony bundle connects PSR-6 cache pools to framework services. It supports session storage, route caching, PSR-3 logging, the Symfony profiler, and targeted cache clearing. Use [Adapter Bundle](https://github.com/php-cache/adapter-bundle) when you also need to register cache pool services from configuration.
 
-Version 2 requires PHP 8.2 or newer, Symfony 6.4, 7, or 8, PSR Cache 3, and PHP Cache 2 packages.
+Version 2.2 requires PHP 8.2 or newer, Symfony 6.4, 7, or 8, and PSR Cache 3. It supports PHP Cache 2 and 3 aggregate releases.
 
 ## Installation
 
 ```bash
-composer require cache/cache-bundle:^2.0
+composer require cache/cache-bundle:^2.2
 ```
 
 Symfony Flex may register the bundle automatically. Otherwise, add it to `config/bundles.php`:
@@ -80,6 +80,14 @@ bin/console cache:flush symfony
 bin/console cache:flush provider cache.provider.app
 bin/console cache:flush all
 ```
+
+## Using version 3 packages
+
+CacheBundle 2.2 supports PHP Cache 3 while it remains compatible with PHP Cache 2.
+
+PHP Cache 3 stores a generation snapshot with each tagged item. Each tag also has a generation marker. Version 2 workers cannot safely read or update this storage format.
+
+Stop or drain all workers, clear each shared cache, and then deploy CacheBundle 2.2 with PHP Cache 3. Use the same sequence before a rollback.
 
 ## Upgrading from 1.x
 
